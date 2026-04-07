@@ -1,0 +1,162 @@
+<!-- 购物车页面 -->
+<scroll-view class="scrollarea" scroll-y type="list">
+  <!-- 头部导航 -->
+  <view class="header-nav">
+    <view class="nav-left" bindtap="onBackClick">
+      <text class="back-icon">←</text>
+    </view>
+    <text class="nav-title">购物车</text>
+    <view class="nav-right" bindtap="onEditClick">
+      <text class="edit-text">{{isEditMode ? '完成' : '编辑'}}</text>
+    </view>
+  </view>
+
+  <!-- 商家信息 -->
+  <view class="store-section" wx:if="{{cartItems.length > 0}}">
+    <view class="store-header">
+      <view class="store-info">
+        <text class="fa fa-store store-logo"></text>
+        <view class="store-details">
+          <text class="store-name">{{storeInfo.name}}</text>
+          <view class="delivery-tags">
+            <text class="tag">{{storeInfo.distance}}</text>
+            <text class="tag">{{storeInfo.deliveryTime}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 购物车列表 -->
+  <view class="cart-section" wx:if="{{cartItems.length > 0}}">
+    <view class="cart-items">
+      <view class="cart-item" wx:for="{{cartItems}}" wx:key="id" wx:for-index="index">
+        <!-- 选择框 -->
+        <view class="item-select">
+          <checkbox class="item-checkbox" value="{{item.id}}" checked="{{item.selected}}" bind:change="onItemSelect" data-item-id="{{item.id}}" />
+        </view>
+
+        <!-- 商品图片 -->
+        <view class="item-image">
+          <image class="food-image"
+                 src="{{item.image || '/images/foods/beef_noodles.png'}}"
+                 mode="aspectFill"
+                 binderror="onImageError"
+                 data-index="{{index}}"></image>
+          <text class="fa fa-utensils food-icon" wx:if="{{!item.image && !item.imageError}}"></text>
+        </view>
+
+        <!-- 商品信息 -->
+        <view class="item-info">
+          <view class="item-header">
+            <text class="food-name">{{item.name}}</text>
+          </view>
+
+          <view class="item-middle">
+            <text class="food-price">¥{{item.price}}</text>
+            <text class="food-subtotal" wx:if="{{item.quantity > 1}}">小计：¥{{item.itemTotal}}</text>
+          </view>
+
+          <!-- 数量控制 -->
+          <view class="quantity-control">
+            <button class="quantity-btn minus-btn" bindtap="onQuantityMinus" data-item-id="{{item.id}}" hover-class="btn-hover">−</button>
+            <input class="quantity-input" type="number" value="{{item.quantity}}" data-item-id="{{item.id}}" bind:change="onQuantityChange" disabled="{{isEditMode}}" />
+            <button class="quantity-btn plus-btn" bindtap="onQuantityPlus" data-item-id="{{item.id}}" hover-class="btn-hover">+</button>
+          </view>
+        </view>
+
+        <!-- 删除按钮 -->
+        <view class="item-delete" wx:if="{{isEditMode}}">
+          <button class="delete-btn" bindtap="onDeleteItem" data-item-id="{{item.id}}" hover-class="delete-hover">删除</button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空购物车提示 -->
+  <view class="empty-cart" wx:else>
+    <view class="empty-content">
+      <text class="fa fa-shopping-cart empty-icon"></text>
+      <text class="empty-text">购物车空空如也</text>
+      <text class="empty-subtext">快去挑选心仪的美食吧</text>
+      <button class="go-shopping-btn" bindtap="onGoShopping">去逛逛</button>
+    </view>
+  </view>
+
+  <!-- 优惠券区域 -->
+  <view class="coupon-section" wx:if="{{cartItems.length > 0}}">
+    <view class="coupon-header" bindtap="onSelectCoupon">
+      <view class="coupon-left">
+        <text class="fa fa-ticket-alt coupon-icon"></text>
+        <text class="section-title">优惠券</text>
+      </view>
+      <view class="coupon-info">
+        <text class="coupon-text">{{selectedCoupon ? selectedCoupon.name : '选择优惠券'}}</text>
+        <text class="arrow-icon">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 费用明细 -->
+  <view class="cost-section" wx:if="{{cartItems.length > 0}}">
+    <text class="section-title">费用明细</text>
+    <view class="cost-details">
+      <view class="cost-row">
+        <text class="cost-label">商品小计</text>
+        <text class="cost-value">¥{{subtotal}}</text>
+      </view>
+      <view class="cost-row">
+        <text class="cost-label">配送费</text>
+        <text class="cost-value">¥{{deliveryFee}}</text>
+      </view>
+      <view class="cost-row" wx:if="{{selectedCoupon}}">
+        <text class="cost-label">优惠券减免</text>
+        <text class="cost-value discount">-¥{{selectedCoupon.discount}}</text>
+      </view>
+      <view class="cost-row cost-row-divider total-row">
+        <text class="total-label">实付金额</text>
+        <view class="total-price-wrapper">
+          <text class="total-value">¥{{totalAmount}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 推荐商品 -->
+  <view class="recommend-section" wx:if="{{cartItems.length > 0}}">
+    <text class="section-title">推荐商品</text>
+    <view class="recommend-list">
+      <view class="recommend-item" wx:for="{{recommendItems}}" wx:key="id" wx:for-index="index" bindtap="onAddRecommend" data-item="{{item}}">
+        <view class="recommend-img-wrapper">
+          <image class="recommend-image"
+                 src="{{item.image || '/images/foods/beef_noodles.png'}}"
+                 mode="aspectFill"
+                 binderror="onRecommendImageError"
+                 data-index="{{index}}"></image>
+        </view>
+        <text class="recommend-name">{{item.name}}</text>
+        <text class="recommend-price">¥{{item.price}}</text>
+        <button class="add-btn" catchtap="onAddRecommend" data-item="{{item}}" hover-class="add-hover">+</button>
+      </view>
+    </view>
+  </view>
+</scroll-view>
+
+<!-- 底部结算栏 -->
+<view class="bottom-settle" wx:if="{{cartItems.length > 0}}">
+  <view class="settle-left">
+    <view class="select-all-wrapper">
+      <checkbox class="select-all" checked="{{allSelected}}" bind:change="onSelectAll" />
+      <text class="select-text">全选</text>
+    </view>
+    <text class="selected-count">已选 {{selectedCount}} 件</text>
+  </view>
+  <view class="settle-right">
+    <view class="total-wrapper">
+      <text class="total-text">合计：</text>
+      <text class="total-amount">¥{{totalAmount}}</text>
+    </view>
+    <button class="settle-btn" bindtap="onSettle" hover-class="settle-hover">去结算</button>
+  </view>
+</view>
+

@@ -1,0 +1,109 @@
+<!-- 地址编辑页面 -->
+<scroll-view class="container" scroll-y>
+  <!-- 头部 -->
+  <view class="header">
+    <text class="header-title">{{isEditMode ? '编辑地址' : '新增地址'}}</text>
+    <text class="header-subtitle">{{isEditMode ? '修改您的收货地址信息' : '添加一个新的收货地址'}}</text>
+  </view>
+
+  <!-- 表单区域 -->
+  <view class="form-section">
+    <!-- 收货人姓名 -->
+    <view class="form-item">
+      <view class="item-label">
+        <text class="required">*</text>
+        <text class="label-text">收货人姓名</text>
+      </view>
+      <input class="item-input {{errors.name ? 'error' : ''}}" 
+             placeholder="请输入收货人姓名" 
+             value="{{formData.name}}"
+             bindinput="onFormInput" data-field="name"/>
+      <text class="error-text" wx:if="{{errors.name}}">{{errors.name}}</text>
+    </view>
+
+    <!-- 手机号码 -->
+    <view class="form-item">
+      <view class="item-label">
+        <text class="required">*</text>
+        <text class="label-text">手机号码</text>
+      </view>
+      <input class="item-input {{errors.phone ? 'error' : ''}}" 
+             placeholder="请输入手机号码" 
+             type="number"
+             maxlength="11"
+             value="{{formData.phone}}"
+             bindinput="onFormInput" data-field="phone"/>
+      <text class="error-text" wx:if="{{errors.phone}}">{{errors.phone}}</text>
+    </view>
+
+    <!-- 省市区 -->
+    <view class="form-item">
+      <view class="item-label">
+        <text class="required">*</text>
+        <text class="label-text">省市区</text>
+      </view>
+      <picker class="item-picker {{errors.location ? 'error' : ''}}" 
+              mode="multiSelector" 
+              range="{{[regions.provinces, regions.cities, regions.districts]}}"
+              range-key="name"
+              value="{{regionIndex}}"
+              bindchange="onRegionChange"
+              bindcolumnchange="onRegionColumnChange">
+        <view class="picker-content">
+          <text class="picker-text">{{formData.province}} {{formData.city}} {{formData.district}}</text>
+          <text class="picker-arrow">▼</text>
+        </view>
+      </picker>
+      <text class="error-text" wx:if="{{errors.location}}">{{errors.location}}</text>
+    </view>
+
+    <!-- 详细地址 -->
+    <view class="form-item">
+      <view class="item-label">
+        <text class="required">*</text>
+        <text class="label-text">详细地址</text>
+      </view>
+      <textarea class="item-textarea {{errors.detail ? 'error' : ''}}" 
+                placeholder="请输入详细的街道地址" 
+                value="{{formData.detail}}"
+                bindinput="onFormInput" data-field="detail"
+                maxlength="100"/>
+      <text class="error-text" wx:if="{{errors.detail}}">{{errors.detail}}</text>
+    </view>
+
+    <!-- 标签设置 -->
+    <view class="form-item">
+      <view class="item-label">
+        <text class="label-text">地址标签</text>
+      </view>
+      <view class="tag-list">
+        <view class="tag-item">
+          <checkbox class="tag-checkbox" value="isHome" checked="{{formData.isHome}}" bindtap="onToggleTag" data-tag="isHome"/>
+          <text class="tag-text">家</text>
+        </view>
+        <view class="tag-item">
+          <checkbox class="tag-checkbox" value="isWork" checked="{{formData.isWork}}" bindtap="onToggleTag" data-tag="isWork"/>
+          <text class="tag-text">公司</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 设为默认地址 -->
+    <view class="form-item switch">
+      <view class="item-label">
+        <text class="label-text">设为默认地址</text>
+      </view>
+      <switch checked="{{formData.isDefault}}" bindchange="onToggleDefault"/>
+    </view>
+  </view>
+
+  <!-- 底部按钮 -->
+  <view class="footer">
+    <button class="save-btn" bindtap="onSaveAddress">
+      <text class="btn-text">{{isEditMode ? '保存修改' : '保存地址'}}</text>
+    </button>
+  </view>
+
+  <!-- 底部安全区域 -->
+  <view class="safe-area-bottom"></view>
+</scroll-view>

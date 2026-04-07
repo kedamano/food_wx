@@ -1,0 +1,93 @@
+<!-- 商家详情页面 -->
+<view class="store-detail-page">
+  <!-- 头部导航 -->
+  <view class="header-nav">
+    <view class="nav-left" bindtap="onBackClick">
+      <text class="back-icon">←</text>
+    </view>
+    <text class="nav-title">商家详情</text>
+    <view class="nav-right" bindtap="onShareClick">
+      <text class="share-icon">⋯</text>
+    </view>
+  </view>
+
+  <!-- 商家信息 -->
+  <view class="store-header" wx:if="{{storeInfo}}">
+    <view class="store-banner">
+      <image class="banner-image" src="{{storeInfo.banner}}" mode="aspectFill"></image>
+    </view>
+    <view class="store-info-section">
+      <text class="store-name">{{storeInfo.name}}</text>
+      <view class="store-tags">
+        <text class="tag">{{storeInfo.distance}}</text>
+        <text class="tag">{{storeInfo.deliveryTime}}</text>
+        <text class="tag">人均 ¥{{storeInfo.price}}</text>
+      </view>
+      <view class="rating-wrapper">
+        <text class="rating">{{storeInfo.rating}}</text>
+        <text class="rating-label">评分</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 商家公告 -->
+  <view class="notice-section" wx:if="{{storeInfo}}">
+    <view class="section-header">
+      <text class="fa fa-bullhorn section-icon"></text>
+      <text class="section-title">商家公告</text>
+    </view>
+    <text class="notice-text">{{storeInfo.notice || '暂无公告'}}</text>
+  </view>
+
+  <!-- 商品分类 -->
+  <view class="category-section">
+    <scroll-view class="category-scroll" scroll-x>
+      <view class="category-list">
+        <view class="category-item {{currentCategory === 0 ? 'active' : ''}}" bindtap="onCategoryTap" data-category="0">
+          <text class="category-name">全部</text>
+        </view>
+        <view class="category-item {{currentCategory === item.id ? 'active' : ''}}" wx:for="{{categories}}" wx:key="id" bindtap="onCategoryTap" data-category="{{item.id}}">
+          <text class="category-name">{{item.name}}</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 商品列表 -->
+  <view class="food-section">
+    <view class="food-list">
+      <view class="food-item" wx:for="{{foodList}}" wx:key="id">
+        <view class="food-image">
+          <image class="food-img" src="{{item.image}}" mode="aspectFill"></image>
+        </view>
+        <view class="food-info">
+          <text class="food-name">{{item.name}}</text>
+          <text class="food-desc">{{item.description}}</text>
+          <view class="food-meta">
+            <text class="food-price">¥{{item.price}}</text>
+            <text class="food-sales">月售{{item.sales}}</text>
+          </view>
+          <button class="add-btn" bindtap="onAddToCart" data-item="{{item}}">+</button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态提示 -->
+  <view class="empty-state" wx:if="{{foodList.length === 0}}">
+    <text class="fa fa-utensils empty-icon"></text>
+    <text class="empty-text">暂无商品</text>
+  </view>
+
+  <!-- 底部购物车栏 -->
+  <view class="bottom-cart" wx:if="{{cartCount > 0}}">
+    <view class="cart-left">
+      <view class="cart-icon-wrapper">
+        <text class="fa fa-shopping-cart cart-icon"></text>
+        <text class="cart-count">{{cartCount}}</text>
+      </view>
+      <text class="cart-total">¥{{cartTotal}}</text>
+    </view>
+    <button class="settle-btn" bindtap="onSettle">去结算</button>
+  </view>
+</view>

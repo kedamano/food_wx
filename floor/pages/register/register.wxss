@@ -1,0 +1,406 @@
+/* pages/register/register.wxss */
+page {
+  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+}
+
+/* Logo区域 */
+.logo-section {
+  text-align: center;
+  padding: 60px 40px 40px;
+  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-section::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  transform: rotate(45deg);
+}
+
+.logo {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 20px;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  position: relative;
+  z-index: 1;
+}
+
+.app-name {
+  display: block;
+  font-size: 32px;
+  font-weight: bold;
+  color: #FFFFFF;
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.app-slogan {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  position: relative;
+  z-index: 1;
+}
+
+/* 注册表单 */
+.register-form {
+  flex: 1;
+  padding: 0 30px 40px;
+  margin-top: 20px;
+}
+
+.form-item {
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.item-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.label-icon {
+  font-size: 20px;
+  margin-right: 8px;
+}
+
+.label-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #212529;
+}
+
+.item-input {
+  width: 100%;
+  height: 56px;
+  background: #F8F9FA;
+  border: 1px solid #E9ECEF;
+  border-radius: 16px;
+  padding: 0 16px;
+  font-size: 16px;
+  color: #212529;
+  transition: all 0.3s ease;
+}
+
+.item-input:focus {
+  background: #FFFFFF;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+.input-placeholder {
+  color: #BDBDBD;
+}
+
+/* 验证码输入 */
+.verify-item {
+  position: relative;
+}
+
+.verify-input {
+  width: 100%;
+  height: 56px;
+  background: #F8F9FA;
+  border: 1px solid #E9ECEF;
+  border-radius: 16px;
+  padding: 0 130px 0 16px;
+  font-size: 16px;
+  color: #212529;
+}
+
+.verify-btn {
+  position: absolute;
+  right: 4px;
+  top: 40px;
+  height: 48px;
+  padding: 0 20px;
+  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 100px;
+}
+
+.verify-btn:disabled {
+  background: #BDBDBD;
+  cursor: not-allowed;
+}
+
+.verify-btn:active {
+  transform: scale(0.95);
+}
+
+/* 密码输入 */
+.password-toggle {
+  position: absolute;
+  right: 16px;
+  top: 40px;
+  font-size: 20px;
+  cursor: pointer;
+  color: #6C757D;
+  z-index: 1;
+  background: #F8F9FA;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.password-toggle:hover {
+  background: #E9ECEF;
+}
+
+/* 用户协议 */
+.user-agreement {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 30px 0;
+  padding: 0 10px;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+}
+
+.checkbox-label {
+  font-size: 14px;
+  color: #6C757D;
+}
+
+.link {
+  font-size: 14px;
+  color: #4CAF50;
+  font-weight: 500;
+  cursor: pointer;
+  margin: 0 4px;
+  position: relative;
+}
+
+.link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: #4CAF50;
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.link:hover::after {
+  transform: scaleX(1);
+}
+
+/* 注册按钮 */
+.register-btn {
+  width: 100%;
+  height: 56px;
+  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 28px;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 16px rgba(76, 175, 80, 0.3);
+  margin-bottom: 20px;
+}
+
+.register-btn:disabled {
+  background: #BDBDBD;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.register-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 4px 8px rgba(76, 175, 80, 0.2);
+}
+
+/* 错误提示 */
+.error-message {
+  display: block;
+  color: #FF5252;
+  font-size: 14px;
+  margin: 10px 0;
+  padding: 12px 16px;
+  background: rgba(255, 82, 82, 0.1);
+  border-radius: 8px;
+  border-left: 4px solid #FF5252;
+}
+
+/* 其他注册方式 */
+.other-register {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.divider-text {
+  display: inline-block;
+  padding: 0 20px;
+  background: #FFFFFF;
+  font-size: 14px;
+  color: #6C757D;
+  position: relative;
+}
+
+.divider-text::before,
+.divider-text::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 60px;
+  height: 1px;
+  background: #E9ECEF;
+}
+
+.divider-text::before {
+  left: -60px;
+}
+
+.divider-text::after {
+  right: -60px;
+}
+
+.social-register {
+  margin-top: 20px;
+}
+
+.social-btn {
+  width: 100%;
+  height: 48px;
+  background: #FFFFFF;
+  border: 1px solid #E9ECEF;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.social-btn:active {
+  transform: scale(0.98);
+}
+
+.social-btn.wechat {
+  background: #07C160;
+  color: #FFFFFF;
+  border-color: #07C160;
+}
+
+.social-icon {
+  font-size: 24px;
+  margin-right: 8px;
+}
+
+.social-text {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* 登录链接 */
+.login-link {
+  text-align: center;
+  padding: 20px 0 40px;
+}
+
+.link-text {
+  font-size: 14px;
+  color: #6C757D;
+}
+
+/* 响应式设计 */
+@media (max-width: 375px) {
+  .logo-section {
+    padding: 40px 20px 30px;
+  }
+
+  .logo {
+    width: 80px;
+    height: 80px;
+  }
+
+  .app-name {
+    font-size: 24px;
+  }
+
+  .register-form {
+    padding: 0 20px 30px;
+  }
+
+  .verify-input {
+    padding-right: 110px;
+  }
+
+  .verify-btn {
+    padding: 0 12px;
+    font-size: 12px;
+    min-width: 80px;
+  }
+}
+
+/* 动画效果 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.logo-section,
+.form-item,
+.user-agreement,
+.register-btn,
+.other-register,
+.login-link {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.form-item:nth-child(2) { animation-delay: 0.1s; }
+.form-item:nth-child(3) { animation-delay: 0.2s; }
+.form-item:nth-child(4) { animation-delay: 0.3s; }
+.form-item:nth-child(5) { animation-delay: 0.4s; }
+.user-agreement { animation-delay: 0.5s; }
+.register-btn { animation-delay: 0.6s; }
+.other-register { animation-delay: 0.7s; }
+.login-link { animation-delay: 0.8s; }

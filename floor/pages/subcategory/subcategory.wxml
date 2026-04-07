@@ -1,0 +1,62 @@
+NEW_FILE_CODE
+<!-- 子分类页面 -->
+<scroll-view class="scrollarea" scroll-y type="list">
+  <!-- 头部导航 -->
+  <view class="header-nav">
+    <view class="nav-left" bindtap="onBackClick">
+      <text class="back-icon">←</text>
+    </view>
+    <text class="nav-title">{{subcategoryName}}</text>
+    <view class="nav-right">
+    </view>
+  </view>
+
+  <!-- 美食列表 -->
+  <view class="food-section">
+    <view class="food-list">
+      <view class="food-item" wx:for="{{foodList}}" wx:key="id" bindtap="onFoodTap" data-food-id="{{item.id}}">
+        <view class="food-image">
+          <image class="food-img" src="{{item.image}}" mode="aspectFill"></image>
+        </view>
+        <view class="food-info">
+          <text class="food-name">{{item.name}}</text>
+          <text class="food-desc">{{item.description}}</text>
+          <view class="food-meta">
+            <text class="food-price">¥{{item.price}}</text>
+            <text class="food-sales">月售{{item.sales}}</text>
+            <view class="rating">
+              <text class="fa fa-star"></text>
+              <text class="rating-text">{{item.rating}}</text>
+            </view>
+          </view>
+          <button class="add-btn" bindtap="onAddToCart" data-item="{{item}}">+</button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{foodList.length === 0 && !isLoading}}">
+    <text class="fa fa-utensils empty-icon"></text>
+    <text class="empty-text">暂无美食</text>
+    <text class="empty-subtext">该分类下暂无商品</text>
+  </view>
+
+  <!-- 加载动画 -->
+  <view class="loading" wx:if="{{isLoading}}">
+    <text class="loading-spinner"></text>
+    <text class="loading-text">正在加载...</text>
+  </view>
+</scroll-view>
+
+<!-- 底部购物车栏 -->
+<view class="bottom-cart" wx:if="{{cartItems.length > 0}}">
+  <view class="cart-left">
+    <view class="cart-icon-wrapper">
+      <text class="fa fa-shopping-cart cart-icon"></text>
+      <text class="cart-count" wx:if="{{cartCount > 0}}">{{cartCount}}</text>
+    </view>
+    <text class="cart-total">¥{{cartTotal}}</text>
+  </view>
+  <button class="settle-btn" bindtap="onSettle">去结算</button>
+</view>

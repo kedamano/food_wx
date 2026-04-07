@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.food.mapper.StoreMapper">
+
+    <resultMap id="BaseResultMap" type="com.food.entity.Store">
+        <id column="store_id" jdbcType="INTEGER" property="storeId"/>
+        <result column="store_name" jdbcType="VARCHAR" property="storeName"/>
+        <result column="logo" jdbcType="VARCHAR" property="logo"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="rating" jdbcType="DECIMAL" property="rating"/>
+        <result column="delivery_time" jdbcType="INTEGER" property="deliveryTime"/>
+        <result column="delivery_fee" jdbcType="DECIMAL" property="deliveryFee"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <sql id="BaseColumnList">
+        store_id, store_name, logo, address, phone, rating, delivery_time, delivery_fee, status, create_time, update_time
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="storeId">
+        INSERT INTO stores (
+            store_name, logo, address, phone, rating, delivery_time, delivery_fee, status
+        ) VALUES (
+            #{storeName}, #{logo}, #{address}, #{phone}, #{rating}, #{deliveryTime}, #{deliveryFee}, #{status}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE stores
+        SET store_name = #{storeName},
+            logo = #{logo},
+            address = #{address},
+            phone = #{phone},
+            rating = #{rating},
+            delivery_time = #{deliveryTime},
+            delivery_fee = #{deliveryFee},
+            status = #{status},
+            update_time = CURRENT_TIMESTAMP
+        WHERE store_id = #{storeId}
+    </update>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM stores
+        WHERE store_id = #{storeId}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM stores
+        WHERE status = 1
+        ORDER BY rating DESC
+    </select>
+
+    <select id="searchByName" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM stores
+        WHERE store_name LIKE CONCAT('%', #{storeName}, '%') AND status = 1
+        ORDER BY rating DESC
+    </select>
+
+</mapper>

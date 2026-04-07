@@ -1,0 +1,158 @@
+<!-- 订单详情页面 -->
+<scroll-view class="scrollarea" scroll-y type="list">
+  <!-- 头部导航 -->
+  <view class="header-nav">
+    <view class="nav-left" bindtap="onBackClick">
+      <text class="back-icon">←</text>
+    </view>
+    <text class="nav-title">订单详情</text>
+    <view class="nav-right" bindtap="onShareOrder">
+      <text class="fa fa-share-alt share-icon"></text>
+    </view>
+  </view>
+
+  <!-- 订单状态 -->
+  <view class="order-status-section">
+    <view class="status-header">
+      <text class="status-icon">{{statusIcon}}</text>
+      <text class="status-text">{{orderInfo.statusText}}</text>
+      <text class="status-desc">{{statusDesc}}</text>
+    </view>
+    <view class="status-progress" wx:if="{{statusSteps.length > 0}}">
+      <view class="progress-item {{item.completed ? 'completed' : ''}} {{item.active ? 'active' : ''}}" wx:for="{{statusSteps}}" wx:key="index">
+        <view class="progress-dot"></view>
+        <text class="progress-text">{{item.name}}</text>
+        <text class="progress-time" wx:if="{{item.time}}">{{item.time}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 配送信息 -->
+  <view class="delivery-section" wx:if="{{orderInfo.status !== 'pending'}}">
+    <text class="section-title">配送信息</text>
+    <view class="delivery-info">
+      <view class="delivery-man">
+        <image class="delivery-avatar" src="{{deliveryInfo.avatar}}" mode="aspectFill"></image>
+        <view class="delivery-details">
+          <text class="delivery-name">{{deliveryInfo.name}}</text>
+          <text class="delivery-phone">{{deliveryInfo.phone}}</text>
+        </view>
+        <button class="contact-btn" bindtap="onContactDelivery">联系骑手</button>
+      </view>
+      <view class="delivery-progress">
+        <text class="progress-text">{{deliveryInfo.progress}}</text>
+        <text class="progress-time">{{deliveryInfo.estimatedTime}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 收货地址 -->
+  <view class="address-section">
+    <text class="section-title">收货地址</text>
+    <view class="address-info">
+      <view class="address-user">
+        <text class="user-name">{{orderInfo.address.name}}</text>
+        <text class="user-phone">{{orderInfo.address.phone}}</text>
+      </view>
+      <text class="address-detail">{{orderInfo.address.province}} {{orderInfo.address.city}} {{orderInfo.address.district}} {{orderInfo.address.detail}}</text>
+    </view>
+  </view>
+
+  <!-- 商家信息 -->
+  <view class="store-section">
+    <text class="section-title">商家信息</text>
+    <view class="store-info">
+      <text class="fa fa-store store-icon"></text>
+      <text class="store-name">{{orderInfo.store.name}}</text>
+      <text class="store-distance">{{orderInfo.store.distance}}</text>
+    </view>
+  </view>
+
+  <!-- 商品清单 -->
+  <view class="items-section">
+    <text class="section-title">商品清单</text>
+    <view class="item-list">
+      <view class="item-row" wx:for="{{orderInfo.items}}" wx:key="foodId">
+        <view class="item-image">
+          <image class="food-image" src="{{item.image}}" mode="aspectFill"></image>
+          <text class="fa fa-utensils food-icon" wx:if="{{!item.image}}"></text>
+        </view>
+        <view class="item-details">
+          <text class="item-name">{{item.name}}</text>
+          <text class="item-spec" wx:if="{{item.spec}}">{{item.spec}}</text>
+          <text class="item-quantity">x{{item.quantity}}</text>
+          <text class="item-price">¥{{item.price}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 费用明细 -->
+  <view class="cost-section">
+    <text class="section-title">费用明细</text>
+    <view class="cost-details">
+      <view class="cost-row">
+        <text class="cost-label">商品小计</text>
+        <text class="cost-value">¥{{orderInfo.subtotal}}</text>
+      </view>
+      <view class="cost-row">
+        <text class="cost-label">配送费</text>
+        <text class="cost-value">¥{{orderInfo.deliveryFee}}</text>
+      </view>
+      <view class="cost-row" wx:if="{{orderInfo.discount > 0}}">
+        <text class="cost-label">优惠金额</text>
+        <text class="cost-value discount">-¥{{orderInfo.discount}}</text>
+      </view>
+      <view class="cost-row total">
+        <text class="total-label">实付金额</text>
+        <text class="total-value">¥{{orderInfo.finalAmount}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 订单信息 -->
+  <view class="order-info-section">
+    <text class="section-title">订单信息</text>
+    <view class="info-row">
+      <text class="info-label">订单编号</text>
+      <text class="info-value">{{orderInfo.orderId}}</text>
+      <text class="copy-btn" bindtap="onCopyOrderId">复制</text>
+    </view>
+    <view class="info-row">
+      <text class="info-label">下单时间</text>
+      <text class="info-value">{{orderInfo.orderTime}}</text>
+    </view>
+    <view class="info-row" wx:if="{{orderInfo.payTime}}">
+      <text class="info-label">支付时间</text>
+      <text class="info-value">{{orderInfo.payTime}}</text>
+    </view>
+    <view class="info-row" wx:if="{{orderInfo.deliveryTime}}">
+      <text class="info-label">送达时间</text>
+      <text class="info-value">{{orderInfo.deliveryTime}}</text>
+    </view>
+    <view class="info-row" wx:if="{{orderInfo.remark}}">
+      <text class="info-label">备注信息</text>
+      <text class="info-value">{{orderInfo.remark}}</text>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-section">
+    <block wx:if="{{orderInfo.status === 'pending'}}">
+      <button class="action-btn cancel-btn" bindtap="onCancelOrder">取消订单</button>
+      <button class="action-btn pay-btn" bindtap="onPayOrder">立即付款</button>
+    </block>
+    <block wx:if="{{orderInfo.status === 'preparing'}}">
+      <button class="action-btn remind-btn" bindtap="onRemindOrder">催单</button>
+    </block>
+    <block wx:if="{{orderInfo.status === 'delivering'}}">
+      <button class="action-btn track-btn" bindtap="onTrackDelivery">查看配送</button>
+      <button class="action-btn receive-btn" bindtap="onConfirmReceive">确认收货</button>
+    </block>
+    <block wx:if="{{orderInfo.status === 'completed'}}">
+      <button class="action-btn review-btn" bindtap="onReviewOrder">评价</button>
+      <button class="action-btn again-btn" bindtap="onOrderAgain">再来一单</button>
+    </block>
+    <button class="action-btn help-btn" bindtap="onHelp">联系客服</button>
+  </view>
+</scroll-view>

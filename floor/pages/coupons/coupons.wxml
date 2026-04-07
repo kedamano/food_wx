@@ -1,0 +1,93 @@
+<!-- 优惠券管理 - 精致版 -->
+<scroll-view class="container" scroll-y>
+  <!-- 积分头部 -->
+  <view class="points-header">
+    <view class="points-content">
+      <text class="points-label">优惠券</text>
+      <view class="points-balance">
+        <text class="points-number">{{couponStats.available}}</text>
+        <text class="points-text">张可用</text>
+      </view>
+    </view>
+    <button class="exchange-btn" bindtap="onExchangeCoupon">
+      <text class="btn-text">兑换</text>
+      <text class="btn-icon">→</text>
+    </button>
+  </view>
+
+  <!-- 分类标签 -->
+  <view class="coupon-tabs">
+    <view class="tab-item {{activeTab === 'available' ? 'active' : ''}}" bindtap="onTabChange" data-tab="available">
+      <text class="tab-text">可用</text>
+      <text class="tab-badge">{{couponStats.available}}</text>
+    </view>
+    <view class="tab-item {{activeTab === 'used' ? 'active' : ''}}" bindtap="onTabChange" data-tab="used">
+      <text class="tab-text">已使用</text>
+      <text class="tab-badge">{{couponStats.used}}</text>
+    </view>
+    <view class="tab-item {{activeTab === 'expired' ? 'active' : ''}}" bindtap="onTabChange" data-tab="expired">
+      <text class="tab-text">已过期</text>
+      <text class="tab-badge">{{couponStats.expired}}</text>
+    </view>
+  </view>
+
+  <!-- 优惠券列表 -->
+  <view class="coupon-list">
+    <view class="coupon-card {{item.status}}" wx:for="{{displayCoupons}}" wx:key="id" bindtap="onSelectCoupon" data-coupon="{{item}}">
+      <!-- 优惠券主体 -->
+      <view class="coupon-main">
+        <view class="coupon-amount">
+          <text class="amount-symbol">¥</text>
+          <text class="amount-value">{{item.discount}}</text>
+        </view>
+        <view class="coupon-info">
+          <text class="coupon-name">{{item.name}}</text>
+          <text class="coupon-condition">{{item.condition}}</text>
+          <text class="coupon-expiry">{{item.expiry}}</text>
+        </view>
+        <view class="coupon-status">
+          <text class="status-text">{{item.statusText}}</text>
+          <view class="status-icon">
+            <text class="icon">{{item.statusIcon}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 优惠券装饰 -->
+      <view class="coupon-decoration">
+        <view class="circle left"></view>
+        <view class="circle right"></view>
+        <view class="dashed-line"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 推荐优惠券 -->
+  <view class="recommend-section" wx:if="{{activeTab === 'available' && recommendCoupons.length > 0}}">
+    <view class="section-header">
+      <text class="section-title">推荐兑换</text>
+      <text class="section-desc">限时优惠，先到先得</text>
+    </view>
+    <view class="recommend-list">
+      <view class="recommend-card" wx:for="{{recommendCoupons}}" wx:key="id" bindtap="onRecommendCoupon" data-coupon="{{item}}">
+        <text class="fa fa-gift recommend-icon"></text>
+        <view class="recommend-info">
+          <text class="recommend-name">{{item.name}}</text>
+          <text class="recommend-discount">¥{{item.discount}}</text>
+          <text class="recommend-condition">{{item.condition}}</text>
+        </view>
+        <text class="recommend-btn">兑换</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{displayCoupons.length === 0}}">
+    <view class="empty-icon fa {{activeTab === 'available' ? 'fa-ticket-alt' : 'fa-clipboard'}}"></view>
+    <text class="empty-title">{{activeTab === 'available' ? '暂无可用优惠券' : '暂无优惠券记录'}}</text>
+    <text class="empty-desc" wx:if="{{activeTab === 'available'}}">去积分商城兑换更多优惠券</text>
+  </view>
+
+  <!-- 底部安全区域 -->
+  <view class="safe-area-bottom"></view>
+</scroll-view>

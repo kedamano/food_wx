@@ -1,0 +1,62 @@
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# Java
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.logs
+*.log
+
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
+
+# Spring Boot
+*.properties
+application-local.properties
+application-dev.properties
+application-prod.properties
+
+# Database
+*.db
+*.sqlite
+
+# WeChat Mini Program
+package-lock.json
+miniprogram_npm/
+service/
+components/
+pages/*/sitemap.json
+pages/*/module.wxml
+pages.*.js
+sitemap.json
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# WorkBuddy
+.workbuddy/

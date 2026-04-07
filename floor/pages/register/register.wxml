@@ -1,0 +1,164 @@
+<view class="container">
+  <!-- Logo区域 -->
+  <view class="logo-section">
+    <image class="logo" src="/images/美团.png" mode="aspectFit"></image>
+    <text class="app-name">美食小程序</text>
+    <text class="app-slogan">开启美食之旅</text>
+  </view>
+
+  <!-- 注册表单 -->
+  <view class="register-form">
+    <form bindsubmit="onRegisterSubmit">
+      <!-- 用户名输入 -->
+      <view class="form-item">
+        <view class="item-label">
+          <text class="fa fa-user label-icon"></text>
+          <text class="label-text">用户名</text>
+        </view>
+        <input 
+          class="item-input" 
+          name="username"
+          placeholder="请输入用户名（3-20个字符）"
+          placeholder-class="input-placeholder"
+          value="{{username}}"
+          bindinput="onUsernameInput"
+        />
+      </view>
+
+      <!-- 手机号输入 -->
+      <view class="form-item">
+        <view class="item-label">
+          <text class="fa fa-mobile-alt label-icon"></text>
+          <text class="label-text">手机号</text>
+        </view>
+        <input 
+          class="item-input" 
+          name="phone"
+          type="number"
+          placeholder="请输入手机号"
+          placeholder-class="input-placeholder"
+          value="{{phone}}"
+          bindinput="onPhoneInput"
+          maxlength="11"
+        />
+      </view>
+
+      <!-- 验证码输入 -->
+      <view class="form-item verify-item">
+        <view class="item-label">
+          <text class="fa fa-hashtag label-icon"></text>
+          <text class="label-text">验证码</text>
+        </view>
+        <input 
+          class="verify-input" 
+          name="verifyCode"
+          type="number"
+          placeholder="请输入验证码"
+          placeholder-class="input-placeholder"
+          value="{{verifyCode}}"
+          bindinput="onVerifyCodeInput"
+          maxlength="6"
+        />
+        <button 
+          class="verify-btn" 
+          bindtap="onGetVerifyCode"
+          disabled="{{isGettingCode}}"
+          loading="{{isGettingCode}}"
+        >
+          {{isGettingCode ? countdown + 's' : '获取验证码'}}
+        </button>
+      </view>
+
+      <!-- 密码输入 -->
+      <view class="form-item">
+        <view class="item-label">
+          <text class="label-icon">🔒</text>
+          <text class="label-text">密码</text>
+        </view>
+        <input 
+          class="item-input" 
+          name="password"
+          type="{{showPassword ? 'text' : 'password'}}"
+          placeholder="请输入密码（至少6位）"
+          placeholder-class="input-placeholder"
+          value="{{password}}"
+          bindinput="onPasswordInput"
+        />
+        <text class="fa {{showPassword ? 'fa-eye-slash' : 'fa-eye'}} password-toggle" bindtap="onTogglePassword"></text>
+      </view>
+
+      <!-- 确认密码输入 -->
+      <view class="form-item">
+        <view class="item-label">
+          <text class="fa fa-lock label-icon"></text>
+          <text class="label-text">确认密码</text>
+        </view>
+        <input 
+          class="item-input" 
+          name="confirmPassword"
+          type="{{showConfirmPassword ? 'text' : 'password'}}"
+          placeholder="请再次输入密码"
+          placeholder-class="input-placeholder"
+          value="{{confirmPassword}}"
+          bindinput="onConfirmPasswordInput"
+        />
+        <text class="fa {{showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'}} password-toggle" bindtap="onToggleConfirmPassword"></text>
+      </view>
+
+      <!-- 邀请码输入 -->
+      <view class="form-item">
+        <view class="item-label">
+          <text class="fa fa-gift label-icon"></text>
+          <text class="label-text">邀请码（可选）</text>
+        </view>
+        <input 
+          class="item-input" 
+          name="inviteCode"
+          placeholder="请输入邀请码"
+          placeholder-class="input-placeholder"
+          value="{{inviteCode}}"
+          bindinput="onInviteCodeInput"
+        />
+      </view>
+
+      <!-- 用户协议 -->
+      <view class="user-agreement">
+        <checkbox class="checkbox" value="{{agreeTerms}}" bindtap="onToggleAgree" />
+        <text class="checkbox-label">我已阅读并同意</text>
+        <text class="link" bindtap="onShowTerms">《用户协议》</text>
+        <text class="checkbox-label">和</text>
+        <text class="link" bindtap="onShowPrivacy">《隐私政策》</text>
+      </view>
+
+      <!-- 注册按钮 -->
+      <button 
+        class="register-btn" 
+        form-type="submit"
+        loading="{{isLoading}}"
+        disabled="{{isLoading}}"
+      >
+        {{isLoading ? '注册中...' : '注册'}}
+      </button>
+    </form>
+
+    <!-- 错误提示 -->
+    <text class="error-message" wx:if="{{errorMessage}}">{{errorMessage}}</text>
+
+    <!-- 其他注册方式 -->
+    <view class="other-register">
+      <text class="divider-text">快速注册</text>
+      <view class="social-register">
+        <button class="social-btn wechat" bindtap="onWeChatRegister">
+          <text class="fa fa-weixin social-icon"></text>
+          <text class="social-text">微信一键注册</text>
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 登录链接 -->
+  <view class="login-link">
+    <text class="link-text">已有账号？</text>
+    <text class="link" bindtap="onGoToLogin">立即登录</text>
+  </view>
+</view>

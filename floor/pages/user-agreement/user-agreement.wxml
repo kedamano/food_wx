@@ -1,0 +1,91 @@
+<!-- 用户协议页面 -->
+<scroll-view class="container" scroll-y>
+  <view class="header">
+    <view class="back-btn" bindtap="onBack">
+      <text class="fa fa-arrow-left"></text>
+    </view>
+    <text class="header-title">用户协议</text>
+    <view class="header-placeholder"></view>
+  </view>
+
+  <view class="content">
+    <view class="agreement-header">
+      <text class="agreement-title">美食小程序用户服务协议</text>
+      <text class="agreement-date">更新日期：{{lastUpdate}}</text>
+    </view>
+
+    <view class="agreement-section">
+      <text class="section-title">一、服务说明</text>
+      <text class="section-text">欢迎使用美食小程序！本协议是您与美食小程序之间关于使用我们服务订立的协议。请在使用前仔细阅读本协议，您使用本服务即表示您已同意本协议的全部内容。</text>
+    </view>
+
+    <view class="agreement-section">
+      <text class="section-title">二、服务内容</text>
+      <text class="section-text">美食小程序致力于为用户提供：</text>
+      <view class="agreement-list">
+        <text class="list-item">• 美食浏览和搜索服务</text>
+        <text class="list-item">• 在线订餐和配送服务</text>
+        <text class="list-item">• 订单管理服务</text>
+        <text class="list-item">• 用户评价和分享服务</text>
+        <text class="list-item">• 优惠信息和会员服务</text>
+      </view>
+    </view>
+
+    <view class="agreement-section">
+      <text class="section-title">三、用户注册</text>
+      <text class="section-text">您在使用本服务前需要注册成为我们的用户。您保证：</text>
+      <view class="agreement-list">
+        <text class="list-item">• 提供真实、准确的个人信息</text>
+        <text class="list-item">• 及时更新注册信息</text>
+        <text class="list-item">• 妥善保管账号和密码</text>
+        <text class="list-item">• 对账户活动负责</text>
+      </view>
+    </view>
+
+    <view class="agreement-section">
+      <text class="section-title">四、订单规则</text>
+      <view class="agreement-list">
+        <text class="list-item">• 您下单后，商家确认接单即表示订单生效</text>
+        <text class="list-item">• 配送时间受天气、交通等因素影响</text>
+        <text class="list-item">• 如有质量问题，请在收到餐品后及时联系客服</text>
+        <text class="list-item">• 取消订单需在商家接单前操作</text>
+      </view>
+    </view>
+
+    <view class="agreement-section">
+      <text class="section-title">五、用户行为</text>
+      <text class="section-text">您承诺：</text>
+      <view class="agreement-list">
+        <text class="list-item">• 不利用本服务从事违法活动</text>
+        <text class="list-item">• 不发布虚假信息或恶意评价</text>
+        <text class="list-item">• 不侵犯他人合法权益</text>
+        <text class="list-item">• 不干扰本服务的正常运营</text>
+      </view>
+    </view>
+
+    <view class="agreement-section">
+      <text class="section-title">六、知识产权</text>
+      <text class="section-text">美食小程序的所有内容，包括但不限于文字、图片、标志、商标等，均受知识产权法律保护。未经授权，您不得擅自复制、修改或传播。</text>
+    </view>
+
+    <view class="agreement-section">
+      <text class="section-title">七、免责声明</text>
+      <text class="section-text">因以下情况造成服务中断或损失，我们不承担责任：</text>
+      <view class="agreement-list">
+        <text class="list-item">• 不可抗力因素</text>
+        <text class="list-item">• 第三方原因导致的损失</text>
+        <text class="list-item">• 用户自身原因导致的损失</text>
+      </view>
+    </view>
+
+    <view class="agreement-section">
+      <text class="section-title">八、协议修改</text>
+      <text class="section-text">我们有权随时修改本协议，修改后的协议一经公布即生效。如您不同意修改，请停止使用服务。</text>
+    </view>
+
+    <view class="agreement-section">
+      <text class="section-title">九、联系我们</text>
+      <text class="section-text">如您对本协议有任何疑问，请联系我们的客服团队。</text>
+    </view>
+  </view>
+</scroll-view>

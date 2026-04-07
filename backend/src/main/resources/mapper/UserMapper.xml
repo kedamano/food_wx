@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.food.mapper.UserMapper">
+
+    <resultMap id="BaseResultMap" type="com.food.entity.User">
+        <id column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="username" jdbcType="VARCHAR" property="username"/>
+        <result column="password" jdbcType="VARCHAR" property="password"/>
+        <result column="avatar" jdbcType="VARCHAR" property="avatar"/>
+        <result column="level" jdbcType="VARCHAR" property="level"/>
+        <result column="points" jdbcType="INTEGER" property="points"/>
+        <result column="phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="invite_code" jdbcType="VARCHAR" property="inviteCode"/>
+        <result column="invited_by" jdbcType="INTEGER" property="invitedBy"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <sql id="BaseColumnList">
+        user_id, username, password, avatar, level, points, phone, invite_code, invited_by, create_time, update_time
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO users (
+            username, password, avatar, level, points, phone, invite_code, invited_by
+        ) VALUES (
+            #{username}, #{password}, #{avatar}, #{level}, #{points}, #{phone}, #{inviteCode}, #{invitedBy}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE users
+        SET username = #{username},
+            avatar = #{avatar},
+            level = #{level},
+            points = #{points},
+            phone = #{phone},
+            update_time = CURRENT_TIMESTAMP
+        WHERE user_id = #{userId}
+    </update>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM users
+        WHERE user_id = #{userId}
+    </select>
+
+    <select id="selectByUsername" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM users
+        WHERE username = #{username}
+    </select>
+
+    <select id="selectByPhone" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM users
+        WHERE phone = #{phone}
+    </select>
+
+    <select id="selectByInviteCode" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM users
+        WHERE invite_code = #{inviteCode}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM users
+        ORDER BY create_time DESC
+    </select>
+
+    <delete id="deleteById">
+        DELETE FROM users
+        WHERE user_id = #{userId}
+    </delete>
+
+</mapper>

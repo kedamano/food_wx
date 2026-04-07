@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.food.mapper.BannerMapper">
+
+    <resultMap id="BaseResultMap" type="com.food.entity.Banner">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="subtitle" jdbcType="VARCHAR" property="subtitle"/>
+        <result column="image_url" jdbcType="VARCHAR" property="imageUrl"/>
+        <result column="background" jdbcType="VARCHAR" property="background"/>
+        <result column="link_type" jdbcType="VARCHAR" property="linkType"/>
+        <result column="link_value" jdbcType="VARCHAR" property="linkValue"/>
+        <result column="sort_order" jdbcType="INTEGER" property="sortOrder"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <sql id="BaseColumnList">
+        id, title, subtitle, image_url, background, link_type, link_value, sort_order, status, create_time, update_time
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO banners (
+            title, subtitle, image_url, background, link_type, link_value, sort_order, status
+        ) VALUES (
+            #{title}, #{subtitle}, #{imageUrl}, #{background}, #{linkType}, #{linkValue}, #{sortOrder}, #{status}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE banners
+        SET title = #{title},
+            subtitle = #{subtitle},
+            image_url = #{imageUrl},
+            background = #{background},
+            link_type = #{linkType},
+            link_value = #{linkValue},
+            sort_order = #{sortOrder},
+            status = #{status},
+            update_time = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM banners
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM banners
+        WHERE status = 1
+        ORDER BY sort_order ASC
+    </select>
+
+</mapper>

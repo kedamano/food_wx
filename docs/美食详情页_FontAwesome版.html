@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美食详情 - FontAwesome版</title>
+    <!-- 引入Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* CSS变量定义配色方案 */
+        :root {
+            --primary-green: #4CAF50;
+            --light-green: #81C784;
+            --dark-green: #388E3C;
+            --white: #FFFFFF;
+            --light-gray: #F8F9FA;
+            --medium-gray: #E9ECEF;
+            --dark-gray: #6C757D;
+            --text-dark: #212529;
+            --text-light: #6C757D;
+            --border-color: #DEE2E6;
+            --shadow: 0 2px 12px rgba(0,0,0,0.08);
+            --shadow-hover: 0 4px 20px rgba(0,0,0,0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--light-gray);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: var(--white);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* 头部 */
+        .header {
+            background: var(--white);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .back-btn {
+            font-size: 20px;
+            color: var(--text-dark);
+            text-decoration: none;
+            margin-right: 15px;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--light-gray);
+            color: var(--primary-green);
+        }
+
+        .header-title {
+            font-size: 16px;
+            font-weight: bold;
+            flex: 1;
+            color: var(--text-dark);
+        }
+
+        /* 美食图片 */
+        .food-image {
+            height: 250px;
+            background: linear-gradient(45deg, var(--primary-green), var(--light-green));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .food-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="3" fill="white" opacity="0.1"/><circle cx="80" cy="30" r="2" fill="white" opacity="0.1"/><circle cx="60" cy="70" r="1.5" fill="white" opacity="0.1"/></svg>') repeat;
+        }
+
+        .food-image-content {
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        /* 美食信息 */
+        .food-info {
+            background: var(--white);
+            padding: 20px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .food-name {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: var(--text-dark);
+            line-height: 1.3;
+        }
+
+        .food-price {
+            color: var(--primary-green);
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+
+        .food-price::before {
+            content: '';
+            margin-right: 8px;
+            font-size: 20px;
+        }
+
+        .food-rating {
+            display: flex;
+            align-items: center;
+            margin-bottom: 18px;
+            padding: 12px;
+            background: var(--light-gray);
+            border-radius: 8px;
+        }
+
+        .rating-stars {
+            color: #FFD700;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        .rating-score {
+            font-weight: bold;
+            margin-right: 10px;
+            color: var(--text-dark);
+        }
+
+        .rating-count {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .food-description {
+            color: var(--text-light);
+            line-height: 1.8;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--light-gray);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-green);
+        }
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--light-gray);
+            border-radius: 8px;
+        }
+
+        .quantity-label {
+            margin-right: 15px;
+            font-weight: bold;
+            color: var(--text-dark);
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+        }
+
+        .quantity-btn {
+            width: 36px;
+            height: 36px;
+            border: 2px solid var(--primary-green);
+            background: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--primary-green);
+            transition: all 0.3s ease;
+        }
+
+        .quantity-btn:hover {
+            background: var(--primary-green);
+            color: var(--white);
+            transform: scale(1.1);
+        }
+
+        .quantity-btn:disabled {
+            border-color: var(--medium-gray);
+            color: var(--text-light);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .quantity-input {
+            width: 60px;
+            height: 36px;
+            border: 2px solid var(--primary-green);
+            text-align: center;
+            margin: 0 12px;
+            border-radius: 18px;
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--text-dark);
+        }
+
+        .food-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .tag {
+            background: linear-gradient(135deg, var(--primary-green), var(--light-green));
+            color: var(--white);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+            display: flex;
+            align-items: center;
+        }
+
+        .tag i {
+            margin-right: 4px;
+        }
+
+        /* 用户评价 */
+        .reviews-section {
+            background: var(--white);
+            padding: 20px;
+            margin-bottom: 80px;
+            box-shadow: var(--shadow);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-dark);
+        }
+
+        .section-title span {
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 8px;
+            color: var(--primary-green);
+        }
+
+        .review-item {
+            border-bottom: 1px solid var(--border-color);
+            padding: 18px 0;
+            transition: all 0.3s ease;
+        }
+
+        .review-item:last-child {
+            border-bottom: none;
+        }
+
+        .review-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary-green), var(--light-green));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 14px;
+            font-weight: bold;
+            margin-right: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .user-name {
+            font-weight: bold;
+            flex: 1;
+            color: var(--text-dark);
+        }
+
+        .review-rating {
+            color: #FFD700;
+            font-size: 14px;
+        }
+
+        .review-content {
+            color: var(--text-light);
+            line-height: 1.6;
+            margin-bottom: 10px;
+            padding: 12px;
+            background: var(--light-gray);
+            border-radius: 8px;
+        }
+
+        .review-time {
+            color: var(--text-light);
+            font-size: 12px;
+        }
+
+        /* 底部操作栏 */
+        .bottom-actions {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 400px;
+            background: var(--white);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            z-index: 100;
+            box-shadow: 0 -4px 16px rgba(0,0,0,0.1);
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-btn i {
+            margin-right: 6px;
+            font-size: 18px;
+        }
+
+        .add-cart {
+            background: var(--light-green);
+            color: var(--white);
+        }
+
+        .buy-now {
+            background: var(--primary-green);
+            color: var(--white);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(76, 175, 80, 0.3);
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 400px) {
+            .container {
+                max-width: 100%;
+            }
+
+            .bottom-actions {
+                max-width: 100%;
+            }
+        }
+
+        /* 动画效果 */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .food-info, .reviews-section {
+            animation: slideIn 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <a href="javascript:history.back()" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+            <div class="header-title">美食详情</div>
+        </div>
+
+        <!-- 美食图片 -->
+        <div class="food-image">
+            <div class="food-image-content"><i class="fas fa-drumstick-bite"></i></div>
+        </div>
+
+        <!-- 美食信息 -->
+        <div class="food-info">
+            <div class="food-name">红烧肉套餐</div>
+            <div class="food-price"><i class="fas fa-yen-sign"></i>28</div>
+            <div class="food-rating">
+                <span class="rating-stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+                <span class="rating-score">4.8</span>
+                <span class="rating-count">(128条评价)</span>
+            </div>
+            <div class="food-description">
+                精选五花肉，经过精心炖煮，肉质鲜嫩，肥而不腻。搭配时令蔬菜和香喷喷的米饭，营养丰富，口感层次分明。传统工艺制作，传承经典美味。
+            </div>
+            <div class="quantity-selector">
+                <span class="quantity-label">数量：</span>
+                <div class="quantity-controls">
+                    <button class="quantity-btn" onclick="changeQuantity(-1)"><i class="fas fa-minus"></i></button>
+                    <input type="number" class="quantity-input" value="1" min="1" id="quantity">
+                    <button class="quantity-btn" onclick="changeQuantity(1)"><i class="fas fa-plus"></i></button>
+                </div>
+            </div>
+            <div class="food-tags">
+                <span class="tag"><i class="fas fa-fire"></i> 热销</span>
+                <span class="tag"><i class="fas fa-star"></i> 经典</span>
+                <span class="tag"><i class="fas fa-utensils"></i> 套餐</span>
+                <span class="tag"><i class="fas fa-dumbbell"></i> 营养丰富</span>
+            </div>
+        </div>
+
+        <!-- 用户评价 -->
+        <div class="reviews-section">
+            <div class="section-title">
+                <span><i class="fas fa-comments"></i> 用户评价</span>
+                <span style="color: var(--text-light); font-size: 14px; font-weight: normal;">查看全部 ></span>
+            </div>
+            <div class="review-item">
+                <div class="review-header">
+                    <div class="user-avatar">张</div>
+                    <div class="user-name">张先生</div>
+                    <div class="review-rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                </div>
+                <div class="review-content">
+                    红烧肉做得非常地道，肥瘦相间，入口即化。配菜也很新鲜，整体搭配很棒！
+                </div>
+                <div class="review-time">2024-01-15 14:30</div>
+            </div>
+            <div class="review-item">
+                <div class="review-header">
+                    <div class="user-avatar">李</div>
+                    <div class="user-name">李女士</div>
+                    <div class="review-rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                </div>
+                <div class="review-content">
+                    味道很好，分量也够，价格公道。已经是第二次点了，下次还会再来。
+                </div>
+                <div class="review-time">2024-01-14 19:45</div>
+            </div>
+            <div class="review-item">
+                <div class="review-header">
+                    <div class="user-avatar">王</div>
+                    <div class="user-name">王先生</div>
+                    <div class="review-rating"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+                </div>
+                <div class="review-content">
+                    整体不错，就是稍微有点咸，不过很下饭。配送也很快。
+                </div>
+                <div class="review-time">2024-01-13 12:20</div>
+            </div>
+        </div>
+
+        <!-- 底部操作栏 -->
+        <div class="bottom-actions">
+            <button class="action-btn add-cart" onclick="addToCart()">
+                <i class="fas fa-cart-plus"></i> 加入购物车
+            </button>
+            <button class="action-btn buy-now" onclick="buyNow()">
+                <i class="fas fa-shopping-bag"></i> 立即购买
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function changeQuantity(delta) {
+            const input = document.getElementById('quantity');
+            let value = parseInt(input.value) + delta;
+            if (value < 1) value = 1;
+            input.value = value;
+
+            // 添加按钮动画
+            const btn = event.target;
+            btn.style.transform = 'scale(0.8)';
+            setTimeout(() => {
+                btn.style.transform = 'scale(1)';
+            }, 150);
+        }
+
+        function addToCart() {
+            const quantity = document.getElementById('quantity').value;
+            const btn = document.querySelector('.add-cart');
+
+            // 按钮动画
+            btn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                btn.style.transform = 'translateY(-2px)';
+            }, 150);
+
+            alert('✅ 已添加 ' + quantity + ' 份红烧肉套餐到购物车');
+        }
+
+        function buyNow() {
+            const quantity = document.getElementById('quantity').value;
+            const btn = document.querySelector('.buy-now');
+
+            // 按钮动画
+            btn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                btn.style.transform = 'translateY(-2px)';
+            }, 150);
+
+            alert('🚀 立即购买 ' + quantity + ' 份红烧肉套餐\n即将跳转到订单确认页面');
+        }
+
+        // 返回按钮动画
+        document.querySelector('.back-btn').addEventListener('click', function() {
+            this.style.transform = 'scale(0.8)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+                history.back();
+            }, 150);
+        });
+    </script>
+</body>
+</html>

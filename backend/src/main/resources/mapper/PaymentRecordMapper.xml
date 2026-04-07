@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.food.mapper.PaymentRecordMapper">
+
+    <resultMap id="BaseResultMap" type="com.food.entity.PaymentRecord">
+        <id column="payment_id" jdbcType="INTEGER" property="paymentId"/>
+        <result column="order_id" jdbcType="INTEGER" property="orderId"/>
+        <result column="payment_no" jdbcType="VARCHAR" property="paymentNo"/>
+        <result column="payment_method" jdbcType="VARCHAR" property="paymentMethod"/>
+        <result column="amount" jdbcType="DECIMAL" property="amount"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="pay_time" jdbcType="TIMESTAMP" property="payTime"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
+
+    <sql id="BaseColumnList">
+        payment_id, order_id, payment_no, payment_method, amount, status, pay_time, create_time
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="paymentId">
+        INSERT INTO payment_records (
+            order_id, payment_no, payment_method, amount, status, pay_time
+        ) VALUES (
+            #{orderId}, #{paymentNo}, #{paymentMethod}, #{amount}, #{status}, #{payTime}
+        )
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM payment_records
+        WHERE payment_id = #{paymentId}
+    </select>
+
+    <select id="selectByPaymentNo" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM payment_records
+        WHERE payment_no = #{paymentNo}
+    </select>
+
+    <select id="selectByOrderId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM payment_records
+        WHERE order_id = #{orderId}
+    </select>
+
+</mapper>

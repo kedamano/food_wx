@@ -1,0 +1,157 @@
+<!-- 美食详情页 -->
+<scroll-view class="scrollarea" scroll-y type="list">
+  <!-- 头部导航 -->
+  <view class="header-nav">
+    <view class="nav-left" bindtap="onBackClick">
+      <text class="back-icon">←</text>
+    </view>
+    <text class="nav-title">美食详情</text>
+    <view class="nav-right">
+      <text class="fa fa-share-alt share-icon"></text>
+    </view>
+  </view>
+
+  <!-- 美食图片轮播 -->
+  <view class="food-images-section">
+    <swiper class="food-swiper" indicator-dots="{{true}}" autoplay="{{true}}" interval="{{4000}}" circular="{{true}}" bindchange="onImageChange">
+      <swiper-item wx:for="{{food.images}}" wx:key="index">
+        <image class="food-image lazyload" src="{{item}}" mode="aspectFill" lazy-load="{{true}}"></image>
+      </swiper-item>
+    </swiper>
+    <view class="image-placeholder" wx:if="{{!food.images || food.images.length === 0}}">
+      <text class="fa fa-drumstick-bite food-icon"></text>
+    </view>
+    <view class="image-counter" wx:if="{{food.images && food.images.length > 0}}">
+      <text class="counter-text">{{currentImageIndex + 1}}/{{food.images.length}}</text>
+    </view>
+  </view>
+
+  <!-- 基本信息区域 -->
+  <view class="basic-info-section">
+    <text class="food-name">{{food.name}}</text>
+    <view class="price-rating">
+      <text class="price-symbol">¥</text>
+      <text class="food-price">{{food.price}}</text>
+      <view class="rating-container">
+        <text class="fa fa-star star-icon"></text>
+        <text class="rating-score">{{food.rating}}</text>
+        <text class="review-count">({{food.reviews}}条评价)</text>
+      </view>
+    </view>
+    <view class="food-stats">
+      <text class="stat-item">已售 {{food.sales}} 份</text>
+      <text class="stat-item">月销 {{food.monthlySales}}</text>
+      <text class="stat-item">配送 {{food.deliveryTime}}</text>
+    </view>
+  </view>
+
+  <!-- 商品描述 -->
+  <view class="description-section">
+    <view class="section-header">
+      <text class="fa fa-file-alt section-icon"></text>
+      <text class="section-title">商品描述</text>
+    </view>
+    <text class="food-description">{{food.description || '暂无描述'}}</text>
+  </view>
+
+  <!-- 标签系统 -->
+  <view class="tags-section" wx:if="{{food.tags}}">
+    <view class="tag-item hot-tag" wx:if="{{food.tags.hot}}">
+      <text class="fa fa-fire tag-icon"></text>
+      <text class="tag-text">热销</text>
+    </view>
+    <view class="tag-item classic-tag" wx:if="{{food.tags.classic}}">
+      <text class="fa fa-star tag-icon"></text>
+      <text class="tag-text">经典</text>
+    </view>
+    <view class="tag-item combo-tag" wx:if="{{food.tags.combo}}">
+      <text class="fa fa-utensils tag-icon"></text>
+      <text class="tag-text">套餐</text>
+    </view>
+    <view class="tag-item healthy-tag" wx:if="{{food.tags.healthy}}">
+      <text class="fa fa-heart tag-icon"></text>
+      <text class="tag-text">营养丰富</text>
+    </view>
+  </view>
+
+  <!-- 用户评价 -->
+  <view class="reviews-section" wx:if="{{reviews && reviews.length > 0}}">
+    <view class="reviews-header">
+      <view class="section-title-wrapper">
+        <text class="fa fa-comment-alt section-icon"></text>
+        <text class="section-title">用户评价 ({{reviews.length}})</text>
+      </view>
+      <text class="view-all" bindtap="onViewAllReviews">查看全部 ></text>
+    </view>
+    <view class="reviews-list">
+      <view class="review-item" wx:for="{{reviews}}" wx:key="id">
+        <view class="review-header">
+          <view class="user-avatar">
+            <text class="avatar-text">{{item.userName.charAt(0)}}</text>
+          </view>
+          <view class="user-info">
+            <text class="user-name">{{item.userName}}</text>
+            <view class="user-rating">
+              <text class="fa fa-star star-icon" wx:for="{{item.rating}}" wx:for-item="star" wx:key="*this"></text>
+            </view>
+          </view>
+          <text class="review-time">{{item.time}}</text>
+        </view>
+        <text class="review-content">{{item.content}}</text>
+        <view class="review-images" wx:if="{{item.images && item.images.length > 0}}">
+          <image class="review-image" wx:for="{{item.images}}" wx:for-item="img" wx:key="*this" src="{{img}}" mode="aspectFill"></image>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空评价提示 -->
+  <view class="empty-reviews" wx:if="{{!isLoading && (!reviews || reviews.length === 0)}}">
+    <text class="fa fa-comment-dots empty-icon"></text>
+    <text class="empty-text">暂无用户评价</text>
+    <text class="empty-subtext">快来成为第一个评价的人吧</text>
+  </view>
+
+  <!-- 商家信息 -->
+  <view class="store-section">
+    <view class="store-info" bindtap="onStoreInfoClick">
+      <image class="store-logo" src="{{store.logo}}" mode="aspectFill"></image>
+      <view class="store-detail">
+        <text class="store-name">{{store.name}}</text>
+        <view class="store-rating">
+          <text class="fa fa-star star-icon"></text>
+          <text class="store-score">{{store.rating}}</text>
+          <text class="store-sales">月销 {{store.monthlySales}}</text>
+        </view>
+        <view class="store-location">
+          <text class="fa fa-map-marker-alt location-icon"></text>
+          <text class="location-text">{{store.distance}} | {{store.deliveryTime}}</text>
+        </view>
+      </view>
+      <text class="arrow-icon">→</text>
+    </view>
+  </view>
+</scroll-view>
+
+<!-- 底部操作栏 -->
+<view class="bottom-action">
+  <view class="action-left">
+    <button class="favorite-btn" bindtap="onFavoriteClick">
+      <text class="fa fa-heart favorite-icon"></text>
+      <text class="btn-text">收藏</text>
+    </button>
+    <button class="cart-btn" bindtap="onCartClick">
+      <text class="fa fa-shopping-cart cart-icon"></text>
+      <text class="btn-text">购物车</text>
+      <text class="cart-count" wx:if="{{cartCount > 0}}">{{cartCount}}</text>
+    </button>
+  </view>
+  <view class="action-right">
+    <button class="add-cart-btn" bindtap="onAddToCart">
+      <text class="btn-text">加入购物车</text>
+    </button>
+    <button class="buy-now-btn" bindtap="onBuyNow">
+      <text class="btn-text">立即购买</text>
+    </button>
+  </view>
+</view>

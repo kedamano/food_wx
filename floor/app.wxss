@@ -1,0 +1,163 @@
+/**app.wxss**/
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 200rpx 0;
+  box-sizing: border-box;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* 全局样式 */
+page {
+  background-color: #F8F9FA;
+  font-family: PingFang SC, Helvetica Neue, Arial, sans-serif;
+  font-size: 14px;
+  color: #212529;
+}
+
+/* Font Awesome 图标样式 */
+.fa {
+  font-family: 'FontAwesome';
+}
+
+/* 按钮样式 */
+.btn {
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn:active {
+  transform: scale(0.95);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+  color: #FFFFFF;
+}
+
+.btn-secondary {
+  background: #F8F9FA;
+  color: #4CAF50;
+  border: 1px solid #DEE2E6;
+}
+
+.btn-success {
+  background: #28A745;
+  color: #FFFFFF;
+}
+
+.btn-danger {
+  background: #FF5252;
+  color: #FFFFFF;
+}
+
+/* 加载动画 */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #DEE2E6;
+  border-top: 2px solid #4CAF50;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 骨架屏 */
+.skeleton {
+  background: linear-gradient(90deg, #F8F9FA 25%, #E9ECEF 50%, #F8F9FA 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* 错误提示 */
+.error-toast {
+  background: #FF5252;
+  color: #FFFFFF;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 成功提示 */
+.success-toast {
+  background: #4CAF50;
+  color: #FFFFFF;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: #6C757D;
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  color: #DEE2E6;
+}
+
+.empty-state-text {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.empty-state-subtext {
+  font-size: 14px;
+  color: #ADB5BD;
+}
+
+/* 响应式断点 */
+@media (max-width: 320px) {
+  .container {
+    max-width: 100%;
+    padding: 15px;
+  }
+}
+
+@media (min-width: 400px) {
+  .container {
+    max-width: 400px;
+  }
+} 
+@font-face {
+  font-family: 'FontAwesome';
+  src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}

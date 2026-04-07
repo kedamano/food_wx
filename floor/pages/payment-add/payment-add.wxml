@@ -1,0 +1,131 @@
+<!-- 新增支付方式页面 -->
+<scroll-view class="container" scroll-y>
+  <!-- 头部 -->
+  <view class="header">
+    <text class="header-title">添加支付方式</text>
+    <text class="header-subtitle">请选择支付方式类型并填写相关信息</text>
+  </view>
+
+  <!-- 支付方式类型选择 -->
+  <view class="type-section">
+    <text class="section-title">选择支付方式</text>
+    <view class="type-list">
+      <view class="type-item {{typeIndex === index ? 'selected' : ''}}" 
+            wx:for="{{paymentTypes}}" wx:key="id"
+            bindtap="onTypeSelect" data-index="{{index}}">
+        <text class="type-icon">{{item.icon}}</text>
+        <text class="type-name">{{item.name}}</text>
+        <text class="type-radio">{{typeIndex === index ? '✓' : ''}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 表单区域 -->
+  <view class="form-section">
+    <!-- 支付方式名称 -->
+    <view class="form-item">
+      <view class="item-label">
+        <text class="label-text">支付方式名称</text>
+      </view>
+      <input class="item-input {{errors.name ? 'error' : ''}}" 
+             placeholder="例如：我的微信支付" 
+             value="{{formData.name}}"
+             bindinput="onFormInput" data-field="name"/>
+      <text class="error-text" wx:if="{{errors.name}}">{{errors.name}}</text>
+    </view>
+
+    <!-- 账户信息 -->
+    <view class="form-item" wx:if="{{formData.type !== 'BANK_CARD'}}">
+      <view class="item-label">
+        <text class="label-text">账户信息</text>
+      </view>
+      <input class="item-input {{errors.number ? 'error' : ''}}" 
+             placeholder="例如：绑定微信账户" 
+             value="{{formData.number}}"
+             bindinput="onFormInput" data-field="number"/>
+      <text class="error-text" wx:if="{{errors.number}}">{{errors.number}}</text>
+    </view>
+
+    <!-- 银行卡信息 -->
+    <block wx:if="{{formData.type === 'BANK_CARD'}}">
+      <view class="form-item">
+        <view class="item-label">
+          <text class="label-text">银行名称</text>
+        </view>
+        <input class="item-input {{errors.bankName ? 'error' : ''}}" 
+               placeholder="例如：招商银行" 
+               value="{{formData.bankName}}"
+               bindinput="onFormInput" data-field="bankName"/>
+        <text class="error-text" wx:if="{{errors.bankName}}">{{errors.bankName}}</text>
+      </view>
+
+      <view class="form-item">
+        <view class="item-label">
+          <text class="label-text">银行卡号</text>
+        </view>
+        <input class="item-input {{errors.cardNumber ? 'error' : ''}}" 
+               placeholder="请输入银行卡号" 
+               type="number"
+               value="{{formData.cardNumber}}"
+               bindinput="onFormInput" data-field="cardNumber"/>
+        <text class="error-text" wx:if="{{errors.cardNumber}}">{{errors.cardNumber}}</text>
+      </view>
+
+      <view class="form-item">
+        <view class="item-label">
+          <text class="label-text">卡类型</text>
+        </view>
+        <picker class="item-picker" 
+                value="{{formData.cardType}}" 
+                range="{{['信用卡', '储蓄卡', '借记卡']}}"
+                bindchange="onFormInput" data-field="cardType">
+          <text class="picker-text">{{formData.cardType}}</text>
+        </picker>
+      </view>
+
+      <view class="form-row">
+        <view class="form-item half">
+          <view class="item-label">
+            <text class="label-text">有效期</text>
+          </view>
+          <input class="item-input {{errors.expireDate ? 'error' : ''}}" 
+                 placeholder="MM/YY" 
+                 value="{{formData.expireDate}}"
+                 bindinput="onFormInput" data-field="expireDate"/>
+          <text class="error-text" wx:if="{{errors.expireDate}}">{{errors.expireDate}}</text>
+        </view>
+
+        <view class="form-item half">
+          <view class="item-label">
+            <text class="label-text">CVV</text>
+          </view>
+          <input class="item-input {{errors.cvv ? 'error' : ''}}" 
+                 placeholder="CVV" 
+                 type="number"
+                 maxlength="4"
+                 value="{{formData.cvv}}"
+                 bindinput="onFormInput" data-field="cvv"/>
+          <text class="error-text" wx:if="{{errors.cvv}}">{{errors.cvv}}</text>
+        </view>
+      </view>
+    </block>
+
+    <!-- 设为默认支付方式 -->
+    <view class="form-item switch">
+      <view class="item-label">
+        <text class="label-text">设为默认支付方式</text>
+      </view>
+      <switch checked="{{formData.isDefault}}" bindchange="onToggleDefault"/>
+    </view>
+  </view>
+
+  <!-- 底部按钮 -->
+  <view class="footer">
+    <button class="save-btn" bindtap="onSavePayment">
+      <text class="btn-text">保存支付方式</text>
+    </button>
+  </view>
+
+  <!-- 底部安全区域 -->
+  <view class="safe-area-bottom"></view>
+</scroll-view>

@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - FontAwesome版</title>
+    <!-- 引入Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* CSS变量定义配色方案 */
+        :root {
+            --primary-green: #4CAF50;
+            --light-green: #81C784;
+            --dark-green: #388E3C;
+            --white: #FFFFFF;
+            --light-gray: #F8F9FA;
+            --medium-gray: #E9ECEF;
+            --dark-gray: #6C757D;
+            --text-dark: #212529;
+            --text-light: #6C757D;
+            --border-color: #DEE2E6;
+            --shadow: 0 2px 12px rgba(0,0,0,0.08);
+            --shadow-hover: 0 4px 20px rgba(0,0,0,0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--light-gray);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: var(--white);
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 60px;
+        }
+
+        /* 用户信息头部 */
+        .user-header {
+            background: linear-gradient(135deg, var(--primary-green), var(--light-green));
+            padding: 30px 20px;
+            color: var(--white);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="3" fill="white" opacity="0.1"/><circle cx="80" cy="30" r="2" fill="white" opacity="0.1"/><circle cx="60" cy="70" r="1.5" fill="white" opacity="0.1"/></svg>') repeat;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 32px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            z-index: 1;
+            box-shadow: var(--shadow);
+        }
+
+        .user-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .user-level {
+            font-size: 14px;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .user-level i {
+            margin-right: 6px;
+        }
+
+        /* 订单状态 */
+        .order-status {
+            background: var(--white);
+            margin: 12px 0;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border-radius: 8px;
+        }
+
+        .order-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-dark);
+        }
+
+        .order-title span {
+            display: flex;
+            align-items: center;
+        }
+
+        .order-title i {
+            margin-right: 8px;
+            color: var(--primary-green);
+        }
+
+        .view-all-orders {
+            font-size: 12px;
+            color: var(--primary-green);
+            text-decoration: none;
+            padding: 4px 8px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .view-all-orders:hover {
+            background: var(--light-gray);
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .status-item {
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .status-item:hover {
+            background: var(--light-gray);
+            transform: translateY(-2px);
+        }
+
+        .status-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .status-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--primary-green), var(--light-green));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            color: var(--white);
+            font-size: 20px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .status-item:hover .status-icon {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .status-count {
+            background: #FF5252;
+            color: var(--white);
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            min-width: 16px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .status-name {
+            font-size: 12px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        /* 统计信息 */
+        .stats-section {
+            background: var(--white);
+            margin: 12px 0;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border-radius: 8px;
+        }
+
+        .stats-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 18px;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+        }
+
+        .stats-title i {
+            margin-right: 8px;
+            color: var(--primary-green);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            text-align: center;
+        }
+
+        .stat-item {
+            border-right: 1px solid var(--border-color);
+            padding: 15px 0;
+        }
+
+        .stat-item:last-child {
+            border-right: none;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-green);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        /* 功能菜单 */
+        .menu-section {
+            background: var(--white);
+            margin: 12px 0;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border-color);
+            text-decoration: none;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .menu-item:hover {
+            background: var(--light-gray);
+            padding-left: 24px;
+        }
+
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .menu-icon {
+            width: 28px;
+            height: 28px;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: var(--primary-green);
+            background: var(--light-gray);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item:hover .menu-icon {
+            background: var(--primary-green);
+            color: var(--white);
+            transform: scale(1.1);
+        }
+
+        .menu-content {
+            flex: 1;
+        }
+
+        .menu-title {
+            font-size: 16px;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+
+        .menu-desc {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .menu-arrow {
+            color: var(--text-light);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item:hover .menu-arrow {
+            color: var(--primary-green);
+            transform: translateX(4px);
+        }
+
+        .menu-badge {
+            background: #FF5252;
+            color: var(--white);
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 400px;
+            background: var(--white);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            z-index: 100;
+            box-shadow: 0 -4px 16px rgba(0,0,0,0.1);
+        }
+
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 12px 0;
+            text-decoration: none;
+            color: var(--text-light);
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: var(--primary-green);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-item.active .nav-icon {
+            transform: scale(1.1);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 400px) {
+            .container {
+                max-width: 100%;
+            }
+
+            .bottom-nav {
+                max-width: 100%;
+            }
+        }
+
+        /* 动画效果 */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .order-status, .stats-section, .menu-section {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .menu-section:nth-child(1) { animation-delay: 0.1s; }
+        .menu-section:nth-child(2) { animation-delay: 0.2s; }
+        .menu-section:nth-child(3) { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 用户信息头部 -->
+        <div class="user-header">
+            <div class="user-avatar"><i class="fas fa-user"></i></div>
+            <div class="user-name">美食爱好者</div>
+            <div class="user-level"><i class="fas fa-star"></i> 黄金会员 | 积分: 1,280</div>
+        </div>
+
+        <!-- 订单状态 -->
+        <div class="order-status">
+            <div class="order-title">
+                <span><i class="fas fa-list-alt"></i> 我的订单</span>
+                <a href="#" class="view-all-orders">查看全部 ></a>
+            </div>
+            <div class="status-grid">
+                <div class="status-item">
+                    <div class="status-wrapper">
+                        <div class="status-icon"><i class="fas fa-clock"></i></div>
+                        <div class="status-count">2</div>
+                    </div>
+                    <div class="status-name">待付款</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-wrapper">
+                        <div class="status-icon"><i class="fas fa-utensils"></i></div>
+                        <div class="status-count">1</div>
+                    </div>
+                    <div class="status-name">制作中</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-icon"><i class="fas fa-truck"></i></div>
+                    <div class="status-name">配送中</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="status-name">已完成</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 统计信息 -->
+        <div class="stats-section">
+            <div class="stats-title"><i class="fas fa-chart-bar"></i> 我的数据</div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">28</div>
+                    <div class="stat-label">累计订单</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">15</div>
+                    <div class="stat-label">收藏商家</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">¥520</div>
+                    <div class="stat-label">累计消费</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 功能菜单 -->
+        <div class="menu-section">
+            <a href="#" class="menu-item">
+                <div class="menu-icon"><i class="fas fa-map-marker-alt"></i></div>
+                <div class="menu-content">
+                    <div class="menu-title">收货地址</div>
+                    <div class="menu-desc">管理我的收货地址</div>
+                </div>
+                <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+            </a>
+            <a href="#" class="menu-item">
+                <div class="menu-icon"><i class="fas fa-credit-card"></i></div>
+                <div class="menu-content">
+                    <div class="menu-title">支付方式</div>
+                    <div class="menu-desc">管理支付方式</div>
+                </div>
+                <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+            </a>
+            <a href="#" class="menu-item">
+                <div class="menu-icon"><i class="fas fa-gift"></i></div>
+                <div class="menu-content">
+                    <div class="menu-title">优惠券</div>
+                    <div class="menu-desc">查看我的优惠券</div>
+                </div>
+                <div class="menu-badge">3</div>
+                <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+            </a>
+        </div>
+
+        <div class="menu-section">
+            <a href="#" class="menu-item">
+                <div class="menu-icon"><i class="fas fa-star"></i></div>
+                <div class="menu-content">
+                    <div class="menu-title">我的评价</div>
+                    <div class="menu-desc">查看我的评价记录</div>
+                </div>
+                <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+            </a>
+            <a href="#" class="menu-item">
+                <div class="menu-icon"><i class="fas fa-user-friends"></i></div>
+                <div class="menu-content">
+                    <div class="menu-title">邀请好友</div>
+                    <div class="menu-desc">邀请好友获得奖励</div>
+                </div>
+                <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+            </a>
+            <a href="#" class="menu-item">
+                <div class="menu-icon"><i class="fas fa-coins"></i></div>
+                <div class="menu-content">
+                    <div class="menu-title">积分商城</div>
+                    <div class="menu-desc">用积分兑换好礼</div>
+                </div>
+                <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+            </a>
+        </div>
+
+        <div class="menu-section">
+            <a href="#" class="menu-item">
+                <div class="menu-icon"><i class="fas fa-headset"></i></div>
+                <div class="menu-content">
+                    <div class="menu-title">客服中心</div>
+                    <div class="menu-desc">联系客服解决问题</div>
+                </div>
+                <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+            </a>
+            <a href="#" class="menu-item">
+                <div class="menu-icon"><i class="fas fa-cog"></i></div>
+                <div class="menu-content">
+                    <div class="menu-title">设置</div>
+                    <div class="menu-desc">账号与隐私设置</div>
+                </div>
+                <div class="menu-arrow"><i class="fas fa-chevron-right"></i></div>
+            </a>
+        </div>
+
+        <!-- 底部导航 -->
+        <div class="bottom-nav">
+            <a href="#" class="nav-item">
+                <span class="nav-icon"><i class="fas fa-home"></i></span>
+                首页
+            </a>
+            <a href="#" class="nav-item">
+                <span class="nav-icon"><i class="fas fa-list"></i></span>
+                分类
+            </a>
+            <a href="#" class="nav-item">
+                <span class="nav-icon"><i class="fas fa-shopping-cart"></i></span>
+                购物车
+            </a>
+            <a href="#" class="nav-item active">
+                <span class="nav-icon"><i class="fas fa-user"></i></span>
+                我的
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // 模拟点击效果
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const title = this.querySelector('.menu-title').textContent;
+
+                // 添加点击动画
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+
+                alert('点击了: ' + title);
+            });
+        });
+
+        document.querySelectorAll('.status-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const name = this.querySelector('.status-name').textContent;
+
+                // 添加点击动画
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'translateY(-2px)';
+                }, 150);
+
+                alert('查看' + name + '的订单');
+            });
+        });
+
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+                const pageName = this.textContent.trim();
+
+                // 添加点击动画
+                this.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+
+                alert('切换到: ' + pageName);
+            });
+        });
+    </script>
+</body>
+</html>

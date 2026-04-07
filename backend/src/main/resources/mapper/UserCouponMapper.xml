@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.food.mapper.UserCouponMapper">
+
+    <resultMap id="BaseResultMap" type="com.food.entity.UserCoupon">
+        <id column="user_coupon_id" jdbcType="INTEGER" property="userCouponId"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="coupon_id" jdbcType="INTEGER" property="couponId"/>
+        <result column="is_used" jdbcType="INTEGER" property="isUsed"/>
+        <result column="used_time" jdbcType="TIMESTAMP" property="usedTime"/>
+        <result column="order_id" jdbcType="INTEGER" property="orderId"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="coupon_name" jdbcType="VARCHAR" property="couponName"/>
+        <result column="discount_amount" jdbcType="DOUBLE" property="discountAmount"/>
+        <result column="min_amount" jdbcType="DOUBLE" property="minAmount"/>
+        <result column="end_time" jdbcType="VARCHAR" property="endTime"/>
+    </resultMap>
+
+    <sql id="BaseColumnList">
+        uc.user_coupon_id, uc.user_id, uc.coupon_id, uc.is_used, uc.used_time, uc.order_id, uc.create_time,
+        c.coupon_name, c.discount_amount, c.min_amount, DATE_FORMAT(c.end_time, '%Y-%m-%d') as end_time
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="userCouponId">
+        INSERT INTO user_coupons (user_id, coupon_id, is_used)
+        VALUES (#{userId}, #{couponId}, 0)
+    </insert>
+
+    <update id="update">
+        UPDATE user_coupons
+        SET is_used = #{isUsed},
+            used_time = #{usedTime},
+            order_id = #{orderId}
+        WHERE user_coupon_id = #{userCouponId}
+    </update>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM user_coupons uc
+        LEFT JOIN coupons c ON uc.coupon_id = c.coupon_id
+        WHERE uc.user_coupon_id = #{userCouponId}
+    </select>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM user_coupons uc
+        LEFT JOIN coupons c ON uc.coupon_id = c.coupon_id
+        WHERE uc.user_id = #{userId}
+        ORDER BY uc.is_used ASC, c.end_time ASC
+    </select>
+    
+    <select id="selectAvailableByUserId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM user_coupons uc
+        LEFT JOIN coupons c ON uc.coupon_id = c.coupon_id
+        WHERE uc.user_id = #{userId} AND uc.is_used = 0 AND c.end_time > NOW()
+        ORDER BY c.discount_amount DESC
+    </select>
+    
+    <select id="selectUsedByUserId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM user_coupons uc
+        LEFT JOIN coupons c ON uc.coupon_id = c.coupon_id
+        WHERE uc.user_id = #{userId} AND uc.is_used = 1
+        ORDER BY uc.used_time DESC
+    </select>
+    
+    <select id="selectExpiredByUserId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM user_coupons uc
+        LEFT JOIN coupons c ON uc.coupon_id = c.coupon_id
+        WHERE uc.user_id = #{userId} AND uc.is_used = 0 AND c.end_time &lt;= NOW()
+        ORDER BY c.end_time DESC
+    </select>
+
+</mapper>

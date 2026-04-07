@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.food.mapper.CartMapper">
+
+    <resultMap id="BaseResultMap" type="com.food.entity.Cart">
+        <id column="cart_id" jdbcType="INTEGER" property="cartId"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="food_id" jdbcType="INTEGER" property="foodId"/>
+        <result column="quantity" jdbcType="INTEGER" property="quantity"/>
+        <result column="store_id" jdbcType="INTEGER" property="storeId"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+
+    <sql id="BaseColumnList">
+        cart_id, user_id, food_id, quantity, store_id, create_time, update_time
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="cartId">
+        INSERT INTO cart (
+            user_id, food_id, quantity, store_id
+        ) VALUES (
+            #{userId}, #{foodId}, #{quantity}, #{storeId}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE cart
+        SET user_id = #{userId},
+            food_id = #{foodId},
+            quantity = #{quantity},
+            store_id = #{storeId},
+            update_time = CURRENT_TIMESTAMP
+        WHERE cart_id = #{cartId}
+    </update>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM cart
+        WHERE cart_id = #{cartId}
+    </select>
+
+    <select id="selectByUserAndFood" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM cart
+        WHERE user_id = #{userId} AND food_id = #{foodId}
+        LIMIT 1
+    </select>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM cart
+        WHERE user_id = #{userId}
+        ORDER BY create_time DESC
+    </select>
+
+    <update id="updateQuantity">
+        UPDATE cart
+        SET quantity = #{quantity},
+            update_time = CURRENT_TIMESTAMP
+        WHERE cart_id = #{cartId}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM cart
+        WHERE cart_id = #{cartId}
+    </delete>
+
+    <delete id="deleteByUserId">
+        DELETE FROM cart
+        WHERE user_id = #{userId}
+    </delete>
+
+    <delete id="deleteByUserAndFood">
+        DELETE FROM cart
+        WHERE user_id = #{userId} AND food_id = #{foodId}
+    </delete>
+
+</mapper>

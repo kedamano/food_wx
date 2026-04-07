@@ -1,0 +1,172 @@
+/* 地址编辑页面样式 */
+.container {
+  height: 100vh;
+  background: linear-gradient(135deg, #F8F9FA 0%, #E9ECEF 100%);
+  font-family: PingFang SC, Helvetica Neue, Arial, sans-serif;
+}
+
+/* 头部样式 */
+.header {
+  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+  padding: 40px 20px 30px;
+  text-align: center;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.header-title {
+  display: block;
+  font-size: 24px;
+  font-weight: bold;
+  color: #FFFFFF;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.header-subtitle {
+  display: block;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* 表单区域 */
+.form-section {
+  padding: 20px;
+}
+
+.form-item {
+  margin-bottom: 20px;
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.form-item.switch {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.required {
+  color: #FF5252;
+  margin-right: 5px;
+}
+
+.label-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #212529;
+}
+
+.item-input,
+.item-picker,
+.item-textarea {
+  width: 100%;
+  padding: 12px;
+  background: #F8F9FA;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #212529;
+  transition: all 0.3s ease;
+}
+
+.item-input.error,
+.item-picker.error,
+.item-textarea.error {
+  border-color: #FF5252;
+  background: #FFF5F5;
+}
+
+.item-input:focus,
+.item-picker:focus,
+.item-textarea:focus {
+  border-color: #4CAF50;
+  background: #FFFFFF;
+  outline: none;
+}
+
+.item-textarea {
+  height: 60px;
+  resize: none;
+}
+
+.picker-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.picker-text {
+  font-size: 14px;
+  color: #212529;
+}
+
+.picker-arrow {
+  font-size: 12px;
+  color: #6C757D;
+}
+
+.error-text {
+  display: block;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #FF5252;
+}
+
+/* 标签设置 */
+.tag-list {
+  display: flex;
+  gap: 20px;
+}
+
+.tag-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tag-checkbox {
+  transform: scale(0.8);
+}
+
+.tag-text {
+  font-size: 14px;
+  color: #212529;
+}
+
+/* 底部按钮 */
+.footer {
+  padding: 20px;
+  margin-top: 30px;
+}
+
+.save-btn {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.save-btn:active {
+  transform: scale(0.98);
+}
+
+/* 安全区域 */
+.safe-area-bottom {
+  height: env(safe-area-inset-bottom);
+}

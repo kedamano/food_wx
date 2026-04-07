@@ -1,0 +1,94 @@
+/* 用户协议页面样式 */
+
+.container {
+  min-height: 100vh;
+  background: #fff;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30rpx 30rpx 20rpx;
+  background: #fff;
+  border-bottom: 1rpx solid #eee;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.back-btn {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  color: #333;
+}
+
+.header-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.header-placeholder {
+  width: 60rpx;
+}
+
+.content {
+  padding: 40rpx 30rpx;
+}
+
+.agreement-header {
+  text-align: center;
+  margin-bottom: 50rpx;
+  padding-bottom: 30rpx;
+  border-bottom: 2rpx solid #eee;
+}
+
+.agreement-title {
+  display: block;
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.agreement-date {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.agreement-section {
+  margin-bottom: 40rpx;
+}
+
+.section-title {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.section-text {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.8;
+  margin-bottom: 16rpx;
+}
+
+.agreement-list {
+  padding-left: 10rpx;
+}
+
+.list-item {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.8;
+  margin-bottom: 8rpx;
+}

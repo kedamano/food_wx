@@ -1,0 +1,76 @@
+<!-- 订单评价页面 -->
+<view class="container">
+  <!-- 头部 -->
+  <view class="header">
+    <view class="nav-left" bindtap="onBack">
+      <text class="back-icon">←</text>
+    </view>
+    <text class="nav-title">订单评价</text>
+  </view>
+
+  <!-- 订单信息 -->
+  <view class="order-info-section">
+    <text class="section-title">{{orderInfo.storeName}}</text>
+    <view class="order-items">
+      <view class="item" wx:for="{{orderInfo.foodItems}}" wx:key="index">
+        <text class="item-name">{{item.name}} x {{item.quantity}}</text>
+        <text class="item-price">¥{{item.price}}</text>
+      </view>
+    </view>
+    <text class="order-time">下单时间：{{orderInfo.orderTime}}</text>
+  </view>
+
+  <!-- 评分 -->
+  <view class="rating-section">
+    <text class="section-title">总体评分</text>
+    <view class="rating-stars">
+      <text class="star {{rating >= 1 ? 'active' : ''}}" bindtap="onRatingChange" data-rating="1">★</text>
+      <text class="star {{rating >= 2 ? 'active' : ''}}" bindtap="onRatingChange" data-rating="2">★</text>
+      <text class="star {{rating >= 3 ? 'active' : ''}}" bindtap="onRatingChange" data-rating="3">★</text>
+      <text class="star {{rating >= 4 ? 'active' : ''}}" bindtap="onRatingChange" data-rating="4">★</text>
+      <text class="star {{rating >= 5 ? 'active' : ''}}" bindtap="onRatingChange" data-rating="5">★</text>
+    </view>
+    <text class="rating-text">{{rating}}分</text>
+  </view>
+
+  <!-- 评价内容 -->
+  <view class="review-section">
+    <text class="section-title">评价内容</text>
+    <textarea
+      class="review-textarea"
+      placeholder="请输入您的评价（至少10个字）"
+      placeholder-class="textarea-placeholder"
+      value="{{reviewContent}}"
+      bindinput="onReviewContentInput"
+      maxlength="500"
+    />
+    <text class="word-count">{{reviewContent.length}}/500</text>
+  </view>
+
+  <!-- 上传图片 -->
+  <view class="image-section">
+    <text class="section-title">上传图片</text>
+    <view class="image-list">
+      <!-- 图片项 -->
+      <view class="image-item" wx:for="{{images}}" wx:key="index">
+        <image class="review-image" src="{{item}}" mode="aspectFill"></image>
+        <view class="delete-btn" bindtap="onDeleteImage" data-index="{{index}}">×</view>
+        <view class="preview-btn" bindtap="onPreviewImage" data-index="{{index}}"></view>
+      </view>
+
+      <!-- 添加图片按钮 -->
+      <view class="add-image-btn {{images.length >= 9 ? 'disabled' : ''}}" bindtap="onChooseImage" wx:if="{{images.length < 9}}">
+        <text class="add-icon">+</text>
+        <text class="add-text">添加图片</text>
+        <text class="image-count">{{images.length}}/9</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 提交按钮 -->
+  <view class="submit-section">
+    <button class="submit-btn {{isLoading ? 'disabled' : ''}}" bindtap="onSubmitReview" disabled="{{isLoading}}">
+      {{isLoading ? '提交中...' : '提交评价'}}
+    </button>
+  </view>
+</view>

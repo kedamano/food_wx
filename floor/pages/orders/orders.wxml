@@ -1,0 +1,94 @@
+<!-- 订单管理页面 - 现代化设计 -->
+<scroll-view class="container" scroll-y>
+  <!-- 头部区域 -->
+  <view class="header-section">
+    <view class="header-content">
+      <text class="header-title">我的订单</text>
+      <view class="search-box" bindtap="onSearchOrders">
+        <text class="fa fa-search search-icon"></text>
+        <text class="search-text">搜索订单</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 状态标签 -->
+  <view class="status-tabs">
+    <view class="tab-item {{activeTab === item.status ? 'active' : ''}}" 
+          wx:for="{{statusTabs}}" wx:key="status" 
+          bindtap="onTabChange" data-status="{{item.status}}">
+      <text class="tab-text">{{item.name}}</text>
+      <text class="tab-badge" wx:if="{{item.count > 0}}">{{item.count}}</text>
+    </view>
+  </view>
+
+  <!-- 订单列表 -->
+  <view class="orders-container">
+    <view class="order-card" wx:for="{{orders}}" wx:key="orderId" bindtap="onOrderDetail" data-order-id="{{item.orderId}}">
+      <!-- 订单头部 -->
+      <view class="order-header">
+        <view class="order-status {{item.status}}">
+          <text class="status-text">{{item.statusText}}</text>
+        </view>
+        <text class="order-time">{{item.orderTime}}</text>
+      </view>
+
+      <!-- 商家信息 -->
+      <view class="store-section">
+        <view class="store-info">
+          <text class="fa fa-store store-icon"></text>
+          <text class="store-name">{{item.storeName}}</text>
+        </view>
+      </view>
+
+      <!-- 商品列表 -->
+      <view class="items-section">
+        <view class="item-list">
+          <view class="item-card" wx:for="{{item.items}}" wx:key="foodId">
+            <view class="item-image">
+              <image class="food-image" src="{{item.image}}" mode="aspectFill" lazy-load></image>
+              <text class="fa fa-utensils food-icon" wx:if="{{!item.image}}"></text>
+            </view>
+            <view class="item-details">
+              <text class="item-name">{{item.name}}</text>
+              <text class="item-quantity">x{{item.quantity}}</text>
+              <text class="item-price">¥{{item.price}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 订单金额 -->
+      <view class="amount-section">
+        <text class="amount-label">实付金额</text>
+        <text class="amount-value">¥{{item.finalAmount}}</text>
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="action-section">
+        <block wx:if="{{item.status === 'pending'}}">
+          <button class="btn btn-secondary" bindtap="onCancelOrder" data-order-id="{{item.orderId}}">取消</button>
+          <button class="btn btn-primary" bindtap="onPayOrder" data-order-id="{{item.orderId}}">立即付款</button>
+        </block>
+        <block wx:if="{{item.status === 'preparing'}}">
+          <button class="btn btn-secondary" bindtap="onRemindOrder" data-order-id="{{item.orderId}}">催单</button>
+        </block>
+        <block wx:if="{{item.status === 'delivering'}}">
+          <button class="btn btn-secondary" bindtap="onTrackOrder" data-order-id="{{item.orderId}}">查看配送</button>
+          <button class="btn btn-primary" bindtap="onConfirmReceive" data-order-id="{{item.orderId}}">确认收货</button>
+        </block>
+        <block wx:if="{{item.status === 'completed'}}">
+          <button class="btn btn-secondary" bindtap="onReviewOrder" data-order-id="{{item.orderId}}">评价</button>
+          <button class="btn btn-outline" bindtap="onOrderAgain" data-order-id="{{item.orderId}}">再来一单</button>
+        </block>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{orders.length === 0}}">
+      <view class="empty-icon fa fa-box-open"></view>
+      <text class="empty-title">还没有相关订单</text>
+      <text class="empty-desc">去首页逛逛，发现更多美食！</text>
+      <button class="btn btn-primary" bindtap="onGoShopping">去购物</button>
+    </view>
+  </view>
+</scroll-view>

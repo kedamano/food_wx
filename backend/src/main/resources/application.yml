@@ -1,0 +1,88 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: food-wx-backend
+
+  # 数据库配置
+  datasource:
+    url: jdbc:mysql://localhost:3306/food_wx?useUnicode=true&character_set_server=utf8mb4&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      idle-timeout: 30000
+      connection-timeout: 20000
+      max-lifetime: 1800000
+
+  # JSON配置
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    serialization:
+      fail-on-empty-beans: false
+
+# MyBatis配置
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.food.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    default-enum-type-handler: org.apache.ibatis.type.EnumTypeHandler
+  type-handlers-package: com.food.handler
+
+# MyBatis Plus配置
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# Swagger配置
+swagger:
+  enabled: true
+  title: 美食小程序API文档
+  description: 美食小程序后端API接口文档
+  version: 1.0.0
+  base-package: com.food.controller
+  contact:
+    name: Food Team
+    email: food@example.com
+
+# JWT配置
+jwt:
+  secret: food_wx_secret_key_2024
+  expiration: 86400000  # 24小时
+
+# 阿里云短信服务配置
+aliyun:
+  sms:
+    access-key-id: your_access_key_id      # 替换为你的AccessKey ID
+    access-key-secret: your_access_key_secret  # 替换为你的AccessKey Secret
+    sign-name: 你的短信签名                 # 替换为你的短信签名
+    template-code: SMS_12345678            # 替换为你的模板Code
+    region-id: cn-hangzhou                 # 区域ID，默认杭州
+
+# 日志配置
+logging:
+  level:
+    com.food: DEBUG
+    org.springframework: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"
+
+# 文件上传配置
+servlet:
+  multipart:
+    max-file-size: 10MB
+    max-request-size: 100MB

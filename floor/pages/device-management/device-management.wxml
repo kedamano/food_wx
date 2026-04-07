@@ -1,0 +1,65 @@
+<!-- 登录设备管理页面 -->
+<view class="container">
+  <!-- 头部 -->
+  <view class="header">
+    <view class="back-btn" bindtap="onBack">
+      <text class="fa fa-arrow-left"></text>
+    </view>
+    <text class="header-title">登录设备</text>
+    <view class="header-placeholder"></view>
+  </view>
+
+  <!-- 设备列表 -->
+  <view class="device-list">
+    <view class="device-item {{item.isCurrent ? 'current' : ''}}" 
+          wx:for="{{devices}}" 
+          wx:key="id"
+          wx:for-item="item">
+      <view class="device-icon">
+        <text class="fa {{item.platform === 'iOS' || item.platform === 'iPadOS' ? 'fa-apple' : 'fa-desktop'}}"></text>
+      </view>
+      <view class="device-info">
+        <view class="device-header">
+          <text class="device-name">{{item.name}}</text>
+          <text class="device-badge" wx:if="{{item.isCurrent}}">当前</text>
+        </view>
+        <text class="device-type">{{item.type}}</text>
+        <view class="device-meta">
+          <text class="meta-item">
+            <text class="fa fa-map-marker-alt"></text>
+            {{item.location}}
+          </text>
+          <text class="meta-item">
+            <text class="fa fa-clock"></text>
+            {{item.lastTime}}
+          </text>
+        </view>
+      </view>
+      <view class="device-action" wx:if="{{!item.isCurrent}}">
+        <button class="unbind-btn" bindtap="onUnbindDevice" data-device-id="{{item.id}}">
+          <text class="fa fa-unlink"></text>
+          解绑
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 全部解绑按钮 -->
+  <view class="action-section" wx:if="{{devices.length > 1}}">
+    <button class="danger-btn" bindtap="onUnbindAll">
+      <text class="fa fa-exclamation-triangle"></text>
+      全部解绑
+    </button>
+  </view>
+
+  <!-- 安全提示 -->
+  <view class="security-tip">
+    <text class="fa fa-info-circle tip-icon"></text>
+    <view class="tip-content">
+      <text class="tip-title">安全提示</text>
+      <text class="tip-text">• 建议定期检查登录设备列表</text>
+      <text class="tip-text">• 发现可疑设备请立即解绑</text>
+      <text class="tip-text">• 不要在公共设备上保存登录状态</text>
+    </view>
+  </view>
+</view>

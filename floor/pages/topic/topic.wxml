@@ -1,0 +1,27 @@
+<view class="container">
+  <view class="header">
+    <text class="title">美食话题</text>
+    <text class="subtitle">发现美食圈的热门话题</text>
+  </view>
+
+  <view class="topic-list">
+    <view class="topic-item" wx:for="{{topics}}" wx:key="id" bindtap="onTopicTap" data-topic="{{item.title}}">
+      <view class="topic-icon">
+        <text class="fa {{item.icon}}"></text>
+      </view>
+      <view class="topic-content">
+        <text class="topic-title">{{item.title}}</text>
+        <text class="topic-desc">{{item.description}}</text>
+        <view class="topic-meta">
+          <text class="topic-posts">{{item.posts}} 帖子</text>
+          <text class="topic-followers">{{item.followers}} 关注</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:if="{{topics.length === 0}}">
+    <text class="fa fa-comments empty-icon"></text>
+    <text class="empty-text">暂无话题</text>
+  </view>
+</view>

@@ -1,0 +1,76 @@
+<!-- 分类页面 -->
+<scroll-view class="scrollarea" scroll-y type="list">
+  <!-- 头部区域 -->
+  <view class="header-section">
+    <text class="page-title">美食分类</text>
+    <view class="search-bar" bindtap="onSearchClick">
+      <text class="fa fa-search"></text>
+      <input class="search-input" placeholder="搜索美食或商家" disabled="true" />
+    </view>
+  </view>
+
+  <!-- 一级分类 -->
+  <view class="category-section">
+    <text class="section-title">热门分类</text>
+    <view class="category-grid">
+      <view class="category-item" wx:for="{{mainCategories}}" wx:key="id" bindtap="onCategoryTap" data-category="{{item.name}}">
+        <view class="category-icon" style="background: {{item.color}}">
+          <text class="fa {{item.icon}}"></text>
+        </view>
+        <text class="category-name">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 二级分类 -->
+  <view class="subcategory-section" wx:if="{{subCategories.length > 0}}">
+    <text class="section-title">{{selectedCategory}}分类</text>
+    <view class="subcategory-list">
+      <view class="subcategory-item" wx:for="{{subCategories}}" wx:key="id" bindtap="onSubCategoryTap" data-subcategory="{{item.name}}">
+        <text class="subcategory-name">{{item.name}}</text>
+        <text class="arrow-icon">→</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 分类美食 -->
+  <view class="food-section" wx:if="{{categoryFoods.length > 0}}">
+    <text class="section-title">{{selectedCategory}}美食</text>
+    <view class="food-grid">
+      <view class="food-item" wx:for="{{categoryFoods}}" wx:key="id" bindtap="onFoodTap" data-food-id="{{item.id}}">
+        <view class="food-image">
+          <image class="real-image lazyload" 
+                 src="{{item.image}}" 
+                 mode="aspectFill"
+                 lazy-load="{{true}}"
+                 wx:if="{{item.image}}"></image>
+          <text class="fa {{item.icon || 'fa-utensils'}} image-placeholder" wx:else></text>
+        </view>
+        <view class="food-info">
+          <text class="food-name">{{item.name}}</text>
+          <view class="food-meta">
+            <text class="food-price">¥{{item.price}}</text>
+            <view class="rating">
+              <text class="fa fa-star"></text>
+              <text class="rating-text">{{item.rating}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{categoryFoods.length === 0 && !isLoading}}">
+    <text class="fa fa-utensils empty-state-icon"></text>
+    <text class="empty-state-text">该分类下暂无美食</text>
+    <text class="empty-state-subtext">敬请期待更多美食上架</text>
+  </view>
+
+  <!-- 加载动画 -->
+  <view class="loading" wx:if="{{isLoading}}">
+    <text class="loading-spinner"></text>
+    <text class="loading-text">正在加载分类数据...</text>
+  </view>
+</scroll-view>
+                                               

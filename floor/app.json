@@ -1,0 +1,77 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/register/register",
+    "pages/index/index",
+    "pages/category/category",
+    "pages/topic/topic",                           
+    "pages/logs/logs",
+    "pages/food-detail/food-detail",
+    "pages/cart/cart",
+    "pages/profile/profile",
+    "pages/reviews/reviews",
+    "pages/address/address",
+    "pages/orders/orders",
+    "pages/order-confirm/order-confirm",
+    "pages/payment/payment",
+    "pages/coupons/coupons",
+    "pages/points/points",
+    "pages/settings/settings",
+    "pages/user-reviews/user-reviews",
+    "pages/order-detail/order-detail",
+    "pages/store-detail/store-detail",
+    "pages/forgot-password/forgot-password",
+    "pages/account-info/account-info",
+    "pages/security/security",
+    "pages/privacy/privacy",
+    "pages/about/about",
+    "pages/help/help",
+    "pages/feedback/feedback",
+    "pages/device-management/device-management",
+    "pages/privacy-policy/privacy-policy",
+    "pages/user-agreement/user-agreement"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#4CAF50",
+    "navigationBarTitleText": "年轻人的美食天堂",
+    "navigationBarTextStyle": "white",
+    "enablePullDownRefresh": true
+  },
+  "tabBar": {
+    "color": "#8c8c8c",
+    "selectedColor": "#4CAF50",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "black",
+    "list": [{
+      "pagePath": "pages/index/index",
+      "text": "首页",
+      "iconPath": "images/tabbar/home.png",
+      "selectedIconPath": "images/tabbar/home.png"
+    }, 
+    {
+      "pagePath": "pages/category/category",      
+      "text": "分类",
+      "iconPath": "images/tabbar/category.png",
+      "selectedIconPath": "images/tabbar/category.png"
+    },
+    {
+      "pagePath": "pages/cart/cart",      
+      "text": "购物车",
+      "iconPath": "images/tabbar/cart.png",
+      "selectedIconPath": "images/tabbar/cart.png"
+    },
+    {
+      "pagePath": "pages/profile/profile",      
+      "text": "我的",
+      "iconPath": "images/tabbar/user.png",
+      "selectedIconPath": "images/tabbar/user.png"
+    }  
+    ],
+    "position": "bottom"
+  },
+  "style": "v2",
+  "componentFramework": "glass-easel",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

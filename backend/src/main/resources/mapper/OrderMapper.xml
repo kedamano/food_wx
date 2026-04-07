@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.food.mapper.OrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.food.entity.Order">
+        <id column="order_id" jdbcType="INTEGER" property="orderId"/>
+        <result column="order_no" jdbcType="VARCHAR" property="orderNo"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="store_id" jdbcType="INTEGER" property="storeId"/>
+        <result column="total_amount" jdbcType="DECIMAL" property="totalAmount"/>
+        <result column="delivery_fee" jdbcType="DECIMAL" property="deliveryFee"/>
+        <result column="discount_amount" jdbcType="DECIMAL" property="discountAmount"/>
+        <result column="pay_amount" jdbcType="DECIMAL" property="payAmount"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="store_name" jdbcType="VARCHAR" property="storeName"/>
+    </resultMap>
+
+    <sql id="BaseColumnList">
+        order_id, order_no, user_id, store_id, total_amount, delivery_fee, discount_amount, pay_amount, status, address, phone, remark, create_time, update_time
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="orderId">
+        INSERT INTO orders (
+            order_no, user_id, store_id, total_amount, delivery_fee, discount_amount, pay_amount, status, address, phone, remark
+        ) VALUES (
+            #{orderNo}, #{userId}, #{storeId}, #{totalAmount}, #{deliveryFee}, #{discountAmount}, #{payAmount}, #{status}, #{address}, #{phone}, #{remark}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE orders
+        SET order_no = #{orderNo},
+            user_id = #{userId},
+            store_id = #{storeId},
+            total_amount = #{totalAmount},
+            delivery_fee = #{deliveryFee},
+            discount_amount = #{discountAmount},
+            pay_amount = #{payAmount},
+            status = #{status},
+            address = #{address},
+            phone = #{phone},
+            remark = #{remark},
+            update_time = CURRENT_TIMESTAMP
+        WHERE order_id = #{orderId}
+    </update>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT o.*, s.store_name
+        FROM orders o
+        LEFT JOIN stores s ON o.store_id = s.store_id
+        WHERE o.order_id = #{orderId}
+    </select>
+
+    <select id="selectByOrderNo" resultMap="BaseResultMap">
+        SELECT o.*, s.store_name
+        FROM orders o
+        LEFT JOIN stores s ON o.store_id = s.store_id
+        WHERE o.order_no = #{orderNo}
+    </select>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT o.*, s.store_name
+        FROM orders o
+        LEFT JOIN stores s ON o.store_id = s.store_id
+        WHERE o.user_id = #{userId}
+        ORDER BY o.create_time DESC
+    </select>
+
+    <select id="selectByStoreId" resultMap="BaseResultMap">
+        SELECT o.*, s.store_name
+        FROM orders o
+        LEFT JOIN stores s ON o.store_id = s.store_id
+        WHERE o.store_id = #{storeId}
+        ORDER BY o.create_time DESC
+    </select>
+
+    <select id="selectByStatus" resultMap="BaseResultMap">
+        SELECT o.*, s.store_name
+        FROM orders o
+        LEFT JOIN stores s ON o.store_id = s.store_id
+        WHERE o.status = #{status}
+        ORDER BY o.create_time DESC
+    </select>
+
+    <update id="updateStatus">
+        UPDATE orders
+        SET status = #{status},
+            update_time = CURRENT_TIMESTAMP
+        WHERE order_id = #{orderId}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM orders
+        WHERE order_id = #{orderId}
+    </delete>
+
+</mapper>

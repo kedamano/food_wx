@@ -1,0 +1,70 @@
+<!-- 用户评价 - 精致版 -->
+<scroll-view class="container" scroll-y>
+  <!-- 头部 -->
+  <view class="header-section">
+    <view class="header-content">
+      <text class="header-title">我的评价</text>
+      <text class="header-subtitle">管理您的评价记录</text>
+    </view>
+    <view class="review-stats">
+      <text class="stat-text">共{{reviewStats.total}}条评价</text>
+    </view>
+  </view>
+
+  <!-- 评价列表 -->
+  <view class="review-list">
+    <view class="review-card" wx:for="{{reviews}}" wx:key="id" bindtap="onReviewDetail" data-review="{{item}}">
+      <!-- 商家信息 -->
+      <view class="store-section">
+        <view class="store-info">
+          <text class="fa fa-store store-icon"></text>
+          <text class="store-name">{{item.storeName}}</text>
+          <text class="review-time">{{item.reviewTime}}</text>
+        </view>
+        <view class="order-info">
+          <text class="order-foods">{{item.foodNames}}</text>
+        </view>
+      </view>
+
+      <!-- 评价内容 -->
+      <view class="review-section">
+        <view class="review-rating">
+          <view class="stars">
+            <text class="fa {{item <= item.rating ? 'fa-star' : 'fa-star-o'}} star"></text>
+          </view>
+          <text class="rating-text">{{item.rating}}分</text>
+        </view>
+        <text class="review-content">{{item.content}}</text>
+      </view>
+
+      <!-- 评价图片 -->
+      <view class="review-images" wx:if="{{item.images.length > 0}}">
+        <view class="image-grid">
+          <image class="review-image" wx:for="{{item.images}}" wx:key="index" src="{{item}}" mode="aspectFill" lazy-load></image>
+        </view>
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="action-section">
+        <button class="action-btn edit" bindtap="onEditReview" data-review="{{item}}">
+          <text class="fa fa-edit btn-icon"></text>
+          <text class="btn-text">修改</text>
+        </button>
+        <button class="action-btn delete" bindtap="onDeleteReview" data-review="{{item}}">
+          <text class="fa fa-trash-alt btn-icon"></text>
+          <text class="btn-text">删除</text>
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{reviews.length === 0}}">
+    <text class="fa fa-star empty-icon"></text>
+    <text class="empty-title">还没有评价</text>
+    <text class="empty-desc">完成订单后可以添加评价哦！</text>
+  </view>
+
+  <!-- 底部安全区域 -->
+  <view class="safe-area-bottom"></view>
+</scroll-view>

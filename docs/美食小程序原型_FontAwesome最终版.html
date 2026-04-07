@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美食小程序原型 - FontAwesome最终版</title>
+    <!-- 引入Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* CSS变量定义配色方案 */
+        :root {
+            --primary-green: #4CAF50;
+            --light-green: #81C784;
+            --dark-green: #388E3C;
+            --white: #FFFFFF;
+            --light-gray: #F8F9FA;
+            --medium-gray: #E9ECEF;
+            --dark-gray: #6C757D;
+            --text-dark: #212529;
+            --text-light: #6C757D;
+            --border-color: #DEE2E6;
+            --shadow: 0 2px 12px rgba(0,0,0,0.08);
+            --shadow-hover: 0 4px 20px rgba(0,0,0,0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--light-gray);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: var(--white);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* 头部样式 */
+        .header {
+            background: linear-gradient(135deg, var(--primary-green), var(--light-green));
+            padding: 15px 20px;
+            color: var(--white);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header h1 i {
+            margin-right: 8px;
+            font-size: 20px;
+        }
+
+        .search-bar {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .search-bar input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            color: var(--text-light);
+            background: transparent;
+        }
+
+        .search-bar .icon {
+            color: var(--primary-green);
+            font-size: 16px;
+            margin-right: 8px;
+        }
+
+        /* 轮播图 */
+        .banner {
+            height: 180px;
+            background: linear-gradient(45deg, var(--primary-green), var(--light-green));
+            position: relative;
+            overflow: hidden;
+        }
+
+        .banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="white" opacity="0.1"/><circle cx="80" cy="30" r="1.5" fill="white" opacity="0.1"/><circle cx="60" cy="70" r="1" fill="white" opacity="0.1"/></svg>') repeat;
+        }
+
+        .banner-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: var(--white);
+            z-index: 1;
+        }
+
+        .banner h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .banner h2 i {
+            margin-right: 10px;
+            font-size: 28px;
+        }
+
+        .banner p {
+            font-size: 14px;
+            opacity: 0.95;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        /* 分类导航 */
+        .category-nav {
+            background: var(--white);
+            padding: 20px 0;
+            display: flex;
+            justify-content: space-around;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .category-item {
+            text-align: center;
+            flex: 1;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .category-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .category-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--primary-green), var(--light-green));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            color: var(--white);
+            font-size: 24px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .category-item:hover .category-icon {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .category-name {
+            font-size: 13px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        /* 推荐美食 */
+        .section {
+            background: var(--white);
+            margin: 12px 0;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 18px;
+            color: var(--text-dark);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title span {
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 8px;
+            color: var(--primary-green);
+        }
+
+        .more {
+            font-size: 12px;
+            color: var(--primary-green);
+            text-decoration: none;
+            padding: 4px 8px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .more:hover {
+            background: var(--light-gray);
+        }
+
+        .food-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .food-item {
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+        }
+
+        .food-item:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--light-green);
+        }
+
+        .food-image {
+            height: 120px;
+            background: linear-gradient(45deg, var(--primary-green), var(--light-green));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .food-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M20,20 Q40,10 60,20 T100,20" stroke="white" stroke-width="2" fill="none" opacity="0.2"/></svg>') no-repeat center;
+            opacity: 0.3;
+        }
+
+        .food-info {
+            padding: 12px;
+        }
+
+        .food-name {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: var(--text-dark);
+            line-height: 1.3;
+        }
+
+        .food-price {
+            color: var(--primary-green);
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 6px;
+        }
+
+        .food-rating {
+            font-size: 11px;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+        }
+
+        .food-rating .stars {
+            color: #FFD700;
+            margin-right: 4px;
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 400px;
+            background: var(--white);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            z-index: 100;
+            box-shadow: 0 -2px 12px rgba(0,0,0,0.08);
+        }
+
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 12px 0;
+            text-decoration: none;
+            color: var(--text-light);
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: var(--primary-green);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-item.active .nav-icon {
+            transform: scale(1.1);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 400px) {
+            .container {
+                max-width: 100%;
+            }
+
+            .bottom-nav {
+                max-width: 100%;
+            }
+        }
+
+        /* 动画关键帧 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .food-item {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .food-item:nth-child(1) { animation-delay: 0.1s; }
+        .food-item:nth-child(2) { animation-delay: 0.2s; }
+        .food-item:nth-child(3) { animation-delay: 0.3s; }
+        .food-item:nth-child(4) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1><i class="fas fa-leaf"></i> 美食小程序</h1>
+            <div class="search-bar">
+                <span class="icon"><i class="fas fa-search"></i></span>
+                <input type="text" placeholder="搜索美食、商家">
+            </div>
+        </div>
+
+        <!-- 轮播图 -->
+        <div class="banner">
+            <div class="banner-content">
+                <h2><i class="fas fa-utensils"></i> 美食天堂</h2>
+                <p>发现身边的美食，享受美味生活</p>
+            </div>
+        </div>
+
+        <!-- 分类导航 -->
+        <div class="category-nav">
+            <div class="category-item">
+                <div class="category-icon"><i class="fas fa-utensils"></i></div>
+                <div class="category-name">面食</div>
+            </div>
+            <div class="category-item">
+                <div class="category-icon"><i class="fas fa-pizza-slice"></i></div>
+                <div class="category-name">披萨</div>
+            </div>
+            <div class="category-item">
+                <div class="category-icon"><i class="fas fa-hamburger"></i></div>
+                <div class="category-name">汉堡</div>
+            </div>
+            <div class="category-item">
+                <div class="category-icon"><i class="fas fa-ice-cream"></i></div>
+                <div class="category-name">甜品</div>
+            </div>
+        </div>
+
+        <!-- 推荐美食 -->
+        <div class="section">
+            <div class="section-title">
+                <span><i class="fas fa-star"></i> 推荐美食</span>
+                <a href="#" class="more">更多 ></a>
+            </div>
+            <div class="food-list">
+                <div class="food-item">
+                    <div class="food-image"><i class="fas fa-utensils"></i></div>
+                    <div class="food-info">
+                        <div class="food-name">红烧肉套餐</div>
+                        <div class="food-price">¥28</div>
+                        <div class="food-rating">
+                            <span class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+                            <span>4.8 (128评价)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="food-item">
+                    <div class="food-image"><i class="fas fa-fire"></i></div>
+                    <div class="food-info">
+                        <div class="food-name">麻辣香锅</div>
+                        <div class="food-price">¥35</div>
+                        <div class="food-rating">
+                            <span class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+                            <span>4.6 (95评价)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="food-item">
+                    <div class="food-image"><i class="fas fa-fish"></i></div>
+                    <div class="food-info">
+                        <div class="food-name">水煮鱼</div>
+                        <div class="food-price">¥42</div>
+                        <div class="food-rating">
+                            <span class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+                            <span>4.9 (203评价)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="food-item">
+                    <div class="food-image"><i class="fas fa-utensils"></i></div>
+                    <div class="food-info">
+                        <div class="food-name">小笼包</div>
+                        <div class="food-price">¥18</div>
+                        <div class="food-rating">
+                            <span class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+                            <span>4.7 (156评价)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 附近商家 -->
+        <div class="section">
+            <div class="section-title">
+                <span><i class="fas fa-store"></i> 附近商家</span>
+                <a href="#" class="more">更多 ></a>
+            </div>
+            <div class="food-list">
+                <div class="food-item">
+                    <div class="food-image"><i class="fas fa-fire"></i></div>
+                    <div class="food-info">
+                        <div class="food-name">川味轩</div>
+                        <div class="food-price">人均 ¥35</div>
+                        <div class="food-rating">
+                            <span class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+                            <span>4.5 (320评价)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="food-item">
+                    <div class="food-image"><i class="fas fa-utensils"></i></div>
+                    <div class="food-info">
+                        <div class="food-name">粤式茶餐厅</div>
+                        <div class="food-price">人均 ¥28</div>
+                        <div class="food-rating">
+                            <span class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span>
+                            <span>4.3 (189评价)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部导航 -->
+        <div class="bottom-nav">
+            <a href="#" class="nav-item active">
+                <span class="nav-icon"><i class="fas fa-home"></i></span>
+                首页
+            </a>
+            <a href="#" class="nav-item">
+                <span class="nav-icon"><i class="fas fa-list"></i></span>
+                分类
+            </a>
+            <a href="#" class="nav-item">
+                <span class="nav-icon"><i class="fas fa-shopping-cart"></i></span>
+                购物车
+            </a>
+            <a href="#" class="nav-item">
+                <span class="nav-icon"><i class="fas fa-user"></i></span>
+                我的
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // 增强的交互效果
+        document.querySelectorAll('.food-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const foodName = this.querySelector('.food-name').textContent;
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'translateY(-4px)';
+                }, 150);
+                alert('点击了美食: ' + foodName);
+            });
+        });
+
+        document.querySelectorAll('.category-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const categoryName = this.querySelector('.category-name').textContent;
+                this.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    this.style.transform = 'translateY(-2px)';
+                }, 150);
+                alert('点击了分类: ' + categoryName);
+            });
+        });
+
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+                const pageName = this.textContent.trim();
+
+                // 添加点击动画
+                this.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+
+                alert('切换到: ' + pageName);
+            });
+        });
+
+        // 搜索框聚焦效果
+        const searchInput = document.querySelector('.search-bar input');
+        searchInput.addEventListener('focus', function() {
+            this.parentElement.style.boxShadow = '0 4px 16px rgba(76, 175, 80, 0.2)';
+        });
+
+        searchInput.addEventListener('blur', function() {
+            this.parentElement.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+        });
+    </script>
+</body>
+</html>

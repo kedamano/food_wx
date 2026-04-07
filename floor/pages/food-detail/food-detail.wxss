@@ -1,0 +1,567 @@
+/* 美食详情页样式 */
+page {
+  background-color: #F8F9FA;
+  font-family: PingFang SC, Helvetica Neue, Arial, sans-serif;
+}
+
+.scrollarea {
+  height: calc(100vh - 60px);
+  background-color: #F8F9FA;
+}
+
+/* 头部导航 */
+.header-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.nav-left, .nav-right {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-icon {
+  font-size: 24px;
+  color: #4CAF50;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.back-icon:active {
+  transform: translateX(-3px);
+}
+
+.nav-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #212529;
+}
+
+.share-icon {
+  font-size: 20px;
+  color: #6C757D;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.share-icon:active {
+  transform: scale(0.9);
+}
+
+/* 美食图片轮播 */
+.food-images-section {
+  position: relative;
+  height: 250px;
+  overflow: hidden;
+}
+
+.food-swiper {
+  height: 100%;
+}
+
+.food-image {
+  width: 100%;
+  height: 100%;
+}
+
+.image-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.food-icon {
+  font-size: 80px;
+  color: #FFFFFF;
+}
+
+/* 基本信息区域 */
+.basic-info-section {
+  background: #FFFFFF;
+  padding: 20px;
+  margin-bottom: 12px;
+}
+
+.food-name {
+  font-size: 22px;
+  font-weight: bold;
+  color: #212529;
+  margin-bottom: 15px;
+  display: block;
+}
+
+.price-rating {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.price-symbol {
+  font-size: 18px;
+  color: #4CAF50;
+  font-weight: bold;
+}
+
+.food-price {
+  font-size: 26px;
+  color: #4CAF50;
+  font-weight: bold;
+}
+
+.rating-container {
+  display: flex;
+  align-items: center;
+}
+
+.star-icon {
+  font-size: 14px;
+  color: #FFD700;
+}
+
+.rating-score {
+  font-size: 14px;
+  color: #6C757D;
+  margin-left: 5px;
+}
+
+.review-count {
+  font-size: 12px;
+  color: #6C757D;
+  margin-left: 8px;
+}
+
+.food-stats {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 15px;
+  border-top: 1px solid #E9ECEF;
+}
+
+.stat-item {
+  font-size: 12px;
+  color: #6C757D;
+}
+
+/* 商品描述 */
+.description-section {
+  background-color: white;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 20rpx;
+}
+
+.section-icon {
+  font-size: 32rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.food-description {
+  font-size: 28rpx;
+  line-height: 1.8;
+  color: var(--text-secondary);
+  display: block;
+}
+
+/* 标签系统 */
+.tags-section {
+  background-color: white;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.tag-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 10rpx 20rpx;
+  border-radius: 24rpx;
+  font-size: 24rpx;
+}
+
+.hot-tag {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+  color: white;
+}
+
+.classic-tag {
+  background: linear-gradient(135deg, #ffd93d, #f6b93b);
+  color: white;
+}
+
+.combo-tag {
+  background: linear-gradient(135deg, #4ecdc4, #44a08d);
+  color: white;
+}
+
+.healthy-tag {
+  background: linear-gradient(135deg, #6bcf7f, #4caf50);
+  color: white;
+}
+
+.tag-icon {
+  font-size: 28rpx;
+}
+
+.tag-text {
+  font-weight: 500;
+}
+
+/* 用户评价 */
+.reviews-section {
+  background-color: white;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+}
+
+.reviews-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.section-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.view-all {
+  font-size: 26rpx;
+  color: var(--primary-color);
+}
+
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.review-item {
+  padding: 24rpx;
+  background-color: var(--bg-color);
+  border-radius: 16rpx;
+}
+
+.review-header {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 16rpx;
+}
+
+.user-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.avatar-text {
+  font-size: 36rpx;
+  color: white;
+  font-weight: bold;
+}
+
+.user-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.user-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.user-rating {
+  display: flex;
+  gap: 4rpx;
+}
+
+.star-icon {
+  font-size: 20rpx;
+  color: #ffd700;
+}
+
+.review-time {
+  font-size: 24rpx;
+  color: var(--text-light);
+}
+
+.review-content {
+  font-size: 28rpx;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.review-images {
+  display: flex;
+  gap: 12rpx;
+  flex-wrap: wrap;
+}
+
+.review-image {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 12rpx;
+  object-fit: cover;
+}
+
+/* 空评价提示 */
+.empty-reviews {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80rpx 0;
+  background-color: white;
+}
+
+.empty-icon {
+  font-size: 100rpx;
+  margin-bottom: 16rpx;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: 30rpx;
+  color: var(--text-secondary);
+  margin-bottom: 8rpx;
+}
+
+.empty-subtext {
+  font-size: 26rpx;
+  color: var(--text-light);
+}
+
+/* 商家信息 */
+.store-section {
+  background: #FFFFFF;
+  padding: 20px;
+  margin-bottom: 12px;
+}
+
+.store-info {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background: #F8F9FA;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.store-info:active {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.store-logo {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  margin-right: 15px;
+  background: #E9ECEF;
+}
+
+.store-detail {
+  flex: 1;
+}
+
+.store-name {
+  font-size: 16px;
+  font-weight: bold;
+  color: #212529;
+  margin-bottom: 8px;
+}
+
+.store-rating {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.store-score {
+  font-size: 14px;
+  color: #6C757D;
+  margin-left: 5px;
+}
+
+.store-sales {
+  font-size: 12px;
+  color: #6C757D;
+  margin-left: 10px;
+}
+
+.store-location {
+  display: flex;
+  align-items: center;
+}
+
+.location-icon {
+  font-size: 12px;
+  color: #6C757D;
+  margin-right: 5px;
+}
+
+.location-text {
+  font-size: 12px;
+  color: #6C757D;
+}
+
+.arrow-icon {
+  font-size: 18px;
+  color: #6C757D;
+}
+
+/* 底部操作栏 */
+.bottom-action {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: #FFFFFF;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  z-index: 1000;
+}
+
+.action-left {
+  display: flex;
+  gap: 15px;
+}
+
+.favorite-btn, .cart-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.favorite-btn:active, .cart-btn:active {
+  transform: scale(0.9);
+}
+
+.favorite-icon, .cart-icon {
+  font-size: 20px;
+  margin-bottom: 2px;
+}
+
+.btn-text {
+  font-size: 10px;
+  color: #6C757D;
+}
+
+.cart-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #FF5252;
+  color: #FFFFFF;
+  font-size: 8px;
+  padding: 2px 5px;
+  border-radius: 10px;
+  min-width: 16px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.action-right {
+  display: flex;
+  gap: 10px;
+}
+
+.add-cart-btn, .buy-now-btn {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 25px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #FFFFFF;
+}
+
+.add-cart-btn:active, .buy-now-btn:active {
+  transform: scale(0.95);
+}
+
+.add-cart-btn {
+  background: linear-gradient(135deg, #81C784 0%, #4CAF50 100%);
+}
+
+.buy-now-btn {
+  background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+}
+
+/* 响应式调整 */
+@media (max-width: 375px) {
+  .food-images-section {
+    height: 200px;
+  }
+
+  .food-name {
+    font-size: 20px;
+  }
+
+  .food-price {
+    font-size: 22px;
+  }
+
+  .bottom-action {
+    padding: 0 10px;
+  }
+
+  .add-cart-btn, .buy-now-btn {
+    padding: 10px 20px;
+    font-size: 12px;
+  }
+}

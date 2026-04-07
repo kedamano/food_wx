@@ -1,0 +1,117 @@
+<!--index.wxml-->
+<scroll-view class="scrollarea" scroll-y type="list">
+  <!-- 头部区域 -->
+  <view class="header">
+    <view class="app-title">
+      <text class="fa fa-leaf"></text>
+      <text class="title-text">美食小程序</text>
+    </view>
+    <view class="search-bar">
+      <text class="fa fa-search"></text>
+      <input class="search-input"
+             placeholder="搜索美食或商家"
+             bind:focus="onSearchFocus"
+             bind:blur="onSearchBlur"
+             confirm-type="search"
+             bindconfirm="onSearchConfirm" />
+      <text class="fa fa-close" wx:if="{{searchValue}}" bindtap="onClearSearch"></text>
+    </view>
+  </view>
+
+  <!-- 轮播图区域 -->
+  <view class="banner-section">
+    <swiper class="banner-swiper" indicator-dots="{{true}}" autoplay="{{true}}" interval="{{3000}}" circular="{{true}}">
+      <swiper-item wx:for="{{banners}}" wx:key="id">
+        <view class="banner-item" style="background: {{item.background}}">
+          <image class="banner-image" src="{{item.image}}" mode="aspectFill" wx:if="{{item.image}}"></image>
+          <text class="fa fa-utensils" wx:else></text>
+          <text class="banner-title">{{item.title}}</text>
+          <text class="banner-subtitle">{{item.subtitle}}</text>
+        </view>
+      </swiper-item>
+    </swiper>
+  </view>
+
+  <!-- 分类导航 -->
+  <view class="category-nav">
+    <view class="category-item" wx:for="{{categories}}" wx:key="id" bindtap="onCategoryTap" data-category="{{item.name}}">
+      <view class="category-icon" style="background: {{item.color}}">
+        <image class="category-image" src="{{item.image}}" mode="aspectFill" wx:if="{{item.image}}"></image>
+        <text class="fa {{item.icon}}" wx:else></text>
+      </view>
+      <text class="category-name">{{item.name}}</text>
+    </view>
+  </view>
+
+  <!-- 推荐美食 -->
+  <view class="section recommend-section">
+    <view class="section-header">
+      <text class="section-title-text"><text class="fa fa-star"></text> 推荐美食</text>
+      <text class="more-text" bindtap="onMoreFoods">更多推荐美食 ></text>
+    </view>
+    <view class="food-grid">
+      <view class="food-item {{item.imageLoaded ? 'loaded' : ''}} {{item.imageError ? 'error' : ''}}" 
+              wx:for="{{recommendFoods}}" wx:key="id" bindtap="onFoodTap" data-food-id="{{item.id}}">
+        <view class="food-image">
+          <image class="real-image lazyload" 
+                 src="{{item.image}}" 
+                 mode="aspectFill"
+                 lazy-load="{{true}}"
+                 bindload="onImageLoad"
+                 binderror="onImageError"
+                 data-food-id="{{item.id}}"
+                 wx:if="{{item.image && !item.imageError}}"></image>
+          <text class="fa {{item.icon || 'fa-utensils'}} image-placeholder" wx:else></text>
+        </view>
+        <view class="food-info">
+          <text class="food-name">{{item.name}}</text>
+          <view class="food-meta">
+            <text class="food-price">¥{{item.price}}</text>
+            <view class="rating">
+              <text class="fa fa-star"></text>
+              <text class="rating-text">{{item.rating}}({{item.reviews}})</text>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="loading-more" wx:if="{{loadingFoods}}">
+        <text class="loading-spinner"></text>
+        <text class="loading-text">正在加载更多美食...</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 附近商家 -->
+  <view class="section stores-section">
+    <view class="section-header">
+      <text class="section-title-text"><text class="fa fa-store"></text> 附近商家</text>
+      <text class="more-text" bindtap="onMoreStores">更多附近商家 ></text>
+    </view>
+    <view class="stores-grid">
+      <view class="store-item" wx:for="{{nearbyStores}}" wx:key="id" bindtap="onStoreTap" data-store-id="{{item.id}}">
+        <view class="store-logo" style="background-image: url({{item.banner || item.image}})" wx:if="{{item.banner || item.image}}">
+        </view>
+        <view class="store-logo" wx:else>
+          <text class="fa {{item.icon || 'fa-store'}}"></text>
+        </view>
+        <view class="store-info">
+          <text class="store-name">{{item.name}}</text>
+          <view class="store-meta">
+            <text class="store-price">人均 ¥{{item.price}}</text>
+            <view class="rating">
+              <text class="fa fa-star"></text>
+              <text class="rating-text">{{item.rating}}({{item.reviews}})</text>
+            </view>
+          </view>
+          <view class="delivery-info">
+            <text class="distance">{{item.distance}}</text>
+            <text class="delivery-time">{{item.deliveryTime}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</scroll-view>
+
+
+

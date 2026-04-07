@@ -1,0 +1,109 @@
+<!-- 积分商城 - 精致版 -->
+<scroll-view class="container" scroll-y>
+  <!-- 积分头部 -->
+  <view class="points-header">
+    <view class="points-card">
+      <view class="points-content">
+        <text class="points-label">我的积分</text>
+        <view class="points-balance">
+          <text class="points-number">{{userPoints}}</text>
+          <text class="points-text">分</text>
+        </view>
+        <view class="points-actions">
+          <button class="action-btn" bindtap="onGetPoints">
+            <text class="fa fa-calendar-check btn-icon"></text>
+            <text class="btn-text">签到</text>
+          </button>
+          <button class="action-btn" bindtap="onPointsRule">
+            <text class="fa fa-info-circle btn-icon"></text>
+            <text class="btn-text">规则</text>
+          </button>
+        </view>
+      </view>
+      <view class="points-stats">
+        <view class="stat-item">
+          <text class="stat-value">{{todayPoints}}</text>
+          <text class="stat-label">今日可获</text>
+        </view>
+        <view class="stat-item">
+          <text class="stat-value">{{monthlyPoints}}</text>
+          <text class="stat-label">本月累计</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 今日任务 -->
+  <view class="tasks-section">
+    <view class="section-header">
+      <text class="section-title"><text class="fa fa-bullseye"></text> 今日任务</text>
+      <text class="section-desc">完成得积分</text>
+    </view>
+    <view class="task-list">
+      <view class="task-card {{item.completed ? 'completed' : ''}}" wx:for="{{dailyTasks}}" wx:key="id" bindtap="onTaskClick" data-task="{{item}}">
+        <view class="task-icon">
+          <text class="icon">{{item.icon}}</text>
+        </view>
+        <view class="task-content">
+          <text class="task-name">{{item.name}}</text>
+          <text class="task-points">+{{item.points}} 积分</text>
+        </view>
+        <view class="task-status">
+          <text class="status-text">{{item.completed ? '✓' : '→'}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 积分商品 -->
+  <view class="products-section">
+    <view class="section-header">
+      <text class="section-title"><text class="fa fa-gift"></text> 积分兑换</text>
+      <view class="sort-options" bindtap="onSortClick">
+        <text class="sort-text">{{sortText}}</text>
+        <text class="sort-icon">▼</text>
+      </view>
+    </view>
+    <view class="product-grid">
+      <view class="product-card" wx:for="{{products}}" wx:key="id" bindtap="onProductClick" data-product="{{item}}">
+        <view class="product-image">
+          <image class="product-img" src="{{item.image}}" mode="aspectFill" lazy-load></image>
+          <text class="product-icon" wx:if="{{!item.image}}">{{item.icon}}</text>
+          <view class="stock-badge" wx:if="{{item.stock <= 10}}">
+            <text class="stock-text">仅剩{{item.stock}}件</text>
+          </view>
+        </view>
+        <view class="product-info">
+          <text class="product-name">{{item.name}}</text>
+          <view class="product-price">
+            <text class="price-points">{{item.points}} 积分</text>
+            <text class="price-original" wx:if="{{item.originalPrice}}">¥{{item.originalPrice}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 积分记录 -->
+  <view class="history-section">
+    <view class="section-header" bindtap="onViewHistory">
+      <text class="section-title"><text class="fa fa-chart-bar"></text> 积分记录</text>
+      <text class="view-all">查看全部 →</text>
+    </view>
+    <view class="history-list">
+      <view class="history-item" wx:for="{{recentHistory}}" wx:key="id">
+        <view class="history-icon">
+          <text class="icon">{{item.icon}}</text>
+        </view>
+        <view class="history-content">
+          <text class="history-type">{{item.type}}</text>
+          <text class="history-time">{{item.time}}</text>
+        </view>
+        <text class="history-points {{item.type === '收入' ? 'income' : 'expense'}}">{{item.points}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部安全区域 -->
+  <view class="safe-area-bottom"></view>
+</scroll-view>

@@ -1,0 +1,66 @@
+<!-- 收货地址管理 - 精致版 -->
+<scroll-view class="container" scroll-y>
+  <!-- 头部 -->
+  <view class="header">
+    <view class="header-content">
+      <text class="header-title">收货地址</text>
+      <text class="header-subtitle">管理您的收货地址</text>
+    </view>
+    <button class="add-btn" bindtap="onAddAddress">
+      <text class="btn-icon">+</text>
+      <text class="btn-text">新建地址</text>
+    </button>
+  </view>
+
+  <!-- 地址列表 -->
+  <view class="address-list">
+    <view class="address-card {{item.isDefault ? 'default' : ''}}" 
+          wx:for="{{addresses}}" wx:key="id" 
+          bindtap="onAddressSelect" data-address="{{item}}">
+      
+      <!-- 默认标签 -->
+      <view class="default-badge" wx:if="{{item.isDefault}}">
+        <text class="badge-text">默认</text>
+      </view>
+
+      <!-- 地址内容 -->
+      <view class="address-content">
+        <view class="user-info">
+          <text class="user-name">{{item.name}}</text>
+          <text class="user-phone">{{item.phone}}</text>
+          <view class="address-tags">
+            <text class="tag work" wx:if="{{item.isWork}}">公司</text>
+            <text class="tag home" wx:if="{{item.isHome}}">家</text>
+          </view>
+        </view>
+        <view class="address-detail">
+          <text class="address-text">{{item.province}} {{item.city}} {{item.district}}</text>
+          <text class="address-text detail">{{item.detail}}</text>
+        </view>
+      </view>
+
+      <!-- 操作区域 -->
+      <view class="address-actions">
+        <button class="action-btn edit" bindtap="onEditAddress" data-address="{{item}}">
+          <text class="fa fa-edit btn-icon"></text>
+          <text class="btn-text">编辑</text>
+        </button>
+        <button class="action-btn delete" bindtap="onDeleteAddress" data-address="{{item}}">
+          <text class="fa fa-trash-alt btn-icon"></text>
+          <text class="btn-text">删除</text>
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{addresses.length === 0}}">
+    <view class="empty-icon fa fa-map-marker-alt"></view>
+    <text class="empty-title">还没有收货地址</text>
+    <text class="empty-desc">添加您的第一个收货地址</text>
+    <button class="btn-primary" bindtap="onAddAddress">添加地址</button>
+  </view>
+
+  <!-- 底部安全区域 -->
+  <view class="safe-area-bottom"></view>
+</scroll-view>

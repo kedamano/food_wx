@@ -1,0 +1,167 @@
+/* 安全设置页面样式 */
+.container {
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40rpx 30rpx 20rpx;
+  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+  color: #fff;
+}
+
+.back-btn {
+  font-size: 36rpx;
+  padding: 10rpx 20rpx;
+}
+
+.header-title {
+  font-size: 34rpx;
+  font-weight: bold;
+}
+
+.header-placeholder {
+  width: 80rpx;
+}
+
+/* 安全等级 */
+.security-level {
+  background: #fff;
+  margin: 20rpx;
+  padding: 30rpx;
+  border-radius: 20rpx;
+}
+
+.level-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.level-title {
+  font-size: 30rpx;
+  color: #333;
+  font-weight: bold;
+}
+
+.level-badge {
+  padding: 6rpx 20rpx;
+  border-radius: 20rpx;
+  font-size: 24rpx;
+}
+
+.level-badge.high {
+  background: #e8f5e9;
+  color: #4CAF50;
+}
+
+.level-badge.medium {
+  background: #fff3e0;
+  color: #ff9800;
+}
+
+.level-badge.low {
+  background: #ffebee;
+  color: #f44336;
+}
+
+.level-bar {
+  height: 16rpx;
+  background: #e0e0e0;
+  border-radius: 8rpx;
+  overflow: hidden;
+  margin-bottom: 16rpx;
+}
+
+.level-progress {
+  height: 100%;
+  background: linear-gradient(90deg, #f44336, #ff9800, #4CAF50);
+  border-radius: 8rpx;
+  transition: width 0.3s;
+}
+
+.level-tip {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 区块 */
+.section {
+  margin: 20rpx;
+}
+
+.section-title {
+  display: block;
+  font-size: 28rpx;
+  color: #999;
+  margin-bottom: 16rpx;
+  padding-left: 10rpx;
+}
+
+.item-list {
+  background: #fff;
+  border-radius: 20rpx;
+  overflow: hidden;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.item:last-child {
+  border-bottom: none;
+}
+
+.item-left {
+  display: flex;
+  align-items: center;
+}
+
+.item-icon {
+  font-size: 40rpx;
+  margin-right: 20rpx;
+}
+
+.item-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.item-name {
+  font-size: 30rpx;
+  color: #333;
+}
+
+.item-desc {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 4rpx;
+}
+
+.item-right {
+  display: flex;
+  align-items: center;
+}
+
+.bind-status {
+  font-size: 26rpx;
+  color: #4CAF50;
+  margin-right: 10rpx;
+}
+
+.bind-status.bound {
+  color: #999;
+}
+
+.item-arrow {
+  font-size: 28rpx;
+  color: #ccc;
+}

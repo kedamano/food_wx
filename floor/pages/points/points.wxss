@@ -1,0 +1,405 @@
+/* 积分商城 - 现代化CSS */
+page {
+  background-color: #F5F5F7;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.container {
+  padding: 20rpx;
+  min-height: 100vh;
+}
+
+/* 积分头部 */
+.points-header {
+  margin-bottom: 20rpx;
+}
+
+.points-card {
+  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+  border-radius: 20rpx;
+  padding: 30rpx;
+  box-shadow: 0 4rpx 12rpx rgba(76, 175, 80, 0.2);
+}
+
+.points-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.points-label {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.8);
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.points-balance {
+  display: flex;
+  align-items: flex-end;
+}
+
+.points-number {
+  font-size: 56rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  line-height: 1;
+}
+
+.points-text {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.8);
+  margin-left: 8rpx;
+  margin-bottom: 8rpx;
+}
+
+.points-actions {
+  display: flex;
+  gap: 16rpx;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 30rpx;
+  padding: 12rpx 24rpx;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.action-btn:active {
+  transform: scale(0.95);
+}
+
+.btn-icon {
+  font-size: 24rpx;
+  margin-right: 8rpx;
+}
+
+.btn-text {
+  font-size: 24rpx;
+  color: #FFFFFF;
+  font-weight: 500;
+}
+
+.points-stats {
+  display: flex;
+  justify-content: space-around;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16rpx;
+  padding: 20rpx;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 4rpx;
+}
+
+.stat-label {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* 今日任务 */
+.tasks-section {
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333333;
+}
+
+.section-desc {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.task-card {
+  display: flex;
+  align-items: center;
+  background: #F9F9F9;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  transition: all 0.3s ease;
+  border: 2rpx solid transparent;
+}
+
+.task-card.completed {
+  opacity: 0.6;
+  background: #F0F0F0;
+}
+
+.task-card:active {
+  transform: scale(0.98);
+}
+
+.task-icon {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 30rpx;
+  background: #E8F5E8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+}
+
+.completed .task-icon {
+  background: #CCCCCC;
+}
+
+.icon {
+  font-size: 32rpx;
+}
+
+.task-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.task-name {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 4rpx;
+}
+
+.task-points {
+  font-size: 24rpx;
+  color: #4CAF50;
+  font-weight: 500;
+}
+
+.completed .task-points {
+  color: #999999;
+}
+
+.task-status {
+  font-size: 32rpx;
+  color: #4CAF50;
+}
+
+.completed .task-status {
+  color: #999999;
+}
+
+/* 积分商品 */
+.products-section {
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.sort-options {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.sort-text {
+  font-size: 24rpx;
+  color: #666666;
+}
+
+.sort-icon {
+  font-size: 20rpx;
+  color: #999999;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20rpx;
+}
+
+.product-card {
+  background: #F9F9F9;
+  border-radius: 16rpx;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.product-card:active {
+  transform: scale(0.98);
+}
+
+.product-image {
+  position: relative;
+  width: 100%;
+  height: 200rpx;
+  background: #F0F0F0;
+}
+
+.product-img {
+  width: 100%;
+  height: 100%;
+}
+
+.product-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 64rpx;
+  color: #CCCCCC;
+}
+
+.stock-badge {
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  background: #FF6B6B;
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+}
+
+.stock-text {
+  font-size: 20rpx;
+  color: #FFFFFF;
+  font-weight: 500;
+}
+
+.product-info {
+  padding: 20rpx;
+}
+
+.product-name {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 12rpx;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.product-price {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.price-points {
+  font-size: 28rpx;
+  color: #FF6B6B;
+  font-weight: 700;
+}
+
+.price-original {
+  font-size: 22rpx;
+  color: #999999;
+  text-decoration: line-through;
+}
+
+/* 积分记录 */
+.history-section {
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.view-all {
+  font-size: 24rpx;
+  color: #4CAF50;
+  font-weight: 500;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  padding: 16rpx;
+  background: #F9F9F9;
+  border-radius: 12rpx;
+}
+
+.history-icon {
+  width: 50rpx;
+  height: 50rpx;
+  border-radius: 25rpx;
+  background: #E8F5E8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16rpx;
+}
+
+.history-icon .icon {
+  font-size: 28rpx;
+}
+
+.history-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.history-type {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 4rpx;
+}
+
+.history-time {
+  font-size: 22rpx;
+  color: #999999;
+}
+
+.history-points {
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.history-points.income {
+  color: #4CAF50;
+}
+
+.history-points.expense {
+  color: #FF6B6B;
+}
+
+/* 底部安全区域 */
+.safe-area-bottom {
+  height: 40rpx;
+}

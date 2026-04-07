@@ -1,0 +1,72 @@
+<!-- 支付方式管理 - 精致版 -->
+<scroll-view class="container" scroll-y>
+  <!-- 头部 -->
+  <view class="header-section">
+    <view class="header-content">
+      <text class="header-title">支付方式</text>
+      <text class="header-subtitle">管理您的支付方式</text>
+    </view>
+    <button class="add-btn" bindtap="onAddPayment">
+      <text class="btn-icon">+</text>
+      <text class="btn-text">添加</text>
+    </button>
+  </view>
+
+  <!-- 支付方式列表 -->
+  <view class="payment-list">
+    <view class="payment-card {{item.isDefault ? 'default' : ''}}" 
+          wx:for="{{paymentMethods}}" wx:key="id" 
+          bindtap="onSelectPayment" data-payment="{{item}}">
+      
+      <!-- 默认标签 -->
+      <view class="default-badge" wx:if="{{item.isDefault}}">
+        <text class="badge-text">默认</text>
+      </view>
+
+      <!-- 支付方式内容 -->
+      <view class="payment-content">
+        <view class="payment-icon">
+          <text class="icon-text">{{item.icon}}</text>
+        </view>
+        <view class="payment-info">
+          <text class="payment-name">{{item.name}}</text>
+          <text class="payment-number">{{item.number}}</text>
+          <view class="payment-status">
+            <text class="status-text">{{item.status}}</text>
+            <text class="status-dot"></text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 操作区域 -->
+      <view class="payment-actions">
+        <button class="action-btn default" bindtap="onSetDefault" data-payment="{{item}}" wx:if="{{!item.isDefault}}">
+          <text class="btn-text">设为默认</text>
+        </button>
+        <button class="action-btn edit" bindtap="onEditPayment" data-payment="{{item}}">
+          <text class="fa fa-edit btn-icon"></text>
+        </button>
+        <button class="action-btn delete" bindtap="onDeletePayment" data-payment="{{item}}">
+          <text class="fa fa-trash-alt btn-icon"></text>
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 安全提示 -->
+  <view class="security-section">
+    <view class="security-header">
+      <text class="fa fa-shield-alt security-icon"></text>
+      <text class="security-title">安全保障</text>
+    </view>
+    <view class="security-content">
+      <text class="security-text">• 支付信息全程加密</text>
+      <text class="security-text">• 支持指纹/面部识别</text>
+      <text class="security-text">• 交易风险实时监控</text>
+      <text class="security-text">• 7×24小时客服支持</text>
+    </view>
+  </view>
+
+  <!-- 底部安全区域 -->
+  <view class="safe-area-bottom"></view>
+</scroll-view>

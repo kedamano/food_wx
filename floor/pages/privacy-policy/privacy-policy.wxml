@@ -1,0 +1,71 @@
+<!-- 隐私政策页面 -->
+<scroll-view class="container" scroll-y>
+  <view class="header">
+    <view class="back-btn" bindtap="onBack">
+      <text class="fa fa-arrow-left"></text>
+    </view>
+    <text class="header-title">隐私政策</text>
+    <view class="header-placeholder"></view>
+  </view>
+
+  <view class="content">
+    <view class="policy-header">
+      <text class="policy-title">美食小程序隐私政策</text>
+      <text class="policy-date">更新日期：{{lastUpdate}}</text>
+    </view>
+
+    <view class="policy-section">
+      <text class="section-title">一、信息收集</text>
+      <text class="section-text">我们承诺尊重并保护您的个人隐私。当您使用美食小程序时，我们可能会收集以下信息：</text>
+      <view class="policy-list">
+        <text class="list-item">• 位置信息：用于推荐附近商家和配送服务</text>
+        <text class="list-item">• 账号信息：用于登录和身份验证</text>
+        <text class="list-item">• 订单信息：用于订单管理和售后服务</text>
+        <text class="list-item">• 设备信息：用于优化服务体验</text>
+      </view>
+    </view>
+
+    <view class="policy-section">
+      <text class="section-title">二、信息使用</text>
+      <text class="section-text">我们收集的信息将用于以下目的：</text>
+      <view class="policy-list">
+        <text class="list-item">• 提供、维护和改进我们的服务</text>
+        <text class="list-item">• 处理您的订单和配送</text>
+        <text class="list-item">• 向您发送订单状态更新</text>
+        <text class="list-item">• 提供客户支持</text>
+        <text class="list-item">• 个性化推荐美食</text>
+      </view>
+    </view>
+
+    <view class="policy-section">
+      <text class="section-title">三、信息共享</text>
+      <text class="section-text">未经您的同意，我们不会与任何第三方共享您的个人信息，以下情况除外：</text>
+      <view class="policy-list">
+        <text class="list-item">• 向商家提供必要信息以完成配送</text>
+        <text class="list-item">• 遵守法律法规的要求</text>
+        <text class="list-item">• 保护我们的合法权益</text>
+      </view>
+    </view>
+
+    <view class="policy-section">
+      <text class="section-title">四、信息安全</text>
+      <text class="section-text">我们采用行业标准的安全措施来保护您的个人信息，防止数据遭到未经授权的访问、使用或泄露。</text>
+    </view>
+
+    <view class="policy-section">
+      <text class="section-title">五、您的权利</text>
+      <text class="section-text">您有权：</text>
+      <view class="policy-list">
+        <text class="list-item">• 访问您的个人信息</text>
+        <text class="list-item">• 更正不准确的信息</text>
+        <text class="list-item">• 删除您的个人信息</text>
+        <text class="list-item">• 撤回同意</text>
+      </view>
+    </view>
+
+    <view class="policy-section">
+      <text class="section-title">六、联系我们</text>
+      <text class="section-text">如果您对本隐私政策有任何疑问，请联系我们的客服团队。</text>
+    </view>
+  </view>
+</scroll-view>

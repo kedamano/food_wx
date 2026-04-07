@@ -1,0 +1,87 @@
+<!-- 用户评价页面 -->
+<scroll-view class="container" scroll-y>
+  <!-- 头部统计 -->
+  <view class="header-section">
+    <view class="stats-card">
+      <view class="stat-item">
+        <text class="stat-value">{{statistics.totalReviews}}</text>
+        <text class="stat-label">全部评价</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-value">{{statistics.avgRating}}</text>
+        <text class="stat-label">平均评分</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-value">{{statistics.fiveStarCount}}</text>
+        <text class="stat-label">5星评价</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 评价列表 -->
+  <view class="reviews-section">
+    <view class="section-header">
+      <text class="section-title">我的评价</text>
+      <text class="section-count">共{{reviews.length}}条</text>
+    </view>
+
+    <view class="review-list">
+      <view class="review-card" wx:for="{{reviews}}" wx:key="reviewId" bindtap="onReviewDetail" data-review="{{item}}">
+        <!-- 评价头部 -->
+        <view class="review-header">
+          <view class="food-info">
+            <image class="food-image" src="{{item.foodImage}}" mode="aspectFill" lazy-load></image>
+            <view class="food-details">
+              <text class="food-name">{{item.foodName}}</text>
+              <view class="rating-stars">
+                <text class="star {{index < item.rating ? 'active' : ''}}" wx:for="{{5}}" wx:key="*this" wx:for-index="index">★</text>
+              </view>
+            </view>
+          </view>
+          <text class="review-time">{{item.createTime}}</text>
+        </view>
+
+        <!-- 评价内容 -->
+        <view class="review-content">
+          <text class="review-text">{{item.content}}</text>
+        </view>
+
+        <!-- 评价图片 -->
+        <view class="review-images" wx:if="{{item.images && item.images.length > 0}}">
+          <image class="review-image" wx:for="{{item.images}}" wx:key="*this" 
+                 src="{{item}}" mode="aspectFill" lazy-load bindtap="onPreviewImage" data-images="{{item.images}}" data-index="{{index}}"></image>
+        </view>
+
+        <!-- 评价操作 -->
+        <view class="review-actions">
+          <view class="action-btn" bindtap="onLikeReview" data-review="{{item}}">
+            <text class="fa {{item.isLiked ? 'fa-heart' : 'fa-heart-o'}} action-icon {{item.isLiked ? 'liked' : ''}}"></text>
+            <text class="action-text">{{item.likeCount || 0}}</text>
+          </view>
+          <view class="action-btn" bindtap="onReplyReview" data-review="{{item}}">
+            <text class="fa fa-comment action-icon"></text>
+            <text class="action-text">回复</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{reviews.length === 0 && !loading}}">
+      <text class="fa fa-edit empty-icon"></text>
+      <text class="empty-title">暂无评价</text>
+      <text class="empty-desc">完成订单后可评价美食</text>
+      <button class="btn btn-primary" bindtap="onGoOrders">去评价</button>
+    </view>
+
+    <!-- 加载状态 -->
+    <view class="loading-state" wx:if="{{loading}}">
+      <text class="loading-text">加载中...</text>
+    </view>
+  </view>
+
+  <!-- 底部安全区域 -->
+  <view class="safe-area-bottom"></view>
+</scroll-view>

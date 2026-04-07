@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.food.mapper.FoodMapper">
+
+    <resultMap id="BaseResultMap" type="com.food.entity.Food">
+        <id column="food_id" jdbcType="INTEGER" property="foodId"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="price" jdbcType="DECIMAL" property="price"/>
+        <result column="description" property="description" jdbcType="LONGVARCHAR"/>
+        <result column="image" jdbcType="VARCHAR" property="image"/>
+        <result column="category_id" jdbcType="INTEGER" property="categoryId"/>
+        <result column="store_id" jdbcType="INTEGER" property="storeId"/>
+        <result column="rating" jdbcType="DECIMAL" property="rating"/>
+        <result column="sales" jdbcType="INTEGER" property="sales"/>
+        <result column="tags" jdbcType="VARCHAR" property="tags" typeHandler="com.food.handler.JsonTypeHandler"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="category_name" jdbcType="VARCHAR" property="categoryName"/>
+        <result column="store_name" jdbcType="VARCHAR" property="storeName"/>
+    </resultMap>
+
+    <sql id="BaseColumnList">
+        food_id, name, price, description, image, category_id, store_id, rating, sales, tags, status, create_time, update_time
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="foodId">
+        INSERT INTO foods (
+            name, price, description, image, category_id, store_id, rating, sales, tags
+        ) VALUES (
+            #{name}, #{price}, #{description}, #{image}, #{categoryId}, #{storeId}, #{rating}, #{sales}, #{tags}
+        )
+
+
+
+
+    </insert>
+
+    <update id="update">
+        UPDATE foods
+        SET name = #{name},
+            price = #{price},
+            description = #{description},
+            image = #{image},
+            category_id = #{categoryId},
+            store_id = #{storeId},
+            rating = #{rating},
+            sales = #{sales},
+            tags = #{tags},
+            status = #{status},
+            update_time = CURRENT_TIMESTAMP
+        WHERE food_id = #{foodId}
+    </update>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM foods
+        WHERE food_id = #{foodId}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT f.*, c.category_name, s.store_name
+        FROM foods f
+        LEFT JOIN categories c ON f.category_id = c.category_id
+        LEFT JOIN stores s ON f.store_id = s.store_id
+        WHERE f.status = 1
+        ORDER BY f.create_time DESC
+    </select>
+
+    <select id="selectByCategoryId" resultMap="BaseResultMap">
+        SELECT f.*, c.category_name, s.store_name
+        FROM foods f
+        LEFT JOIN categories c ON f.category_id = c.category_id
+        LEFT JOIN stores s ON f.store_id = s.store_id
+        WHERE f.category_id = #{categoryId} AND f.status = 1
+        ORDER BY f.rating DESC
+    </select>
+
+    <select id="selectByStoreId" resultMap="BaseResultMap">
+        SELECT f.*, c.category_name, s.store_name
+        FROM foods f
+        LEFT JOIN categories c ON f.category_id = c.category_id
+        LEFT JOIN stores s ON f.store_id = s.store_id
+        WHERE f.store_id = #{storeId} AND f.status = 1
+        ORDER BY f.sales DESC
+    </select>
+
+    <select id="searchByName" resultMap="BaseResultMap">
+        SELECT f.*, c.category_name, s.store_name
+        FROM foods f
+        LEFT JOIN categories c ON f.category_id = c.category_id
+        LEFT JOIN stores s ON f.store_id = s.store_id
+        WHERE f.name LIKE CONCAT('%', #{name}, '%') AND f.status = 1
+        ORDER BY f.rating DESC
+    </select>
+
+    <select id="selectByRating" resultMap="BaseResultMap">
+        SELECT f.*, c.category_name, s.store_name
+        FROM foods f
+        LEFT JOIN categories c ON f.category_id = c.category_id
+        LEFT JOIN stores s ON f.store_id = s.store_id
+        WHERE f.rating &gt;= #{minRating} AND f.status = 1
+        ORDER BY f.rating DESC
+    </select>
+
+    <update id="updateSales">
+        UPDATE foods
+        SET sales = sales + #{sales}
+        WHERE food_id = #{foodId}
+    </update>
+
+    <delete id="deleteById">
+        UPDATE foods
+        SET status = 0
+        WHERE food_id = #{foodId}
+    </delete>
+
+</mapper>
