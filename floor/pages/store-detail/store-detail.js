@@ -1,98 +1,122 @@
-// 商家详情页面逻辑
+// 商家详情页 - 大众点评风格
 Page({
   data: {
-    // 商家信息
-    storeInfo: {
-      id: 0,
-      name: '',
-      banner: '',
-      distance: '',
-      deliveryTime: '',
-      price: 0,
-      rating: 0,
-      notice: ''
-    },
-    
-    // 商品分类
+    storeInfo: { id: 0, name: '', banner: '', distance: '', deliveryTime: '', price: 0, rating: 0, notice: '', status: '' },
+    storeImages: [],
+    isCollected: false,
     categories: [],
     currentCategory: 0,
-    
-    // 商品列表
     foodList: [],
-    
-    // 购物车
     cartItems: [],
     cartCount: 0,
-    cartTotal: 0
+    cartTotal: 0,
+    activeTab: 'menu',
+    deals: [],
+    reviewsList: [],
+    showCartPopup: false,
+    cartPopupItems: [],
+    cartPopupCount: 0,
+    cartPopupTotal: '0.00'
   },
 
-  // 页面加载
-  onLoad(options) {
-    console.log('商家详情页加载，参数：', options);
-    
-    // 获取商家ID
-    const storeId = options.storeId || 1;
-    
-    // 加载商家信息
+  onLoad: function(options) {
+    var storeId = parseInt(options.storeId) || 1;
+    var self = this;
+    // 检查收藏状态
+    var favoriteIds = wx.getStorageSync('favoriteStoreIds') || [];
+    var isCollected = false;
+    for (var i = 0; i < favoriteIds.length; i++) {
+      if (favoriteIds[i] === storeId) {
+        isCollected = true;
+        break;
+      }
+    }
+    this.setData({ isCollected: isCollected });
     this.loadStoreInfo(storeId);
-    
-    // 加载分类
     this.loadCategories();
-    
-    // 加载商品
     this.loadFoods(storeId);
-    
-    // 加载购物车
     this.loadCart();
   },
 
-  // 返回按钮点击
-  onBackClick() {
-    console.log('返回按钮点击');
-    wx.navigateBack({
-      delta: 1
+  goBack: function() { wx.navigateBack({ delta: 1 }); },
+
+  onShare: function() {
+    var self = this;
+    wx.showActionSheet({
+      itemList: ['分享给朋友', '生成海报', '复制链接'],
+      success: function(res) {
+        if (res.tapIndex === 0) {
+          // 使用微信分享
+          wx.showShareMenu({ withShareTicket: true });
+        } else if (res.tapIndex === 1) {
+          wx.showToast({ title: '海报生成中...', icon: 'none' });
+          setTimeout(function() {
+            wx.showToast({ title: '海报已保存到相册', icon: 'success' });
+          }, 1500);
+        } else if (res.tapIndex === 2) {
+          wx.setClipboardData({
+            data: '美食探店 - ' + self.data.storeInfo.name,
+            success: function() {
+              wx.showToast({ title: '链接已复制', icon: 'success' });
+            }
+          });
+        }
+      }
     });
   },
 
-  // 分享按钮点击
-  onShareClick() {
-    console.log('分享按钮点击');
-    wx.showToast({
-      title: '分享功能开发中',
-      icon: 'none'
-    });
-  },
+  toggleCollect: function() {
+    var storeId = this.data.storeInfo.id;
+    var isCollected = !this.data.isCollected;
 
-  // 分类点击
-  onCategoryTap(e) {
-    const categoryId = e.currentTarget.dataset.category;
-    console.log('点击分类：', categoryId);
-    
-    this.setData({
-      currentCategory: parseInt(categoryId)
-    });
-    
-    // 重新加载商品
-    const storeId = this.data.storeInfo.id;
-    this.loadFoods(storeId, categoryId);
-  },
-
-  // 添加商品到购物车
-  onAddToCart(e) {
-    const item = e.currentTarget.dataset.item;
-    console.log('添加商品到购物车：', item);
-    
-    // 获取现有购物车数据
-    const app = getApp();
-    let cart = app.globalData.cart || [];
-    
-    // 检查是否已存在
-    const existingItemIndex = cart.findIndex(cartItem => cartItem.foodId === item.id);
-    if (existingItemIndex !== -1) {
-      // 更新数量
-      cart[existingItemIndex].quantity += 1;
+    // 保存到本地存储
+    var favoriteIds = wx.getStorageSync('favoriteStoreIds') || [];
+    if (isCollected) {
+      favoriteIds.push(storeId);
     } else {
-      // 添加新商品
+      var newFavoriteIds = [];
+      for (var i = 0; i < favoriteIds.length; i++) {
+        if (favoriteIds[i] !== storeId) {
+          newFavoriteIds.push(favoriteIds[i]);
+        }
+      }
+      favoriteIds = newFavoriteIds;
+    }
+    wx.setStorageSync('favoriteStoreIds', favoriteIds);
+
+    this.setData({ isCollected: isCollected });
+    wx.showToast({ title: isCollected ? '已收藏' : '已取消收藏', icon: 'none' });
+  },
+
+  switchTab: function(e) {
+    var tab = e.currentTarget.dataset.tab;
+    this.setData({ activeTab: tab });
+    if (tab === 'reviews' && this.data.reviewsList.length === 0) {
+      this.loadReviews();
+    }
+  },
+
+  onCategoryTap: function(e) {
+    var id = e.currentTarget.dataset.id;
+    this.setData({ currentCategory: id });
+    this.loadFoods(this.data.storeInfo.id, id);
+  },
+
+  onAddToCart: function(e) {
+    var self = this;
+    var item = e.currentTarget.dataset.item;
+    var app = getApp();
+    var cart = app.globalData.cart || [];
+    var idx = -1;
+    for (var i = 0; i < cart.length; i++) {
+      if (cart[i].foodId === item.id) {
+        idx = i;
+        break;
+      }
+    }
+    if (idx !== -1) {
+      cart[idx].quantity += 1;
+    } else {
       cart.push({
         foodId: item.id,
         name: item.name,
@@ -102,275 +126,341 @@ Page({
         storeId: this.data.storeInfo.id
       });
     }
-    
-    // 更新全局购物车数据
-    app.globalData.cart = cart;
-    app.globalData.cartCount = cart.reduce((sum, cartItem) => sum + cartItem.quantity, 0);
-    
-    // 更新购物车显示
+    app.updateCart(cart);
     this.updateCartDisplay();
-    
-    // 显示成功提示
-    wx.showToast({
-      title: '已加入购物车',
-      icon: 'success',
-      duration: 1500
+    wx.showToast({ title: '已加入购物车', icon: 'success', duration: 800 });
+  },
+
+  onCartTap: function() {
+    var self = this;
+    var app = getApp();
+    var cart = app.globalData.cart || [];
+    var totalCount = 0;
+    var totalPrice = 0;
+    for (var i = 0; i < cart.length; i++) {
+      totalCount += cart[i].quantity;
+      totalPrice += cart[i].price * cart[i].quantity;
+    }
+    var items = [];
+    for (var j = 0; j < cart.length; j++) {
+      var item = cart[j];
+      var newItem = {};
+      for (var key in item) {
+        newItem[key] = item[key];
+      }
+      newItem.subtotal = (item.price * item.quantity).toFixed(2);
+      items.push(newItem);
+    }
+
+    this.setData({
+      cartPopupItems: items,
+      cartPopupCount: totalCount,
+      cartPopupTotal: totalPrice.toFixed(2),
+      showCartPopup: true
     });
   },
 
-  // 结算
-  onSettle() {
-    console.log('结算');
-    
-    const { cartItems, cartTotal } = this.data;
-    
+  hideCartPopup: function() {
+    this.setData({ showCartPopup: false });
+  },
+
+  onCartItemMinus: function(e) {
+    var self = this;
+    var index = e.currentTarget.dataset.index;
+    var app = getApp();
+    var cart = app.globalData.cart || [];
+
+    if (cart[index].quantity > 1) {
+      cart[index].quantity -= 1;
+    } else {
+      cart.splice(index, 1);
+    }
+
+    app.globalData.cart = cart;
+    var cartCount = 0;
+    for (var i = 0; i < cart.length; i++) {
+      cartCount += cart[i].quantity;
+    }
+    app.globalData.cartCount = cartCount;
+    this.refreshCartPopup(cart);
+    this.updateCartDisplay();
+  },
+
+  onCartItemPlus: function(e) {
+    var self = this;
+    var index = e.currentTarget.dataset.index;
+    var app = getApp();
+    var cart = app.globalData.cart || [];
+
+    cart[index].quantity += 1;
+    app.globalData.cart = cart;
+    var cartCount = 0;
+    for (var i = 0; i < cart.length; i++) {
+      cartCount += cart[i].quantity;
+    }
+    app.globalData.cartCount = cartCount;
+    this.refreshCartPopup(cart);
+    this.updateCartDisplay();
+  },
+
+  clearCart: function() {
+    var app = getApp();
+    app.globalData.cart = [];
+    app.globalData.cartCount = 0;
+    this.setData({
+      cartPopupItems: [],
+      cartPopupCount: 0,
+      cartPopupTotal: '0.00',
+      showCartPopup: false
+    });
+    this.updateCartDisplay();
+    wx.showToast({ title: '已清空购物车', icon: 'none' });
+  },
+
+  refreshCartPopup: function(cart) {
+    var totalCount = 0;
+    var totalPrice = 0;
+    for (var i = 0; i < cart.length; i++) {
+      totalCount += cart[i].quantity;
+      totalPrice += cart[i].price * cart[i].quantity;
+    }
+    var items = [];
+    for (var j = 0; j < cart.length; j++) {
+      var item = cart[j];
+      var newItem = {};
+      for (var key in item) {
+        newItem[key] = item[key];
+      }
+      newItem.subtotal = (item.price * item.quantity).toFixed(2);
+      items.push(newItem);
+    }
+    this.setData({
+      cartPopupItems: items,
+      cartPopupCount: totalCount,
+      cartPopupTotal: totalPrice.toFixed(2)
+    });
+  },
+
+  goToCartFromPopup: function() {
+    this.setData({ showCartPopup: false });
+    wx.switchTab({ url: '/pages/cart/cart' });
+  },
+
+  onSettle: function() {
+    var cartItems = this.data.cartItems;
+    var cartTotal = this.data.cartTotal;
     if (cartItems.length === 0) {
-      wx.showToast({
-        title: '购物车为空',
-        icon: 'none'
-      });
+      wx.showToast({ title: '购物车为空', icon: 'none' });
       return;
     }
-    
-    // 创建订单信息
-    const orderInfo = {
+    var orderInfo = {
       orderId: Date.now().toString(),
       storeId: this.data.storeInfo.id,
       storeName: this.data.storeInfo.name,
       items: cartItems,
       totalAmount: cartTotal,
-      deliveryFee: 5.00,
+      deliveryFee: this.data.storeInfo.deliveryFee || 5,
       discount: 0,
-      finalAmount: cartTotal + 5.00,
+      finalAmount: cartTotal + (this.data.storeInfo.deliveryFee || 5),
       orderTime: new Date().toISOString(),
       status: 'pending'
     };
-    
-    // 保存订单到全局
-    const app = getApp();
+    var app = getApp();
     app.globalData.currentOrder = orderInfo;
-    
-    // 跳转到订单确认页
     wx.navigateTo({
       url: '/pages/order-confirm/order-confirm',
-      success: (res) => {
-        console.log('跳转到订单确认页成功');
+      fail: function() {
+        wx.showModal({
+          title: '订单信息',
+          content: '订单已创建！金额：¥' + orderInfo.finalAmount,
+          showCancel: false
+        });
+      }
+    });
+  },
+
+  loadStoreInfo: function(storeId) {
+    var self = this;
+    var app = getApp();
+    app.authRequest({
+      url: '/store/' + storeId,
+      method: 'GET',
+      success: function(res) {
+        if (res && res.code === 200 && res.data) {
+          var d = res.data;
+          var deliveryTimeStr = d.deliveryTime ? d.deliveryTime + '分钟' : '30分钟';
+          var deliveryFeeVal = d.deliveryFee || 5;
+          var priceLevelVal = d.priceLevel || d.price || 25;
+          var tagsArray = d.tags || ['味道赞', '环境好', '服务棒'];
+          var info = {
+            id: d.storeId || d.id || storeId,
+            name: d.storeName || d.name || '未知商家',
+            banner: app.resolveImageUrl(d.banner) || app.resolveImageUrl(d.logo) || '',
+            distance: d.distance || '1.5km',
+            deliveryTime: deliveryTimeStr,
+            price: priceLevelVal,
+            rating: Number(d.rating) || 4.5,
+            notice: d.notice || '欢迎光临！',
+            address: d.address || '',
+            phone: d.phone || '',
+            deliveryFee: deliveryFeeVal,
+            status: d.status === 1 ? '营业中' : '休息中',
+            reviews: d.reviews || 0,
+            tags: tagsArray,
+            businessHours: d.businessHours || '10:00 - 22:00'
+          };
+          var dealsArr = [
+            { badge: '满减', text: '满100减' + Math.floor(info.price) },
+            { badge: '新客', text: '新用户立减15元' },
+            { badge: '折扣', text: '招牌菜享8折优惠' }
+          ];
+          var storeImagesArr = [];
+          if (info.banner) {
+            storeImagesArr.push(info.banner);
+            storeImagesArr.push(info.banner);
+          }
+          self.setData({
+            storeInfo: info,
+            storeImages: storeImagesArr,
+            deals: dealsArr
+          });
+        } else {
+          wx.showToast({ title: '加载商家信息失败', icon: 'none' });
+        }
       },
-      fail: (err) => {
-        console.error('跳转失败：', err);
-        
-        // 如果订单确认页不存在，显示订单信息
-        if (err.errMsg.includes('not found')) {
-          wx.showModal({
-            title: '订单信息',
-            content: `订单号: ${orderInfo.orderId}\n商家: ${orderInfo.storeName}\n商品数量: ${cartItems.length}\n总金额: ¥${orderInfo.finalAmount}\n订单已创建成功！`,
-            showCancel: false,
-            success: (res) => {
-              if (res.confirm) {
-                // 清空购物车
-                app.globalData.cart = [];
-                app.globalData.cartCount = 0;
-                this.loadCart();
+      fail: function() {
+        wx.showToast({ title: '网络错误', icon: 'none' });
+      }
+    });
+  },
+
+  loadCategories: function() {
+    this.setData({
+      categories: [
+        { id: 1, name: '招牌推荐' },
+        { id: 2, name: '热销榜' },
+        { id: 3, name: '主食' },
+        { id: 4, name: '小吃' },
+        { id: 5, name: '饮品' },
+        { id: 6, name: '套餐' }
+      ]
+    });
+  },
+
+  loadFoods: function(storeId, categoryId) {
+    var self = this;
+    var app = getApp();
+    var url = '/food/store/' + storeId;
+    app.authRequest({
+      url: url,
+      method: 'GET',
+      success: function(res) {
+        if (res && res.code === 200 && res.data) {
+          var list = [];
+          for (var i = 0; i < res.data.length; i++) {
+            var f = res.data[i];
+            list.push({
+              id: f.foodId || f.id,
+              name: f.foodName || f.name,
+              price: f.price,
+              description: f.description || '',
+              sales: f.sales || f.monthlySales || 0,
+              image: app.resolveImageUrl(f.image) || app.resolveImageUrl(f.cover) || ''
+            });
+          }
+          self.setData({ foodList: list });
+        } else {
+          self.setData({ foodList: [] });
+        }
+      },
+      fail: function() {
+        self.setData({ foodList: [] });
+      }
+    });
+  },
+
+  loadReviews: function() {
+    var self = this;
+    var app = getApp();
+    var storeId = self.data.storeInfo.id;
+    app.authRequest({
+      url: '/food/store/' + storeId,
+      method: 'GET',
+      success: function(res) {
+        if (res && res.code === 200 && res.data && res.data.length > 0) {
+          var foodId = res.data[0].foodId || res.data[0].id;
+          app.authRequest({
+            url: '/review/food/' + foodId,
+            method: 'GET',
+            success: function(reviewRes) {
+              if (reviewRes && reviewRes.code === 200 && reviewRes.data) {
+                var dataArray = Array.isArray(reviewRes.data) ? reviewRes.data : [];
+                var list = [];
+                for (var i = 0; i < dataArray.length; i++) {
+                  var r = dataArray[i];
+                  list.push({
+                    userName: r.userName || r.nickname || '匿名用户',
+                    starCount: r.rating || 5,
+                    content: r.content || '',
+                    time: r.createTime || '',
+                    images: r.images || []
+                  });
+                }
+                self.setData({ reviewsList: list });
+              } else {
+                self.setData({ reviewsList: [] });
               }
+            },
+            fail: function() {
+              self.setData({ reviewsList: [] });
             }
           });
         } else {
-          wx.showToast({
-            title: '页面跳转失败',
-            icon: 'none'
-          });
-        }
-      }
-    });
-  },
-
-  // 加载商家信息
-  loadStoreInfo(storeId) {
-    console.log('加载商家信息：', storeId);
-    
-    const app = getApp();
-    app.authRequest({
-      url: `/store/${storeId}`,
-      method: 'GET',
-      success: (res) => {
-        console.log('商家详情响应数据:', res);
-        
-        // app.authRequest 返回的是 {code, message, data} 格式
-        if (res && res.code === 200 && res.data) {
-          const storeData = res.data;
-          const processedData = {
-            id: storeData.storeId || storeData.id || storeId,
-            name: storeData.storeName || storeData.name || '未知商家',
-            logo: storeData.logo || 'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=200&h=200&fit=crop',
-            banner: storeData.banner || storeData.logo || 'https://images.unsplash.com/photo-1552611052-33e04de081de?w=800&h=600&fit=crop',
-            distance: storeData.distance || '1.5km',
-            deliveryTime: storeData.deliveryTime ? `${storeData.deliveryTime}分钟` : '30分钟',
-            price: storeData.priceLevel || storeData.price || 25.00,
-            rating: Number(storeData.rating) || 4.5,
-            notice: storeData.notice || '欢迎光临！',
-            address: storeData.address || '',
-            phone: storeData.phone || '',
-            deliveryFee: storeData.deliveryFee || 5.00,
-            status: storeData.status === 1 ? '营业中' : '休息中'
-          };
-          
-          console.log('处理后的商家数据:', processedData);
-          
-          this.setData({
-            storeInfo: processedData
-          });
-        } else {
-          // API 返回错误，使用模拟数据
-          console.log('使用商家模拟数据，storeId:', storeId);
-          this.setStoreMockData(storeId);
+          self.setData({ reviewsList: [] });
         }
       },
-      fail: (err) => {
-        console.error('商家详情请求失败:', err);
-        this.setStoreMockData(storeId);
+      fail: function() {
+        self.setData({ reviewsList: [] });
       }
     });
   },
-  
-  // 设置商家模拟数据
-  setStoreMockData(storeId) {
-    const mockStores = {
-      1: { name: '川味人家', banner: 'https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800&h=600&fit=crop' },
-      2: { name: '面点王', banner: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop' },
-      3: { name: '披萨达人', banner: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&h=600&fit=crop' },
-      4: { name: '汉堡世界', banner: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=800&h=600&fit=crop' }
-    };
-    
-    const mockInfo = mockStores[storeId] || { name: '未知商家', banner: 'https://images.unsplash.com/photo-1552611052-33e04de081de?w=800&h=600&fit=crop' };
-    
-    const mockStoreData = {
-      id: storeId,
-      name: mockInfo.name,
-      banner: mockInfo.banner,
-      distance: '1.2km',
-      deliveryTime: '30分钟',
-      price: 25.00,
-      rating: 4.5 + Math.random() * 0.5,
-      notice: '欢迎光临！今日特惠：满100减20，满200减50！'
-    };
-    
-    this.setData({
-      storeInfo: mockStoreData
-    });
-  },
 
-  // 加载分类
-  loadCategories() {
-    console.log('加载分类');
-    
-    const mockCategories = [
-      { id: 1, name: '招牌菜' },
-      { id: 2, name: '热销榜' },
-      { id: 3, name: '套餐' },
-      { id: 4, name: '主食' },
-      { id: 5, name: '小吃' },
-      { id: 6, name: '饮品' }
-    ];
-    
-    this.setData({
-      categories: mockCategories
-    });
-  },
-
-  // 加载商品
-  loadFoods(storeId, categoryId = 0) {
-    console.log('加载商品，商家ID：', storeId, '分类ID：', categoryId);
-    
-    // 模拟商品数据
-    const mockFoods = [
-      {
-        id: 1,
-        name: '经典牛肉面',
-        price: 28.00,
-        rating: 4.8,
-        sales: 156,
-        image: 'https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?w=300&h=200&fit=crop',
-        description: '精选优质牛肉，搭配劲道面条'
-      },
-      {
-        id: 2,
-        name: '担担面',
-        price: 25.00,
-        rating: 4.5,
-        sales: 178,
-        image: 'https://images.unsplash.com/photo-1552611052-33e04de081de?w=300&h=200&fit=crop',
-        description: '传统川菜，麻辣鲜香'
-      },
-      {
-        id: 3,
-        name: '麻辣香锅',
-        price: 45.00,
-        rating: 4.6,
-        sales: 178,
-        image: 'https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?w=300&h=200&fit=crop',
-        description: '多种食材搭配，麻辣鲜香'
-      }
-    ];
-    
-    // 根据分类过滤
-    let filteredFoods = mockFoods;
-    if (categoryId === 1) {
-      filteredFoods = mockFoods.filter(food => food.rating >= 4.7);
-    } else if (categoryId === 2) {
-      filteredFoods = mockFoods.filter(food => food.sales >= 170);
-    } else if (categoryId === 3) {
-      filteredFoods = mockFoods.filter(food => food.price <= 30);
+  loadCart: function() {
+    var self = this;
+    var app = getApp();
+    var cart = app.globalData.cart || [];
+    var cartTotal = 0;
+    for (var i = 0; i < cart.length; i++) {
+      cartTotal += cart[i].price * cart[i].quantity;
     }
-    
-    this.setData({
-      foodList: filteredFoods
-    });
-  },
-
-  // 加载购物车
-  loadCart() {
-    const app = getApp();
-    const cart = app.globalData.cart || [];
-    const cartCount = app.globalData.cartCount || 0;
-    const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    
     this.setData({
       cartItems: cart,
-      cartCount: cartCount,
+      cartCount: app.globalData.cartCount || 0,
       cartTotal: cartTotal
     });
   },
 
-  // 更新购物车显示
-  updateCartDisplay() {
+  updateCartDisplay: function() {
     this.loadCart();
   },
 
-  // 页面显示
-  onShow() {
-    console.log('商家详情页显示');
-    // 更新购物车
+  onShow: function() {
     this.updateCartDisplay();
   },
 
-  // 下拉刷新
-  onPullDownRefresh() {
-    console.log('下拉刷新');
-    
-    const storeId = this.data.storeInfo.id;
-    this.loadFoods(storeId, this.data.currentCategory);
-    
-    setTimeout(() => {
+  onPullDownRefresh: function() {
+    var self = this;
+    this.loadFoods(this.data.storeInfo.id, this.data.currentCategory);
+    setTimeout(function() {
       wx.stopPullDownRefresh();
     }, 1000);
   },
 
-  // 分享功能
-  onShareAppMessage() {
-    const store = this.data.storeInfo;
+  onShareAppMessage: function() {
+    var self = this;
     return {
-      title: `${store.name} - 美食小程序`,
-      path: `/pages/store-detail/store-detail?storeId=${store.id}`
+      title: self.data.storeInfo.name + ' - 美食探店',
+      path: '/pages/store-detail/store-detail?storeId=' + self.data.storeInfo.id
     };
   }
 });

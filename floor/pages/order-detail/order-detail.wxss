@@ -46,7 +46,7 @@ page {
 
 .back-icon, .share-icon {
   font-size: 24px;
-  color: #4CAF50;
+  color: #FF6633;
   transition: all 0.3s ease;
 }
 
@@ -58,7 +58,7 @@ page {
 
 /* 订单状态 */
 .order-status-section {
-  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+  background: linear-gradient(135deg, #FF6633 0%, #FF8855 100%);
   margin: 0 0 20px;
   padding: 40px 20px 30px;
   text-align: center;
@@ -164,7 +164,7 @@ page {
 
 .progress-dot::after {
   content: '✓';
-  color: #4CAF50;
+  color: #FF6633;
   font-weight: bold;
   font-size: 16px;
 }
@@ -218,7 +218,7 @@ page {
   width: 50px;
   height: 50px;
   border-radius: 25px;
-  border: 2px solid #4CAF50;
+  border: 2px solid #FF6633;
 }
 
 .delivery-details {
@@ -240,7 +240,7 @@ page {
 
 .contact-btn {
   padding: 8px 16px;
-  background: #4CAF50;
+  background: #FF6633;
   color: #FFFFFF;
   border: none;
   border-radius: 20px;
@@ -328,7 +328,7 @@ page {
 
 .store-icon {
   font-size: 24px;
-  color: #4CAF50;
+  color: #FF6633;
 }
 
 .store-name {
@@ -378,7 +378,7 @@ page {
   width: 60px;
   height: 60px;
   margin-right: 12px;
-  background: linear-gradient(45deg, #4CAF50 0%, #81C784 100%);
+  background: linear-gradient(45deg, #FF6633 0%, #FF8855 100%);
   border-radius: 8px;
   overflow: hidden;
   display: flex;
@@ -427,7 +427,7 @@ page {
 .item-price {
   font-size: 14px;
   font-weight: 600;
-  color: #4CAF50;
+  color: #FF6633;
 }
 
 /* 费用明细 */
@@ -461,7 +461,7 @@ page {
 }
 
 .cost-value.discount {
-  color: #4CAF50;
+  color: #FF6633;
 }
 
 .cost-row.total {
@@ -479,7 +479,7 @@ page {
 .total-value {
   font-size: 20px;
   font-weight: 700;
-  color: #4CAF50;
+  color: #FF6633;
 }
 
 /* 订单信息 */
@@ -512,7 +512,7 @@ page {
 
 .copy-btn {
   padding: 4px 12px;
-  background: #4CAF50;
+  background: #FF6633;
   color: #FFFFFF;
   border: none;
   border-radius: 12px;
@@ -560,9 +560,9 @@ page {
 }
 
 .pay-btn {
-  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+  background: linear-gradient(135deg, #FF6633 0%, #FF8855 100%);
   color: #FFFFFF;
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 102, 51, 0.3);
 }
 
 .remind-btn {
@@ -578,9 +578,9 @@ page {
 }
 
 .receive-btn {
-  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+  background: linear-gradient(135deg, #FF6633 0%, #FF8855 100%);
   color: #FFFFFF;
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 102, 51, 0.3);
 }
 
 .review-btn {
@@ -590,9 +590,9 @@ page {
 }
 
 .again-btn {
-  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+  background: linear-gradient(135deg, #FF6633 0%, #FF8855 100%);
   color: #FFFFFF;
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 102, 51, 0.3);
 }
 
 .help-btn {

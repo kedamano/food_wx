@@ -5,7 +5,7 @@
     <view class="header-content">
       <text class="header-title">我的订单</text>
       <view class="search-box" bindtap="onSearchOrders">
-        <text class="fa fa-search search-icon"></text>
+        <text class="-search search-icon">🔍</text>
         <text class="search-text">搜索订单</text>
       </view>
     </view>
@@ -35,7 +35,7 @@
       <!-- 商家信息 -->
       <view class="store-section">
         <view class="store-info">
-          <text class="fa fa-store store-icon"></text>
+          <text class="-store store-icon">🏪</text>
           <text class="store-name">{{item.storeName}}</text>
         </view>
       </view>
@@ -46,7 +46,7 @@
           <view class="item-card" wx:for="{{item.items}}" wx:key="foodId">
             <view class="item-image">
               <image class="food-image" src="{{item.image}}" mode="aspectFill" lazy-load></image>
-              <text class="fa fa-utensils food-icon" wx:if="{{!item.image}}"></text>
+              <text class="-utensils food-icon" wx:if="{{!item.image}}">🍴</text>
             </view>
             <view class="item-details">
               <text class="item-name">{{item.name}}</text>
@@ -85,7 +85,7 @@
 
     <!-- 空状态 -->
     <view class="empty-state" wx:if="{{orders.length === 0}}">
-      <view class="empty-icon fa fa-box-open"></view>
+      <text class="empty-icon">📦</text>
       <text class="empty-title">还没有相关订单</text>
       <text class="empty-desc">去首页逛逛，发现更多美食！</text>
       <button class="btn btn-primary" bindtap="onGoShopping">去购物</button>

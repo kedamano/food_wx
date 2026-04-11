@@ -24,6 +24,9 @@ public class CartController {
 
     private Integer getUserIdFromRequest(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
         if (token != null && !token.isEmpty()) {
             return jwtUtil.getUserIdFromToken(token);
         }
@@ -54,14 +57,13 @@ public class CartController {
             return BaseResult.error(401, "未登录");
         }
 
-        // 验证购物车项属于该用户
-        Cart cart = cartService.getCartByUserId(userId).getData() != null ?
-                ((List<Cart>) cartService.getCartByUserId(userId).getData()).stream()
-                        .filter(c -> c.getCartId().equals(cartId))
-                        .findFirst()
-                        .orElse(null) : null;
-
+        // 优化：直接查询购物车项并验证权限，避免多次查询
+        Cart cart = cartService.getCartById(cartId);
         if (cart == null) {
+            return BaseResult.error(404, "购物车项不存在");
+        }
+
+        if (!cart.getUserId().equals(userId)) {
             return BaseResult.error(403, "无权操作该购物车项");
         }
 
@@ -76,14 +78,13 @@ public class CartController {
             return BaseResult.error(401, "未登录");
         }
 
-        // 验证购物车项属于该用户
-        Cart cart = cartService.getCartByUserId(userId).getData() != null ?
-                ((List<Cart>) cartService.getCartByUserId(userId).getData()).stream()
-                        .filter(c -> c.getCartId().equals(cartId))
-                        .findFirst()
-                        .orElse(null) : null;
-
+        // 优化：直接查询购物车项并验证权限，避免多次查询
+        Cart cart = cartService.getCartById(cartId);
         if (cart == null) {
+            return BaseResult.error(404, "购物车项不存在");
+        }
+
+        if (!cart.getUserId().equals(userId)) {
             return BaseResult.error(403, "无权操作该购物车项");
         }
 

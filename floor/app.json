@@ -16,6 +16,7 @@
     "pages/payment/payment",
     "pages/coupons/coupons",
     "pages/points/points",
+    "pages/points-history/points-history",
     "pages/settings/settings",
     "pages/user-reviews/user-reviews",
     "pages/order-detail/order-detail",
@@ -29,20 +30,24 @@
     "pages/feedback/feedback",
     "pages/device-management/device-management",
     "pages/privacy-policy/privacy-policy",
-    "pages/user-agreement/user-agreement"
+    "pages/user-agreement/user-agreement",
+    "pages/search/search",
+    "pages/favorites/favorites",
+    "pages/spending/spending",
+    "pages/customer/customer"
   ],
   "window": {
-    "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#4CAF50",
-    "navigationBarTitleText": "年轻人的美食天堂",
-    "navigationBarTextStyle": "white",
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTitleText": "美食探店",
+    "navigationBarTextStyle": "black",
     "enablePullDownRefresh": true
   },
   "tabBar": {
-    "color": "#8c8c8c",
-    "selectedColor": "#4CAF50",
-    "backgroundColor": "#FFFFFF",
-    "borderStyle": "black",
+    "color": "#999999",
+    "selectedColor": "#FF6633",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
     "list": [{
       "pagePath": "pages/index/index",
       "text": "首页",
@@ -71,7 +76,6 @@
     "position": "bottom"
   },
   "style": "v2",
-  "componentFramework": "glass-easel",
   "sitemapLocation": "sitemap.json",
   "lazyCodeLoading": "requiredComponents"
 }

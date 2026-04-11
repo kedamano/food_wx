@@ -9,11 +9,11 @@ page {
 }
 
 .header-section {
-  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+  background: linear-gradient(135deg, #FF6633 0%, #FF8855 100%);
   border-radius: 20rpx;
   padding: 30rpx;
   margin-bottom: 20rpx;
-  box-shadow: 0 4rpx 12rpx rgba(76, 175, 80, 0.2);
+  box-shadow: 0 4rpx 12rpx rgba(255, 102, 51, 0.2);
 }
 
 .header-content {
@@ -67,7 +67,7 @@ page {
 }
 
 .tab-item.active {
-  background: #4CAF50;
+  background: #FF6633;
 }
 
 .tab-text {
@@ -125,8 +125,8 @@ page {
 }
 
 .order-status.pending {
-  background: #E8F5E8;
-  color: #4CAF50;
+  background: #FFF0EB;
+  color: #FF6633;
 }
 
 .order-status.preparing {
@@ -273,7 +273,7 @@ page {
 }
 
 .btn-primary {
-  background: #4CAF50;
+  background: #FF6633;
   color: #FFFFFF;
 }
 
@@ -284,8 +284,8 @@ page {
 
 .btn-outline {
   background: transparent;
-  color: #4CAF50;
-  border: 2rpx solid #4CAF50;
+  color: #FF6633;
+  border: 2rpx solid #FF6633;
 }
 
 .empty-state {

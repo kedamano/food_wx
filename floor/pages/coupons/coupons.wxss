@@ -11,11 +11,11 @@ page {
 
 /* 积分头部 */
 .points-header {
-  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+  background: linear-gradient(135deg, #FF6633 0%, #FF8855 100%);
   border-radius: 20rpx;
   padding: 30rpx;
   margin-bottom: 20rpx;
-  box-shadow: 0 4rpx 12rpx rgba(76, 175, 80, 0.2);
+  box-shadow: 0 4rpx 12rpx rgba(255, 102, 51, 0.2);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -105,7 +105,7 @@ page {
 }
 
 .tab-item.active {
-  background: #4CAF50;
+  background: #FF6633;
 }
 
 .tab-text {
@@ -225,7 +225,7 @@ page {
 
 .status-text {
   font-size: 22rpx;
-  color: #4CAF50;
+  color: #FF6633;
   margin-bottom: 8rpx;
   font-weight: 500;
 }
@@ -353,7 +353,7 @@ page {
 }
 
 .recommend-btn {
-  background: #4CAF50;
+  background: #FF6633;
   color: #FFFFFF;
   padding: 12rpx 24rpx;
   border-radius: 12rpx;
@@ -364,7 +364,7 @@ page {
 }
 
 .recommend-btn:active {
-  background: #45a049;
+  background: #ee5522;
   transform: scale(0.95);
 }
 

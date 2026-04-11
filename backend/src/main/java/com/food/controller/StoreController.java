@@ -95,10 +95,14 @@ public class StoreController {
     private Map<String, Object> enrichStoreData(Store store) {
         Map<String, Object> storeMap = new HashMap<>();
         storeMap.put("id", store.getStoreId());
+        storeMap.put("storeId", store.getStoreId());
         storeMap.put("name", store.getName());
+        storeMap.put("storeName", store.getName());
         storeMap.put("price", store.getPriceLevel());
         storeMap.put("rating", store.getRating());
         storeMap.put("icon", getStoreIcon(store.getStoreId()));
+        storeMap.put("logo", store.getLogo() != null ? store.getLogo() : "");
+        storeMap.put("banner", store.getLogo() != null ? store.getLogo() : "");
         storeMap.put("distance", calculateDistance(store.getLat(), store.getLng()));
         storeMap.put("deliveryTime", estimateDeliveryTime(store.getStoreId()));
         return storeMap;

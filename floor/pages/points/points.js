@@ -1,5 +1,21 @@
 // pages/points/points.js
-const app = getApp()
+var app = getApp();
+
+// FontAwesome 图标名转 emoji（小程序不支持 FA 字体）
+var ICON_MAP = {
+  'fa-check': '\u2713',
+  'fa-utensils': '\uD83C\uDF74',
+  'fa-star': '\u2B50',
+  'fa-share-alt': '\uD83D\uDD17',
+  'fa-ticket-alt': '\uD83C\uDFAB',
+  'fa-gem': '\uD83D\uDC8E',
+  'fa-gift': '\uD83C\uDF81',
+  'fa-check-circle': '\u2705',
+  'fa-times-circle': '\u274C',
+  'fa-exclamation-circle': '\u26A0',
+  'fa-info-circle': '\u2139',
+  'fa-dollar-sign': '\uD83D\uDCB5'
+};
 
 Page({
   data: {
@@ -15,7 +31,8 @@ Page({
         id: 1,
         name: '签到',
         points: 20,
-        icon: 'fa-calendar-check',
+        icon: 'fa-check',
+        iconText: '\u2713',
         completed: false
       },
       {
@@ -23,6 +40,7 @@ Page({
         name: '完成订单',
         points: 50,
         icon: 'fa-utensils',
+        iconText: '\uD83C\uDF74',
         completed: false
       },
       {
@@ -30,6 +48,7 @@ Page({
         name: '评价订单',
         points: 30,
         icon: 'fa-star',
+        iconText: '\u2B50',
         completed: false
       },
       {
@@ -37,6 +56,7 @@ Page({
         name: '分享小程序',
         points: 20,
         icon: 'fa-share-alt',
+        iconText: '\uD83D\uDD17',
         completed: false
       }
     ],
@@ -48,7 +68,8 @@ Page({
         points: 500,
         originalPrice: 5,
         stock: 999,
-        icon: 'fa-ticket-alt'
+        icon: 'fa-ticket-alt',
+        iconText: '\uD83C\uDFAB'
       },
       {
         id: 2,
@@ -56,7 +77,8 @@ Page({
         points: 980,
         originalPrice: 10,
         stock: 256,
-        icon: 'fa-ticket-alt'
+        icon: 'fa-ticket-alt',
+        iconText: '\uD83C\uDFAB'
       },
       {
         id: 3,
@@ -64,7 +86,8 @@ Page({
         points: 1980,
         originalPrice: 20,
         stock: 89,
-        icon: 'fa-ticket-alt'
+        icon: 'fa-ticket-alt',
+        iconText: '\uD83C\uDFAB'
       },
       {
         id: 4,
@@ -72,7 +95,8 @@ Page({
         points: 4880,
         originalPrice: 50,
         stock: 32,
-        icon: 'fa-ticket-alt'
+        icon: 'fa-ticket-alt',
+        iconText: '\uD83C\uDFAB'
       },
       {
         id: 5,
@@ -80,14 +104,16 @@ Page({
         points: 9880,
         originalPrice: 100,
         stock: 12,
-        icon: 'fa-ticket-alt'
+        icon: 'fa-gem',
+        iconText: '\uD83D\uDC8E'
       },
       {
         id: 6,
         name: '定制餐具套装',
         points: 1280,
         stock: 45,
-        icon: 'fa-utensils'
+        icon: 'fa-utensils',
+        iconText: '\uD83C\uDF74'
       }
     ],
     // 排序文本
@@ -97,67 +123,72 @@ Page({
   },
 
   // 页面加载
-  onLoad(options) {
+  onLoad: function(options) {
     console.log('积分商城页面加载');
     this.loadUserPointsInfo();
     this.checkDailyTasks();
+    this.loadRecentHistory();
   },
 
   // 页面显示时刷新
-  onShow() {
+  onShow: function() {
     this.loadUserPointsInfo();
     this.checkDailyTasks();
+    this.loadRecentHistory();
   },
 
   // 加载用户积分信息
-  loadUserPointsInfo() {
-    const userId = app.globalData.userId || wx.getStorageSync('userId') || 1;
+  loadUserPointsInfo: function() {
+    var self = this;
+    var userId = app.globalData.userId || wx.getStorageSync('userId') || 1;
 
     app.authRequest({
-      url: `/user/points/${userId}`,
+      url: '/user/points/' + userId,
       method: 'GET'
-    }).then(res => {
+    }).then(function(res) {
       if (res && res.code === 200 && res.data) {
-        this.setData({
+        self.setData({
           userPoints: res.data.points || 0,
           todayPoints: res.data.todayPoints || 0,
           monthlyPoints: res.data.monthlyPoints || 0
         });
-        
-        // 保存到本地
         wx.setStorageSync('userPoints', res.data.points);
       }
-    }).catch(err => {
+    }).catch(function(err) {
       console.error('加载积分信息失败', err);
-      // 使用本地缓存
-      const cachedPoints = wx.getStorageSync('userPoints') || 0;
-      this.setData({ userPoints: cachedPoints });
+      var cachedPoints = wx.getStorageSync('userPoints') || 0;
+      self.setData({ userPoints: cachedPoints });
+    });
+  },
+
+  // 加载最近积分记录
+  loadRecentHistory: function() {
+    var history = wx.getStorageSync('pointsHistory') || [];
+    // 只显示最近3条
+    this.setData({
+      recentHistory: history.slice(0, 3)
     });
   },
 
   // 检查每日任务完成状态
-  checkDailyTasks() {
-    // 检查今日是否已签到
-    const today = new Date().toDateString();
-    const signInDate = wx.getStorageSync('signInDate');
-    
-    const tasks = [...this.data.dailyTasks];
+  checkDailyTasks: function() {
+    var today = new Date().toDateString();
+    var signInDate = wx.getStorageSync('signInDate');
+
+    var tasks = [];
+    for (var i = 0; i < this.data.dailyTasks.length; i++) {
+      var task = this.data.dailyTasks[i];
+      var taskCopy = {};
+      for (var tk in task) taskCopy[tk] = task[tk];
+      tasks.push(taskCopy);
+    }
     tasks[0].completed = (signInDate === today);
-    
+
     this.setData({ dailyTasks: tasks });
   },
 
-  // 返回按钮点击
-  onBackClick() {
-    console.log('返回按钮点击');
-    wx.navigateBack({
-      delta: 1
-    });
-  },
-
   // 积分规则
-  onPointsRule() {
-    console.log('积分规则');
+  onPointsRule: function() {
     wx.showModal({
       title: '积分规则',
       content: '• 签到：每日20积分\n• 完成订单：每单50积分\n• 评价订单：每次30积分\n• 分享小程序：每次20积分\n• 积分有效期：12个月',
@@ -167,251 +198,207 @@ Page({
   },
 
   // 领取积分（签到）
-  onGetPoints() {
-    console.log('领取积分');
+  onGetPoints: function() {
+    var self = this;
 
-    // 检查是否已经签到
-    const today = new Date().toDateString();
-    const signInDate = wx.getStorageSync('signInDate');
-    
+    var today = new Date().toDateString();
+    var signInDate = wx.getStorageSync('signInDate');
+
     if (signInDate === today) {
-      wx.showToast({
-        title: '今日已签到',
-        icon: 'none'
-      });
+      wx.showToast({ title: '今日已签到', icon: 'none' });
       return;
     }
 
-    const userId = app.globalData.userId || wx.getStorageSync('userId') || 1;
+    var userId = app.globalData.userId || wx.getStorageSync('userId') || 1;
 
-    wx.showLoading({
-      title: '签到中...'
-    });
+    wx.showLoading({ title: '签到中...' });
 
     app.authRequest({
-      url: `/user/sign-in/${userId}`,
+      url: '/user/sign-in/' + userId,
       method: 'POST'
-    }).then(res => {
+    }).then(function(res) {
       wx.hideLoading();
-      
+
       if (res && res.code === 200 && res.data) {
-        // 更新签到状态
-        const updatedTasks = this.data.dailyTasks.map(task => 
-          task.name === '签到' ? { ...task, completed: true } : task
-        );
+        var updatedTasks = [];
+        for (var ti = 0; ti < self.data.dailyTasks.length; ti++) {
+          var tsk = self.data.dailyTasks[ti];
+          var tCopy = {};
+          for (var tj in tsk) tCopy[tj] = tsk[tj];
+          if (tsk.name === '签到') {
+            tCopy.completed = true;
+          }
+          updatedTasks.push(tCopy);
+        }
 
-        // 更新用户积分
-        const newUserPoints = res.data.totalPoints || (this.data.userPoints + 20);
+        var newUserPoints = res.data.totalPoints || (self.data.userPoints + 20);
 
-        this.setData({
+        self.setData({
           userPoints: newUserPoints,
           dailyTasks: updatedTasks,
-          todayPoints: this.data.todayPoints + 20
+          todayPoints: self.data.todayPoints + 20
         });
 
-        // 保存签到日期
         wx.setStorageSync('signInDate', today);
         wx.setStorageSync('userPoints', newUserPoints);
 
-        wx.showToast({
-          title: '签到成功，获得20积分',
-          icon: 'success'
-        });
-
-        // 添加到积分记录
-        const newHistory = {
+        // 添加积分记录
+        var newRecord = {
           id: Date.now(),
           type: '收入',
+          desc: '每日签到',
           points: '+20',
-          icon: 'fa-calendar-check',
+          icon: 'fa-check',
+          iconText: '\u2713',
           time: new Date().toLocaleString()
         };
+        var history = wx.getStorageSync('pointsHistory') || [];
+        history.unshift(newRecord);
+        wx.setStorageSync('pointsHistory', history);
+        self.loadRecentHistory();
 
-        this.setData({
-          recentHistory: [newHistory, ...this.data.recentHistory]
-        });
+        wx.showToast({ title: '签到成功，获得20积分', icon: 'success' });
       } else {
-        wx.showToast({
-          title: res.message || '签到失败',
-          icon: 'none'
-        });
+        wx.showToast({ title: res.message || '签到失败', icon: 'none' });
       }
-    }).catch(err => {
+    }).catch(function(err) {
       wx.hideLoading();
       console.error('签到失败', err);
-      
-      // 如果请求失败，使用本地模拟
-      const today = new Date().toDateString();
-      const signInDate = wx.getStorageSync('signInDate');
-      
-      if (signInDate !== today) {
-        const updatedTasks = this.data.dailyTasks.map(task => 
-          task.name === '签到' ? { ...task, completed: true } : task
-        );
-        
-        const newUserPoints = this.data.userPoints + 20;
-        
-        this.setData({
-          userPoints: newUserPoints,
-          dailyTasks: updatedTasks,
-          todayPoints: this.data.todayPoints + 20
+
+      var today2 = new Date().toDateString();
+      var signInDate2 = wx.getStorageSync('signInDate');
+
+      if (signInDate2 !== today2) {
+        var updatedTasks2 = [];
+        for (var ti2 = 0; ti2 < self.data.dailyTasks.length; ti2++) {
+          var tsk2 = self.data.dailyTasks[ti2];
+          var tCopy2 = {};
+          for (var tj2 in tsk2) tCopy2[tj2] = tsk2[tj2];
+          if (tsk2.name === '签到') {
+            tCopy2.completed = true;
+          }
+          updatedTasks2.push(tCopy2);
+        }
+
+        var newUserPoints2 = self.data.userPoints + 20;
+
+        self.setData({
+          userPoints: newUserPoints2,
+          dailyTasks: updatedTasks2,
+          todayPoints: self.data.todayPoints + 20
         });
-        
-        wx.setStorageSync('signInDate', today);
-        wx.setStorageSync('userPoints', newUserPoints);
-        
-        wx.showToast({
-          title: '签到成功，获得20积分',
-          icon: 'success'
-        });
-        
-        const newHistory = {
+
+        wx.setStorageSync('signInDate', today2);
+        wx.setStorageSync('userPoints', newUserPoints2);
+
+        var newRecord2 = {
           id: Date.now(),
           type: '收入',
+          desc: '每日签到',
           points: '+20',
-          icon: 'fa-calendar-check',
+          icon: 'fa-check',
+          iconText: '\u2713',
           time: new Date().toLocaleString()
         };
-        
-        this.setData({
-          recentHistory: [newHistory, ...this.data.recentHistory]
-        });
+        var history2 = wx.getStorageSync('pointsHistory') || [];
+        history2.unshift(newRecord2);
+        wx.setStorageSync('pointsHistory', history2);
+        self.loadRecentHistory();
+
+        wx.showToast({ title: '签到成功，获得20积分', icon: 'success' });
       } else {
-        wx.showToast({
-          title: '今日已签到',
-          icon: 'none'
-        });
+        wx.showToast({ title: '今日已签到', icon: 'none' });
       }
     });
   },
 
   // 任务点击
-  onTaskClick(e) {
-    const task = e.currentTarget.dataset.task;
-    console.log('任务点击：', task);
+  onTaskClick: function(e) {
+    var task = e.currentTarget.dataset.task;
 
     if (task.completed) {
-      wx.showToast({
-        title: '任务已完成',
-        icon: 'none'
-      });
+      wx.showToast({ title: '任务已完成', icon: 'none' });
       return;
     }
 
-    // 根据任务类型跳转到对应页面
     switch (task.name) {
       case '完成订单':
-        wx.switchTab({
-          url: '/pages/index/index'
-        });
+        wx.switchTab({ url: '/pages/index/index' });
         break;
       case '评价订单':
-        wx.navigateTo({
-          url: '/pages/orders/orders?status=completed'
-        });
+        wx.navigateTo({ url: '/pages/orders/orders?status=completed' });
         break;
       case '分享小程序':
-        // 触发分享
-        wx.shareAppMessage({
-          title: '美食小程序 - 发现美味，享受生活',
-          path: '/pages/index/index'
-        });
+        wx.showToast({ title: '请在菜单中分享', icon: 'none' });
         break;
       default:
-        wx.showToast({
-          title: '任务开发中',
-          icon: 'none'
-        });
+        wx.showToast({ title: '任务开发中', icon: 'none' });
     }
   },
 
   // 排序点击
-  onSortClick() {
-    console.log('排序点击');
+  onSortClick: function() {
+    var self = this;
     wx.showActionSheet({
       itemList: ['积分从低到高', '积分从高到低', '热度排序'],
-      success: (res) => {
-        const sortIndex = res.tapIndex;
-        const sortOptions = ['积分从低到高', '积分从高到低', '热度排序'];
-        const sortText = sortOptions[sortIndex];
-
-        this.setData({
-          sortText: sortText
-        });
-
-        // 执行排序
-        this.sortProducts(sortIndex);
+      success: function(res) {
+        var sortIndex = res.tapIndex;
+        var sortOptions = ['积分从低到高', '积分从高到低', '热度排序'];
+        var sortText = sortOptions[sortIndex];
+        self.setData({ sortText: sortText });
+        self.sortProducts(sortIndex);
       }
     });
   },
 
   // 排序商品
-  sortProducts(sortType) {
-    let sortedProducts = [...this.data.products];
+  sortProducts: function(sortType) {
+    var sortedProducts = this.data.products.slice();
 
-    switch (sortType) {
-      case 0: // 积分从低到高
-        sortedProducts.sort((a, b) => a.points - b.points);
-        break;
-      case 1: // 积分从高到低
-        sortedProducts.sort((a, b) => b.points - a.points);
-        break;
-      case 2: // 热度排序
-        sortedProducts.sort((a, b) => b.stock - a.stock);
-        break;
+    if (sortType === 0) {
+      sortedProducts.sort(function(a, b) { return a.points - b.points; });
+    } else if (sortType === 1) {
+      sortedProducts.sort(function(a, b) { return b.points - a.points; });
+    } else {
+      sortedProducts.sort(function(a, b) { return b.stock - a.stock; });
     }
 
-    this.setData({
-      products: sortedProducts
-    });
+    this.setData({ products: sortedProducts });
   },
 
   // 商品点击
-  onProductClick(e) {
-    const product = e.currentTarget.dataset.product;
-    console.log('商品点击：', product);
+  onProductClick: function(e) {
+    var self = this;
+    var product = e.currentTarget.dataset.product;
 
-    // 检查库存
     if (product.stock <= 0) {
-      wx.showToast({
-        title: '库存不足',
-        icon: 'none'
-      });
+      wx.showToast({ title: '库存不足', icon: 'none' });
       return;
     }
 
-    // 检查积分是否足够
     if (this.data.userPoints < product.points) {
-      wx.showToast({
-        title: '积分不足',
-        icon: 'none'
-      });
+      wx.showToast({ title: '积分不足', icon: 'none' });
       return;
     }
 
-    // 确认兑换
     wx.showModal({
       title: '确认兑换',
-      content: `确定要用 ${product.points} 积分兑换 ${product.name} 吗？`,
-      success: (res) => {
+      content: '确定要用 ' + product.points + ' 积分兑换 ' + product.name + ' 吗？',
+      success: function(res) {
         if (res.confirm) {
-          this.exchangeProduct(product);
+          self.exchangeProduct(product);
         }
       }
     });
   },
 
   // 兑换商品
-  exchangeProduct(product) {
-    console.log('兑换商品：', product);
+  exchangeProduct: function(product) {
+    var self = this;
+    var userId = app.globalData.userId || wx.getStorageSync('userId') || 1;
 
-    const userId = app.globalData.userId || wx.getStorageSync('userId') || 1;
+    wx.showLoading({ title: '兑换中...' });
 
-    wx.showLoading({
-      title: '兑换中...'
-    });
-
-    // 调用后端API扣除积分
     app.authRequest({
       url: '/user/points',
       method: 'PUT',
@@ -419,107 +406,107 @@ Page({
         points: product.points,
         type: 'subtract'
       }
-    }).then(res => {
+    }).then(function(res) {
       wx.hideLoading();
 
       if (res && res.code === 200) {
-        // 扣除积分
-        const newUserPoints = this.data.userPoints - product.points;
+        var newUserPoints = self.data.userPoints - product.points;
+        var updatedProducts = [];
+        for (var pi = 0; pi < self.data.products.length; pi++) {
+          var prodItem = self.data.products[pi];
+          var pCopy = {};
+          for (var pk in prodItem) pCopy[pk] = prodItem[pk];
+          if (prodItem.id === product.id) {
+            pCopy.stock = prodItem.stock - 1;
+          }
+          updatedProducts.push(pCopy);
+        }
 
-        // 减少库存
-        const updatedProducts = this.data.products.map(item => 
-          item.id === product.id ? { ...item, stock: item.stock - 1 } : item
-        );
-
-        this.setData({
+        self.setData({
           userPoints: newUserPoints,
           products: updatedProducts
         });
 
-        // 保存到本地
         wx.setStorageSync('userPoints', newUserPoints);
 
-        // 添加到积分记录
-        const newHistory = {
+        // 添加积分记录
+        var newRecord = {
           id: Date.now(),
           type: '支出',
-          points: `-${product.points}`,
+          desc: '兑换' + product.name,
+          points: '-' + product.points,
           icon: 'fa-gift',
+          iconText: '\uD83C\uDF81',
           time: new Date().toLocaleString()
         };
+        var history = wx.getStorageSync('pointsHistory') || [];
+        history.unshift(newRecord);
+        wx.setStorageSync('pointsHistory', history);
+        self.loadRecentHistory();
 
-        this.setData({
-          recentHistory: [newHistory, ...this.data.recentHistory]
-        });
+        wx.showToast({ title: '兑换成功', icon: 'success' });
 
-        wx.showToast({
-          title: '兑换成功',
-          icon: 'success'
-        });
-        
-        // 跳转到优惠券页面
-        setTimeout(() => {
-          wx.navigateTo({
-            url: '/pages/coupons/coupons'
-          });
+        setTimeout(function() {
+          wx.navigateTo({ url: '/pages/coupons/coupons' });
         }, 1500);
       } else {
-        wx.showToast({
-          title: res.message || '兑换失败',
-          icon: 'none'
-        });
+        wx.showToast({ title: res.message || '兑换失败', icon: 'none' });
       }
-    }).catch(err => {
+    }).catch(function(err) {
       wx.hideLoading();
       console.error('兑换失败', err);
-      
-      // 如果请求失败，使用本地模拟
-      const newUserPoints = this.data.userPoints - product.points;
-      const updatedProducts = this.data.products.map(item => 
-        item.id === product.id ? { ...item, stock: item.stock - 1 } : item
-      );
 
-      this.setData({
-        userPoints: newUserPoints,
-        products: updatedProducts
+      var newUserPoints2 = self.data.userPoints - product.points;
+      var updatedProducts2 = [];
+      for (var pi2 = 0; pi2 < self.data.products.length; pi2++) {
+        var prodItem2 = self.data.products[pi2];
+        var pCopy2 = {};
+        for (var pk2 in prodItem2) pCopy2[pk2] = prodItem2[pk2];
+        if (prodItem2.id === product.id) {
+          pCopy2.stock = prodItem2.stock - 1;
+        }
+        updatedProducts2.push(pCopy2);
+      }
+
+      self.setData({
+        userPoints: newUserPoints2,
+        products: updatedProducts2
       });
 
-      wx.setStorageSync('userPoints', newUserPoints);
+      wx.setStorageSync('userPoints', newUserPoints2);
 
-      const newHistory = {
+      var newRecord2 = {
         id: Date.now(),
         type: '支出',
-        points: `-${product.points}`,
+        desc: '兑换' + product.name,
+        points: '-' + product.points,
         icon: 'fa-gift',
+        iconText: '\uD83C\uDF81',
         time: new Date().toLocaleString()
       };
+      var history2 = wx.getStorageSync('pointsHistory') || [];
+      history2.unshift(newRecord2);
+      wx.setStorageSync('pointsHistory', history2);
+      self.loadRecentHistory();
 
-      this.setData({
-        recentHistory: [newHistory, ...this.data.recentHistory]
-      });
-
-      wx.showToast({
-        title: '兑换成功',
-        icon: 'success'
-      });
+      wx.showToast({ title: '兑换成功', icon: 'success' });
     });
   },
 
   // 查看积分记录
-  onViewHistory() {
-    console.log('查看积分记录');
+  onViewHistory: function() {
     wx.navigateTo({
       url: '/pages/points-history/points-history'
     });
   },
 
   // 下拉刷新
-  onPullDownRefresh() {
-    console.log('下拉刷新');
+  onPullDownRefresh: function() {
     this.loadUserPointsInfo();
     this.checkDailyTasks();
+    this.loadRecentHistory();
 
-    setTimeout(() => {
+    setTimeout(function() {
       wx.stopPullDownRefresh();
     }, 1000);
   }

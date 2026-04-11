@@ -15,10 +15,10 @@ page {
 }
 
 .points-card {
-  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+  background: linear-gradient(135deg, #FF6633 0%, #FF8855 100%);
   border-radius: 20rpx;
   padding: 30rpx;
-  box-shadow: 0 4rpx 12rpx rgba(76, 175, 80, 0.2);
+  box-shadow: 0 4rpx 12rpx rgba(255, 102, 51, 0.2);
 }
 
 .points-content {
@@ -166,7 +166,7 @@ page {
   width: 60rpx;
   height: 60rpx;
   border-radius: 30rpx;
-  background: #E8F5E8;
+  background: #FFF0EB;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -196,7 +196,7 @@ page {
 
 .task-points {
   font-size: 24rpx;
-  color: #4CAF50;
+  color: #FF6633;
   font-weight: 500;
 }
 
@@ -206,7 +206,7 @@ page {
 
 .task-status {
   font-size: 32rpx;
-  color: #4CAF50;
+  color: #FF6633;
 }
 
 .completed .task-status {
@@ -335,7 +335,7 @@ page {
 
 .view-all {
   font-size: 24rpx;
-  color: #4CAF50;
+  color: #FF6633;
   font-weight: 500;
 }
 
@@ -357,7 +357,7 @@ page {
   width: 50rpx;
   height: 50rpx;
   border-radius: 25rpx;
-  background: #E8F5E8;
+  background: #FFF0EB;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -392,7 +392,7 @@ page {
 }
 
 .history-points.income {
-  color: #4CAF50;
+  color: #FF6633;
 }
 
 .history-points.expense {

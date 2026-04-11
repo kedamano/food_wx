@@ -1,5 +1,5 @@
 // pages/user-reviews/user-reviews.js
-const app = getApp()
+var app = getApp();
 
 Page({
   data: {
@@ -15,47 +15,51 @@ Page({
     loading: false
   },
 
-  onLoad(options) {
+  onLoad: function(options) {
     console.log('用户评价页面加载');
     this.loadUserReviews();
   },
 
-  onShow() {
+  onShow: function() {
     this.loadUserReviews();
   },
 
-  onPullDownRefresh() {
+  onPullDownRefresh: function() {
     this.loadUserReviews();
     wx.stopPullDownRefresh();
   },
 
   // 加载用户评价列表
-  loadUserReviews() {
-    const userId = app.globalData.userId || wx.getStorageSync('userId') || 1;
+  loadUserReviews: function() {
+    var userId = app.globalData.userId || wx.getStorageSync('userId') || 1;
 
     this.setData({ loading: true });
 
+    var self = this;
     app.authRequest({
-      url: `/review/user/${userId}`,
+      url: '/review/user/' + userId,
       method: 'GET'
-    }).then(res => {
-      this.setData({ loading: false });
+    }).then(function(res) {
+      self.setData({ loading: false });
 
       if (res && res.code === 200 && res.data) {
-        let reviews = res.data;
-        
-        // 格式化评价数据
-        reviews = reviews.map(review => this.formatReview(review));
-        
+        var reviews = res.data;
+
+        // 格式化评价数据 - 用 for 循环替换 map
+        var formattedReviews = [];
+        for (var i = 0; i < reviews.length; i++) {
+          formattedReviews.push(self.formatReview(reviews[i]));
+        }
+
         // 计算统计数据
-        const statistics = this.calculateStatistics(reviews);
-        
-        this.setData({
-          reviews: reviews,
+        var statistics = self.calculateStatistics(formattedReviews);
+
+        self.setData({
+          reviews: formattedReviews,
           statistics: statistics
         });
       } else {
-        this.setData({
+        self.setData({
           reviews: [],
           statistics: {
             totalReviews: 0,
@@ -64,25 +68,29 @@ Page({
           }
         });
       }
-    }).catch(err => {
-      this.setData({ loading: false });
+    }).catch(function(err) {
+      self.setData({ loading: false });
       console.error('加载评价列表失败', err);
       // 使用缓存数据
-      this.useCachedData();
+      self.useCachedData();
     });
   },
 
   // 格式化评价数据
-  formatReview(review) {
+  formatReview: function(review) {
     // 格式化时间
-    let createTime = '';
+    var createTime = '';
     if (review.createTime) {
-      const date = new Date(review.createTime);
-      createTime = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+      var date = new Date(review.createTime);
+      var month = date.getMonth() + 1;
+      var day = date.getDate();
+      var hours = date.getHours().toString().padStart(2, '0');
+      var minutes = date.getMinutes().toString().padStart(2, '0');
+      createTime = month + '/' + day + ' ' + hours + ':' + minutes;
     }
 
     // 解析图片
-    let images = [];
+    var images = [];
     if (review.images) {
       try {
         images = typeof review.images === 'string' ? JSON.parse(review.images) : review.images;
@@ -107,19 +115,21 @@ Page({
   },
 
   // 计算统计数据
-  calculateStatistics(reviews) {
-    const totalReviews = reviews.length;
-    let totalRating = 0;
-    let fiveStarCount = 0;
+  calculateStatistics: function(reviews) {
+    var totalReviews = reviews.length;
+    var totalRating = 0;
+    var fiveStarCount = 0;
 
-    reviews.forEach(review => {
+    // 用 for 循环替换 forEach
+    for (var i = 0; i < reviews.length; i++) {
+      var review = reviews[i];
       totalRating += review.rating;
       if (review.rating >= 5) {
         fiveStarCount++;
       }
-    });
+    }
 
-    const avgRating = totalReviews > 0 ? (totalRating / totalReviews).toFixed(1) : '0.0';
+    var avgRating = totalReviews > 0 ? (totalRating / totalReviews).toFixed(1) : '0.0';
 
     return {
       totalReviews: totalReviews,
@@ -129,14 +139,19 @@ Page({
   },
 
   // 使用缓存数据
-  useCachedData() {
-    const cachedReviews = wx.getStorageSync('cachedUserReviews') || [];
-    
+  useCachedData: function() {
+    var cachedReviews = wx.getStorageSync('cachedUserReviews') || [];
+    var self = this;
+
     if (cachedReviews.length > 0) {
-      const reviews = cachedReviews.map(review => this.formatReview(review));
-      const statistics = this.calculateStatistics(reviews);
-      
-      this.setData({
+      // 用 for 循环替换 map
+      var reviews = [];
+      for (var i = 0; i < cachedReviews.length; i++) {
+        reviews.push(self.formatReview(cachedReviews[i]));
+      }
+      var statistics = self.calculateStatistics(reviews);
+
+      self.setData({
         reviews: reviews,
         statistics: statistics
       });
@@ -147,8 +162,8 @@ Page({
   },
 
   // 使用 Mock 数据
-  useMockData() {
-    const mockReviews = [
+  useMockData: function() {
+    var mockReviews = [
       {
         reviewId: 1,
         orderId: 1,
@@ -190,8 +205,8 @@ Page({
       }
     ];
 
-    const statistics = this.calculateStatistics(mockReviews);
-    
+    var statistics = this.calculateStatistics(mockReviews);
+
     this.setData({
       reviews: mockReviews,
       statistics: statistics
@@ -202,10 +217,10 @@ Page({
   },
 
   // 查看评价详情
-  onReviewDetail(e) {
-    const review = e.currentTarget.dataset.review;
+  onReviewDetail: function(e) {
+    var review = e.currentTarget.dataset.review;
     console.log('查看评价详情：', review);
-    
+
     wx.showModal({
       title: review.foodName,
       content: review.content,
@@ -215,23 +230,35 @@ Page({
   },
 
   // 点赞评价
-  onLikeReview(e) {
-    const review = e.currentTarget.dataset.review;
+  onLikeReview: function(e) {
+    var review = e.currentTarget.dataset.review;
     console.log('点赞评价：', review.reviewId);
 
-    // 更新本地状态
-    const reviews = this.data.reviews.map(item => {
+    var self = this;
+    // 用 for 循环替换 map
+    var reviews = [];
+    for (var i = 0; i < this.data.reviews.length; i++) {
+      var item = this.data.reviews[i];
       if (item.reviewId === review.reviewId) {
-        return {
-          ...item,
-          isLiked: !item.isLiked,
-          likeCount: item.isLiked ? item.likeCount - 1 : item.likeCount + 1
-        };
+        reviews.push({
+          reviewId: item.reviewId,
+          orderId: item.orderId,
+          foodId: item.foodId,
+          foodName: item.foodName,
+          foodImage: item.foodImage,
+          rating: item.rating,
+          content: item.content,
+          images: item.images,
+          createTime: item.createTime,
+          likeCount: item.isLiked ? item.likeCount - 1 : item.likeCount + 1,
+          isLiked: !item.isLiked
+        });
+      } else {
+        reviews.push(item);
       }
-      return item;
-    });
+    }
 
-    this.setData({ reviews });
+    this.setData({ reviews: reviews });
 
     // 调用后端 API
     wx.showToast({
@@ -241,21 +268,37 @@ Page({
   },
 
   // 回复评价
-  onReplyReview(e) {
-    const review = e.currentTarget.dataset.review;
-    console.log('回复评价：', review.reviewId);
-
-    wx.showToast({
-      title: '回复功能开发中',
-      icon: 'none'
+  onReplyReview: function(e) {
+    var review = e.currentTarget.dataset.review;
+    var self = this;
+    wx.showModal({
+      title: '回复评价',
+      editable: true,
+      placeholderText: '请输入回复内容...',
+      confirmText: '发送',
+      success: function(res) {
+        if (res.confirm && res.content) {
+          // 保存回复到本地
+          var replies = wx.getStorageSync('reviewReplies') || {};
+          var replyList = replies[review.reviewId] || [];
+          replyList.push({
+            content: res.content,
+            time: new Date().toLocaleString(),
+            reviewer: '我'
+          });
+          replies[review.reviewId] = replyList;
+          wx.setStorageSync('reviewReplies', replies);
+          wx.showToast({ title: '回复成功', icon: 'success' });
+        }
+      }
     });
   },
 
   // 预览图片
-  onPreviewImage(e) {
-    const images = e.currentTarget.dataset.images;
-    const index = e.currentTarget.dataset.index;
-    
+  onPreviewImage: function(e) {
+    var images = e.currentTarget.dataset.images;
+    var index = e.currentTarget.dataset.index;
+
     wx.previewImage({
       urls: images,
       current: images[index]
@@ -263,9 +306,9 @@ Page({
   },
 
   // 去评价
-  onGoOrders() {
+  onGoOrders: function() {
     wx.navigateTo({
       url: '/pages/orders/orders?status=completed'
     });
   }
-})
+});

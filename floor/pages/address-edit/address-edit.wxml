@@ -93,7 +93,7 @@
       <view class="item-label">
         <text class="label-text">设为默认地址</text>
       </view>
-      <switch checked="{{formData.isDefault}}" bindchange="onToggleDefault"/>
+      <switch checked="{{formData.isDefault}}" bindchange="onToggleDefault" color="#FF6633"/>
     </view>
   </view>
 

@@ -1,45 +1,22 @@
 <!-- 帮助中心页面 -->
 <view class="container">
-  <!-- 头部 -->
-  <view class="header">
-    <view class="back-btn" bindtap="onBack">←</view>
-    <text class="header-title">帮助中心</text>
-    <view class="header-placeholder"></view>
-  </view>
-
   <!-- 搜索栏 -->
   <view class="search-section">
-    <input 
-      class="search-input" 
-      placeholder="搜索帮助问题..."
-      value="{{searchKeyword}}"
-      bindinput="onSearch"
-    />
-    <text class="fa fa-search search-icon"></text>
+    <input class="search-input" placeholder="搜索帮助问题..." value="{{searchKeyword}}" bindinput="onSearch" />
+    <text class="-search search-icon">🔍</text>
   </view>
 
   <!-- 常见问题分类 -->
   <view class="categories">
-    <view 
-      class="category-item {{expandedCategory === item.id ? 'expanded' : ''}}" 
-      wx:for="{{categories}}" 
-      wx:key="id"
-      wx:for-item="category"
-    >
+    <view class="category-item {{expandedCategory === item.id ? 'expanded' : ''}}" wx:for="{{categories}}" wx:key="id" wx:for-item="category">
       <view class="category-header" bindtap="onToggleCategory" data-id="{{category.id}}">
-        <text class="fa {{category.icon}} category-icon"></text>
+        <text category-icon>{{iconText || "❓"}}</text>
         <text class="category-name">{{category.name}}</text>
         <text class="category-arrow">{{expandedCategory === category.id ? '▼' : '▶'}}</text>
       </view>
 
       <view class="questions-list" wx:if="{{expandedCategory === category.id}}">
-        <view 
-          class="question-item {{expandedQuestion === qIndex ? 'expanded' : ''}}" 
-          wx:for="{{category.questions}}" 
-          wx:for-item="question"
-          wx:key="q"
-          wx:for-index="qIndex"
-        >
+        <view class="question-item {{expandedQuestion === qIndex ? 'expanded' : ''}}" wx:for="{{category.questions}}" wx:for-item="question" wx:key="q" wx:for-index="qIndex">
           <view class="question-header" bindtap="onToggleQuestion" data-index="{{qIndex}}">
             <text class="question-q">{{question.q}}</text>
             <text class="question-arrow">{{expandedQuestion === qIndex ? '−' : '+'}}</text>
@@ -57,14 +34,16 @@
     <text class="contact-title">没找到答案？</text>
     <view class="contact-methods">
       <button class="contact-btn" bindtap="onCopyPhone">
-        <text class="btn-icon">📞</text>
+        <text class="-phone btn-icon">📞</text>
         <text class="btn-text">拨打热线</text>
       </button>
       <button class="contact-btn primary" bindtap="onFeedback">
-        <text class="fa fa-comment-dots btn-icon"></text>
+        <text class="-comments btn-icon">💬</text>
         <text class="btn-text">在线反馈</text>
       </button>
     </view>
     <text class="service-time">客服时间：周一至周日 9:00-21:00</text>
   </view>
+
+  <view class="safe-area-bottom"></view>
 </view>

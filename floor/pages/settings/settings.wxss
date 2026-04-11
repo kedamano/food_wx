@@ -11,11 +11,11 @@ page {
 
 /* 头部 */
 .header-section {
-  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+  background: linear-gradient(135deg, #FF6633 0%, #FF8855 100%);
   border-radius: 20rpx;
   padding: 30rpx;
   margin-bottom: 20rpx;
-  box-shadow: 0 4rpx 12rpx rgba(76, 175, 80, 0.2);
+  box-shadow: 0 4rpx 12rpx rgba(255, 102, 51, 0.2);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -102,8 +102,8 @@ page {
 }
 
 .item-icon.account {
-  background: #E8F5E8;
-  color: #4CAF50;
+  background: #FFF0EB;
+  color: #FF6633;
 }
 
 .item-icon.security {
@@ -117,8 +117,8 @@ page {
 }
 
 .item-icon.notifications {
-  background: #E8F5E8;
-  color: #4CAF50;
+  background: #FFF0EB;
+  color: #FF6633;
 }
 
 .item-icon.promotions {
@@ -137,8 +137,8 @@ page {
 }
 
 .item-icon.update {
-  background: #E8F5E8;
-  color: #4CAF50;
+  background: #FFF0EB;
+  color: #FF6633;
 }
 
 .item-icon.language {
@@ -152,8 +152,8 @@ page {
 }
 
 .item-icon.about {
-  background: #E8F5E8;
-  color: #4CAF50;
+  background: #FFF0EB;
+  color: #FF6633;
 }
 
 .item-icon.help {

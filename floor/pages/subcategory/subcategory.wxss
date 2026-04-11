@@ -15,7 +15,7 @@ page {
   align-items: center;
   justify-content: space-between;
   padding: 24rpx 30rpx;
-  background: linear-gradient(135deg, #00d04e, #00b84a);
+  background: linear-gradient(135deg, #FF6633, #ee5522);
   color: white;
   position: sticky;
   top: 0;
@@ -139,7 +139,7 @@ page {
   width: 56rpx;
   height: 56rpx;
   border-radius: 50%;
-  background: linear-gradient(135deg, #00d04e, #00b84a);
+  background: linear-gradient(135deg, #FF6633, #ee5522);
   color: white;
   font-size: 44rpx;
   padding: 0;
@@ -147,7 +147,7 @@ page {
   align-items: center;
   justify-content: center;
   border: none;
-  box-shadow: 0 4rpx 12rpx rgba(0, 208, 78, 0.3);
+  box-shadow: 0 4rpx 12rpx rgba(255, 102, 51, 0.3);
 }
 
 /* 空状态 */
@@ -186,7 +186,7 @@ page {
   width: 60rpx;
   height: 60rpx;
   border: 4rpx solid #f0f0f0;
-  border-top-color: #00d04e;
+  border-top-color: #FF6633;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -246,7 +246,7 @@ page {
 }
 
 .settle-btn {
-  background: linear-gradient(135deg, #00d04e, #00b84a);
+  background: linear-gradient(135deg, #FF6633, #ee5522);
   color: white;
   font-size: 30rpx;
   font-weight: 600;

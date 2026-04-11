@@ -1,64 +1,64 @@
 /**
  * 支付方式相关API接口
+ * 注意：后端暂无 PaymentController，支付方式数据暂存在本地 storage
+ * TODO: 后端新增支付接口后替换为真实API调用
  */
-const { api, showLoading, hideLoading, showError, showSuccess } = require('./request');
+var requestHelper = require('./request');
 
-// 模拟支付方式数据
-const mockPaymentMethods = [
+var STORAGE_KEY = 'payment_methods';
+
+// 默认支付方式（首次使用时初始化）
+var DEFAULT_PAYMENT_METHODS = [
   {
     id: 1,
     name: '微信支付',
     type: 'WECHAT',
     number: '绑定微信账户',
-    icon: 'fa-weixin',
+    icon: 'fa-comment-dollar',
     status: '已启用',
     isDefault: true,
-    createTime: '2024-01-01T00:00:00Z',
+    createTime: new Date().toISOString()
   },
   {
     id: 2,
-    name: '支付宝',
-    type: 'ALIPAY',
-    number: '绑定支付宝账户',
-    icon: '💙',
-    status: '已启用',
-    isDefault: false,
-    createTime: '2024-01-02T00:00:00Z',
-  },
-  {
-    id: 3,
-    name: '银行卡',
-    type: 'BANK_CARD',
-    number: '尾号 8888',
-    icon: 'fa-credit-card',
-    status: '已启用',
-    isDefault: false,
-    createTime: '2024-01-03T00:00:00Z',
-    bankName: '招商银行',
-    cardType: '信用卡',
-  },
-  {
-    id: 4,
     name: '余额支付',
     type: 'BALANCE',
-    number: '账户余额 ¥128.50',
-    icon: '💰',
+    number: '账户余额',
+    icon: 'fa-wallet',
     status: '可用',
     isDefault: false,
-    createTime: '2024-01-04T00:00:00Z',
-    balance: 128.50,
-  },
+    createTime: new Date().toISOString()
+  }
 ];
+
+/**
+ * 从本地存储获取支付方式列表
+ * @returns {Array}
+ */
+function _getPaymentsFromStorage() {
+  try {
+    var list = wx.getStorageSync(STORAGE_KEY);
+    return list || DEFAULT_PAYMENT_METHODS;
+  } catch (e) {
+    return DEFAULT_PAYMENT_METHODS;
+  }
+}
+
+/**
+ * 保存支付方式列表到本地存储
+ * @param {Array} payments
+ */
+function _savePaymentsToStorage(payments) {
+  wx.setStorageSync(STORAGE_KEY, payments);
+}
 
 /**
  * 获取支付方式列表
  * @returns {Promise}
  */
 function getPaymentMethodList() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(mockPaymentMethods);
-    }, 300);
+  return new Promise(function(resolve) {
+    resolve(_getPaymentsFromStorage());
   });
 }
 
@@ -68,11 +68,12 @@ function getPaymentMethodList() {
  * @returns {Promise}
  */
 function getPaymentMethodDetail(paymentId) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const payment = mockPaymentMethods.find(p => p.id === parseInt(paymentId));
-      resolve(payment || null);
-    }, 200);
+  return new Promise(function(resolve) {
+    var payments = _getPaymentsFromStorage();
+    var payment = payments.find(function(p) {
+      return p.id === parseInt(paymentId);
+    });
+    resolve(payment || null);
   });
 }
 
@@ -83,22 +84,32 @@ function getPaymentMethodDetail(paymentId) {
  */
 function createPaymentMethod(data) {
   showLoading('添加中...');
-  
-  return new Promise((resolve) => {
-    setTimeout(() => {
+  return new Promise(function(resolve) {
+    setTimeout(function() {
       hideLoading();
-      
-      const newPayment = {
+      var payments = _getPaymentsFromStorage();
+      var newPayment = {
         id: Date.now(),
-        ...data,
-        createTime: new Date().toISOString(),
+        name: data.name,
+        type: data.type,
+        number: data.number,
+        icon: data.icon,
         status: '已启用',
+        isDefault: data.isDefault || false,
+        createTime: new Date().toISOString()
       };
-      
-      mockPaymentMethods.push(newPayment);
+
+      if (newPayment.isDefault) {
+        payments.forEach(function(p) {
+          p.isDefault = false;
+        });
+      }
+
+      payments.push(newPayment);
+      _savePaymentsToStorage(payments);
       showSuccess('添加成功');
       resolve(newPayment);
-    }, 1000);
+    }, 500);
   });
 }
 
@@ -110,25 +121,31 @@ function createPaymentMethod(data) {
  */
 function updatePaymentMethod(paymentId, data) {
   showLoading('更新中...');
-  
-  return new Promise((resolve) => {
-    setTimeout(() => {
+  return new Promise(function(resolve) {
+    setTimeout(function() {
       hideLoading();
-      
-      const index = mockPaymentMethods.findIndex(p => p.id === parseInt(paymentId));
+      var payments = _getPaymentsFromStorage();
+      var index = payments.findIndex(function(p) {
+        return p.id === parseInt(paymentId);
+      });
       if (index !== -1) {
-        mockPaymentMethods[index] = {
-          ...mockPaymentMethods[index],
-          ...data,
-        };
-        
+        if (data.isDefault) {
+          payments.forEach(function(p) {
+            p.isDefault = false;
+          });
+        }
+        var merged = {};
+        for (var pk in payments[index]) merged[pk] = payments[index][pk];
+        for (var dk in data) merged[dk] = data[dk];
+        payments[index] = merged;
+        _savePaymentsToStorage(payments);
         showSuccess('更新成功');
-        resolve(mockPaymentMethods[index]);
+        resolve(payments[index]);
       } else {
         showError('支付方式不存在');
         resolve(null);
       }
-    }, 800);
+    }, 500);
   });
 }
 
@@ -139,23 +156,22 @@ function updatePaymentMethod(paymentId, data) {
  */
 function deletePaymentMethod(paymentId) {
   showLoading('删除中...');
-  
-  return new Promise((resolve) => {
-    setTimeout(() => {
+  return new Promise(function(resolve) {
+    setTimeout(function() {
       hideLoading();
-      
-      const index = mockPaymentMethods.findIndex(p => p.id === parseInt(paymentId));
+      var payments = _getPaymentsFromStorage();
+      var index = payments.findIndex(function(p) {
+        return p.id === parseInt(paymentId);
+      });
       if (index !== -1) {
-        const payment = mockPaymentMethods[index];
-        
-        // 检查是否为默认支付方式
+        var payment = payments[index];
         if (payment.isDefault) {
           showError('不能删除默认支付方式');
           resolve({ success: false });
           return;
         }
-        
-        mockPaymentMethods.splice(index, 1);
+        payments.splice(index, 1);
+        _savePaymentsToStorage(payments);
         showSuccess('删除成功');
         resolve({ success: true });
       } else {
@@ -173,21 +189,19 @@ function deletePaymentMethod(paymentId) {
  */
 function setDefaultPaymentMethod(paymentId) {
   showLoading('设置中...');
-  
-  return new Promise((resolve) => {
-    setTimeout(() => {
+  return new Promise(function(resolve) {
+    setTimeout(function() {
       hideLoading();
-      
-      const targetIndex = mockPaymentMethods.findIndex(p => p.id === parseInt(paymentId));
+      var payments = _getPaymentsFromStorage();
+      var targetIndex = payments.findIndex(function(p) {
+        return p.id === parseInt(paymentId);
+      });
       if (targetIndex !== -1) {
-        // 取消所有默认支付方式
-        mockPaymentMethods.forEach(p => {
+        payments.forEach(function(p) {
           p.isDefault = false;
         });
-        
-        // 设置新的默认支付方式
-        mockPaymentMethods[targetIndex].isDefault = true;
-        
+        payments[targetIndex].isDefault = true;
+        _savePaymentsToStorage(payments);
         showSuccess('设置成功');
         resolve({ success: true });
       } else {
@@ -203,11 +217,12 @@ function setDefaultPaymentMethod(paymentId) {
  * @returns {Promise}
  */
 function getDefaultPaymentMethod() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const defaultPayment = mockPaymentMethods.find(p => p.isDefault);
-      resolve(defaultPayment || null);
-    }, 200);
+  return new Promise(function(resolve) {
+    var payments = _getPaymentsFromStorage();
+    var defaultPayment = payments.find(function(p) {
+      return p.isDefault;
+    });
+    resolve(defaultPayment || null);
   });
 }
 
@@ -217,9 +232,8 @@ function getDefaultPaymentMethod() {
  * @returns {Object} 验证结果
  */
 function validatePaymentMethod(data) {
-  const errors = {};
+  var errors = {};
   
-  // 验证必填字段
   if (!data.name || data.name.trim().length < 2) {
     errors.name = '请输入有效的支付方式名称';
   }
@@ -228,57 +242,19 @@ function validatePaymentMethod(data) {
     errors.type = '请选择支付方式类型';
   }
   
-  // 银行卡类型特殊验证
   if (data.type === 'BANK_CARD') {
     if (!data.bankName || data.bankName.trim().length < 2) {
       errors.bankName = '请输入银行名称';
     }
-    
     if (!data.cardNumber || !/^\d{16,19}$/.test(data.cardNumber)) {
       errors.cardNumber = '请输入有效的银行卡号（16-19位数字）';
-    }
-    
-    if (!data.cardType) {
-      errors.cardType = '请选择卡类型';
-    }
-    
-    if (!data.expireDate || !/^(0[1-9]|1[0-2])\/(\d{2})$/.test(data.expireDate)) {
-      errors.expireDate = '请输入有效的有效期（MM/YY格式）';
-    }
-    
-    if (!data.cvv || !/^\d{3,4}$/.test(data.cvv)) {
-      errors.cvv = '请输入有效的CVV安全码（3-4位数字）';
     }
   }
   
   return {
     isValid: Object.keys(errors).length === 0,
-    errors,
+    errors: errors
   };
-}
-
-/**
- * 获取支付方式统计
- * @returns {Promise}
- */
-function getPaymentMethodStats() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const stats = {
-        total: mockPaymentMethods.length,
-        enabled: mockPaymentMethods.filter(p => p.status === '已启用').length,
-        disabled: mockPaymentMethods.filter(p => p.status === '已禁用').length,
-        default: mockPaymentMethods.filter(p => p.isDefault).length,
-        byType: {
-          WECHAT: mockPaymentMethods.filter(p => p.type === 'WECHAT').length,
-          ALIPAY: mockPaymentMethods.filter(p => p.type === 'ALIPAY').length,
-          BANK_CARD: mockPaymentMethods.filter(p => p.type === 'BANK_CARD').length,
-          BALANCE: mockPaymentMethods.filter(p => p.type === 'BALANCE').length,
-        },
-      };
-      resolve(stats);
-    }, 200);
-  });
 }
 
 module.exports = {
@@ -289,7 +265,5 @@ module.exports = {
   deletePaymentMethod,
   setDefaultPaymentMethod,
   getDefaultPaymentMethod,
-  validatePaymentMethod,
-  getPaymentMethodStats,
-  mockPaymentMethods, // 导出供其他模块使用
+  validatePaymentMethod
 };

@@ -7,7 +7,7 @@
   <view class="topic-list">
     <view class="topic-item" wx:for="{{topics}}" wx:key="id" bindtap="onTopicTap" data-topic="{{item.title}}">
       <view class="topic-icon">
-        <text class="fa {{item.icon}}"></text>
+        <text>{{iconText || "⭐"}}</text>
       </view>
       <view class="topic-content">
         <text class="topic-title">{{item.title}}</text>
@@ -21,7 +21,7 @@
   </view>
 
   <view class="empty-state" wx:if="{{topics.length === 0}}">
-    <text class="fa fa-comments empty-icon"></text>
+    <text class="-comments empty-icon">💬</text>
     <text class="empty-text">暂无话题</text>
   </view>
 </view>

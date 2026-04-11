@@ -1,157 +1,197 @@
-<!-- 美食详情页 -->
-<scroll-view class="scrollarea" scroll-y type="list">
-  <!-- 头部导航 -->
-  <view class="header-nav">
-    <view class="nav-left" bindtap="onBackClick">
-      <text class="back-icon">←</text>
-    </view>
-    <text class="nav-title">美食详情</text>
-    <view class="nav-right">
-      <text class="fa fa-share-alt share-icon"></text>
-    </view>
-  </view>
-
-  <!-- 美食图片轮播 -->
+<!-- 美食详情页 - 大众点评风格 -->
+<view class="page-container">
+  <!-- 美食图片 -->
   <view class="food-images-section">
-    <swiper class="food-swiper" indicator-dots="{{true}}" autoplay="{{true}}" interval="{{4000}}" circular="{{true}}" bindchange="onImageChange">
+    <swiper class="food-swiper" indicator-dots="{{true}}" indicator-active-color="#FF6633" indicator-color="rgba(255,255,255,0.5)" autoplay="{{true}}" interval="{{4000}}" circular="{{true}}" bindchange="onImageChange">
       <swiper-item wx:for="{{food.images}}" wx:key="index">
-        <image class="food-image lazyload" src="{{item}}" mode="aspectFill" lazy-load="{{true}}"></image>
+        <image class="food-image" src="{{item}}" mode="aspectFill"></image>
       </swiper-item>
     </swiper>
-    <view class="image-placeholder" wx:if="{{!food.images || food.images.length === 0}}">
-      <text class="fa fa-drumstick-bite food-icon"></text>
+    <view class="image-counter" wx:if="{{food.images && food.images.length > 1}}">
+      <text>{{currentImageIndex + 1}}/{{food.images.length}}</text>
     </view>
-    <view class="image-counter" wx:if="{{food.images && food.images.length > 0}}">
-      <text class="counter-text">{{currentImageIndex + 1}}/{{food.images.length}}</text>
+    <!-- 返回按钮 -->
+    <view class="nav-back" bindtap="onBackClick">
+      <view class="nav-back-btn">←</view>
+    </view>
+    <!-- 分享/收藏 -->
+    <view class="nav-actions">
+      <view class="nav-action-btn" bindtap="onFavoriteClick">
+        <text class="action-icon" style="font-size:36rpx;">{{isFavorite ? '❤️' : '🤍'}}</text>
+      </view>
+      <button class="nav-action-btn share-btn" open-type="share">
+        <text class="action-icon -share-alt" style="font-size:36rpx;">↗</text>
+      </button>
     </view>
   </view>
 
   <!-- 基本信息区域 -->
-  <view class="basic-info-section">
-    <text class="food-name">{{food.name}}</text>
-    <view class="price-rating">
-      <text class="price-symbol">¥</text>
-      <text class="food-price">{{food.price}}</text>
-      <view class="rating-container">
-        <text class="fa fa-star star-icon"></text>
-        <text class="rating-score">{{food.rating}}</text>
-        <text class="review-count">({{food.reviews}}条评价)</text>
+  <view class="info-section">
+    <view class="price-row">
+      <view class="price-box">
+        <text class="price-symbol">¥</text>
+        <text class="food-price">{{food.price}}</text>
+        <view class="original-price" wx:if="{{food.originalPrice}}">
+          <text class="orig-symbol">¥</text>
+          <text class="orig-price">{{food.originalPrice}}</text>
+        </view>
+      </view>
+      <view class="sold-info">
+        <text class="sold-text">已售 {{food.sales || food.monthlySales || 0}} 份</text>
       </view>
     </view>
-    <view class="food-stats">
-      <text class="stat-item">已售 {{food.sales}} 份</text>
-      <text class="stat-item">月销 {{food.monthlySales}}</text>
-      <text class="stat-item">配送 {{food.deliveryTime}}</text>
+    <text class="food-name">{{food.name}}</text>
+    <view class="tags-row" wx:if="{{food.tags}}">
+      <view class="tag tag-hot" wx:if="{{food.tags.hot}}"><text class="-fire" style="margin-right:4rpx;">🔥</text>热销</view>
+      <view class="tag tag-classic" wx:if="{{food.tags.classic}}"><text class="-star" style="margin-right:4rpx;">⭐</text>经典</view>
+      <view class="tag tag-combo" wx:if="{{food.tags.combo}}"><text class="-utensils" style="margin-right:4rpx;">🍴</text>套餐</view>
+      <view class="tag tag-healthy" wx:if="{{food.tags.healthy}}"><text class="-leaf" style="margin-right:4rpx;">●</text>营养</view>
+    </view>
+  </view>
+
+  <!-- 评分信息 -->
+  <view class="rating-section">
+    <view class="rating-score">
+      <text class="score-num">{{food.rating}}</text>
+      <view class="score-stars">
+        <text class="star" wx:for="{{5}}" wx:for-item="s" wx:key="*this">{{s <= food.rating ? '★' : '☆'}}</text>
+      </view>
+      <text class="review-count">{{food.reviews || 0}}条评价</text>
+    </view>
+    <view class="rating-info">
+      <view class="info-item" wx:if="{{food.monthlySales}}">
+        <text class="info-num">{{food.monthlySales}}</text>
+        <text class="info-label">月销量</text>
+      </view>
+      <view class="info-item" wx:if="{{food.deliveryTime}}">
+        <text class="info-num">{{food.deliveryTime}}</text>
+        <text class="info-label">配送时间</text>
+      </view>
+      <view class="info-item">
+        <text class="info-num">好评{{food.rating > 0 ? Math.round(food.rating / 5 * 100) : 95}}%</text>
+        <text class="info-label">好评率</text>
+      </view>
     </view>
   </view>
 
   <!-- 商品描述 -->
-  <view class="description-section">
+  <view class="desc-section">
     <view class="section-header">
-      <text class="fa fa-file-alt section-icon"></text>
-      <text class="section-title">商品描述</text>
+      <text class="section-title">商品详情</text>
     </view>
-    <text class="food-description">{{food.description || '暂无描述'}}</text>
-  </view>
-
-  <!-- 标签系统 -->
-  <view class="tags-section" wx:if="{{food.tags}}">
-    <view class="tag-item hot-tag" wx:if="{{food.tags.hot}}">
-      <text class="fa fa-fire tag-icon"></text>
-      <text class="tag-text">热销</text>
-    </view>
-    <view class="tag-item classic-tag" wx:if="{{food.tags.classic}}">
-      <text class="fa fa-star tag-icon"></text>
-      <text class="tag-text">经典</text>
-    </view>
-    <view class="tag-item combo-tag" wx:if="{{food.tags.combo}}">
-      <text class="fa fa-utensils tag-icon"></text>
-      <text class="tag-text">套餐</text>
-    </view>
-    <view class="tag-item healthy-tag" wx:if="{{food.tags.healthy}}">
-      <text class="fa fa-heart tag-icon"></text>
-      <text class="tag-text">营养丰富</text>
-    </view>
+    <text class="desc-text">{{food.description || '暂无描述'}}</text>
   </view>
 
   <!-- 用户评价 -->
   <view class="reviews-section" wx:if="{{reviews && reviews.length > 0}}">
-    <view class="reviews-header">
-      <view class="section-title-wrapper">
-        <text class="fa fa-comment-alt section-icon"></text>
-        <text class="section-title">用户评价 ({{reviews.length}})</text>
-      </view>
-      <text class="view-all" bindtap="onViewAllReviews">查看全部 ></text>
+    <view class="section-header">
+      <text class="section-title">用户评价 ({{reviews.length}})</text>
+      <text class="view-all" bindtap="onViewAllReviews">全部 ›</text>
     </view>
-    <view class="reviews-list">
-      <view class="review-item" wx:for="{{reviews}}" wx:key="id">
-        <view class="review-header">
-          <view class="user-avatar">
-            <text class="avatar-text">{{item.userName.charAt(0)}}</text>
+    <view class="review-list">
+      <view class="review-card" wx:for="{{reviews}}" wx:key="id">
+        <view class="review-top">
+          <view class="reviewer-avatar">
+            <text class="avatar-text">{{item.userName[0]}}</text>
           </view>
-          <view class="user-info">
-            <text class="user-name">{{item.userName}}</text>
-            <view class="user-rating">
-              <text class="fa fa-star star-icon" wx:for="{{item.rating}}" wx:for-item="star" wx:key="*this"></text>
+          <view class="reviewer-info">
+            <text class="reviewer-name">{{item.userName}}</text>
+            <view class="review-stars">
+              <text class="star" wx:for="{{item.rating}}" wx:for-item="r" wx:key="*this">★</text>
             </view>
           </view>
           <text class="review-time">{{item.time}}</text>
         </view>
         <text class="review-content">{{item.content}}</text>
         <view class="review-images" wx:if="{{item.images && item.images.length > 0}}">
-          <image class="review-image" wx:for="{{item.images}}" wx:for-item="img" wx:key="*this" src="{{img}}" mode="aspectFill"></image>
+          <image class="review-img" wx:for="{{item.images}}" wx:for-item="img" wx:key="*this" src="{{img}}" mode="aspectFill"></image>
         </view>
       </view>
     </view>
   </view>
 
-  <!-- 空评价提示 -->
+  <!-- 空评价 -->
   <view class="empty-reviews" wx:if="{{!isLoading && (!reviews || reviews.length === 0)}}">
-    <text class="fa fa-comment-dots empty-icon"></text>
-    <text class="empty-text">暂无用户评价</text>
-    <text class="empty-subtext">快来成为第一个评价的人吧</text>
+      <text class="-comments empty-icon" style="font-size:80rpx;">💬</text>
+    <text class="empty-text">暂无评价，快来抢沙发</text>
   </view>
 
   <!-- 商家信息 -->
-  <view class="store-section">
-    <view class="store-info" bindtap="onStoreInfoClick">
+  <view class="store-card" bindtap="onStoreInfoClick">
+    <view class="store-left">
       <image class="store-logo" src="{{store.logo}}" mode="aspectFill"></image>
-      <view class="store-detail">
+      <view class="store-info">
         <text class="store-name">{{store.name}}</text>
-        <view class="store-rating">
-          <text class="fa fa-star star-icon"></text>
-          <text class="store-score">{{store.rating}}</text>
-          <text class="store-sales">月销 {{store.monthlySales}}</text>
+        <view class="store-meta">
+          <text class="store-rating">★ {{store.rating}}</text>
+          <text class="store-divider">|</text>
+          <text class="store-sales">月售{{store.monthlySales}}</text>
         </view>
-        <view class="store-location">
-          <text class="fa fa-map-marker-alt location-icon"></text>
-          <text class="location-text">{{store.distance}} | {{store.deliveryTime}}</text>
+        <view class="store-dist">
+          <text>{{store.distance}} · {{store.deliveryTime}}</text>
         </view>
       </view>
-      <text class="arrow-icon">→</text>
     </view>
+    <text class="store-arrow">›</text>
   </view>
-</scroll-view>
+
+  <!-- 底部占位 -->
+  <view style="height: 140rpx;"></view>
+</view>
 
 <!-- 底部操作栏 -->
-<view class="bottom-action">
-  <view class="action-left">
-    <button class="favorite-btn" bindtap="onFavoriteClick">
-      <text class="fa fa-heart favorite-icon"></text>
-      <text class="btn-text">收藏</text>
-    </button>
-    <button class="cart-btn" bindtap="onCartClick">
-      <text class="fa fa-shopping-cart cart-icon"></text>
-      <text class="btn-text">购物车</text>
-      <text class="cart-count" wx:if="{{cartCount > 0}}">{{cartCount}}</text>
-    </button>
+<view class="bottom-bar">
+  <view class="bar-icons">
+    <view class="bar-icon-item" bindtap="onFavoriteClick">
+      <text class="bar-icon" style="font-size:40rpx;">{{isFavorite ? '❤️' : '🤍'}}</text>
+      <text class="bar-label">{{isFavorite ? '已收藏' : '收藏'}}</text>
+    </view>
+    <view class="bar-icon-item" bindtap="onCartClick">
+      <text class="bar-icon -shopping-cart" style="font-size:40rpx;">🛒</text>
+      <text class="bar-label">购物车</text>
+      <view class="bar-badge" wx:if="{{cartCount > 0}}">{{cartCount}}</view>
+    </view>
   </view>
-  <view class="action-right">
-    <button class="add-cart-btn" bindtap="onAddToCart">
-      <text class="btn-text">加入购物车</text>
-    </button>
-    <button class="buy-now-btn" bindtap="onBuyNow">
-      <text class="btn-text">立即购买</text>
-    </button>
+  <view class="bar-btns">
+    <button class="bar-btn add-cart" bindtap="onAddToCart">加入购物车</button>
+    <button class="bar-btn buy-now" bindtap="onBuyNow">立即购买</button>
+  </view>
+</view>
+
+<!-- 购物车详情弹窗 -->
+<view class="cart-popup-mask" wx:if="{{showCartPopup}}" bindtap="hideCartPopup"></view>
+<view class="cart-popup {{showCartPopup ? 'cart-popup-show' : ''}}">
+  <view class="cart-popup-header">
+    <text class="cart-popup-title">购物车</text>
+    <text class="cart-popup-count" wx:if="{{cartPopupItems.length > 0}}">共{{cartPopupCount}}件</text>
+    <text class="cart-popup-clear" wx:if="{{cartPopupItems.length > 0}}" bindtap="clearCart">清空</text>
+  </view>
+  <scroll-view class="cart-popup-list" scroll-y enhanced show-scrollbar="{{false}}">
+    <view class="cart-popup-empty" wx:if="{{cartPopupItems.length === 0}}">
+      <text class="cart-empty-icon -shopping-cart" style="font-size:80rpx;">🛒</text>
+      <text class="cart-empty-text">购物车是空的</text>
+    </view>
+    <view class="cart-popup-item" wx:for="{{cartPopupItems}}" wx:key="foodId">
+      <image class="cart-item-img" src="{{item.image}}" mode="aspectFill"></image>
+      <view class="cart-item-info">
+        <text class="cart-item-name">{{item.name}}</text>
+        <text class="cart-item-price">¥{{item.price}}</text>
+      </view>
+      <view class="cart-item-right">
+        <text class="cart-item-subtotal">¥{{item.subtotal}}</text>
+        <view class="cart-item-qty">
+          <view class="qty-btn" bindtap="onCartItemMinus" data-index="{{index}}">-</view>
+          <text class="qty-num">{{item.quantity}}</text>
+          <view class="qty-btn qty-plus" bindtap="onCartItemPlus" data-index="{{index}}">+</view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+  <view class="cart-popup-footer" wx:if="{{cartPopupItems.length > 0}}">
+    <view class="cart-popup-total">
+      <text class="cart-total-label">合计</text>
+      <text class="cart-total-price">¥{{cartPopupTotal}}</text>
+    </view>
+    <view class="cart-popup-go" bindtap="goToCart">去购物车</view>
   </view>
 </view>

@@ -1,64 +1,70 @@
-<!-- 收货地址管理 - 精致版 -->
+<!-- 收货地址管理 -->
 <scroll-view class="container" scroll-y>
   <!-- 头部 -->
   <view class="header">
-    <view class="header-content">
+    <view class="header-left">
       <text class="header-title">收货地址</text>
       <text class="header-subtitle">管理您的收货地址</text>
     </view>
-    <button class="add-btn" bindtap="onAddAddress">
-      <text class="btn-icon">+</text>
+    <button class="add-btn" catchtap="onAddAddress">
+      <text class="btn-plus">+</text>
       <text class="btn-text">新建地址</text>
     </button>
   </view>
 
   <!-- 地址列表 -->
-  <view class="address-list">
-    <view class="address-card {{item.isDefault ? 'default' : ''}}" 
-          wx:for="{{addresses}}" wx:key="id" 
-          bindtap="onAddressSelect" data-address="{{item}}">
-      
+  <view class="address-list" wx:if="{{addresses.length > 0}}">
+    <view class="address-card {{item.isDefault ? 'default-card' : ''}}"
+          wx:for="{{addresses}}" wx:key="id">
+
       <!-- 默认标签 -->
       <view class="default-badge" wx:if="{{item.isDefault}}">
         <text class="badge-text">默认</text>
       </view>
 
       <!-- 地址内容 -->
-      <view class="address-content">
-        <view class="user-info">
+      <view class="address-content" bindtap="onAddressSelect" data-address="{{item}}">
+        <view class="user-row">
           <text class="user-name">{{item.name}}</text>
           <text class="user-phone">{{item.phone}}</text>
-          <view class="address-tags">
-            <text class="tag work" wx:if="{{item.isWork}}">公司</text>
-            <text class="tag home" wx:if="{{item.isHome}}">家</text>
-          </view>
+          <text class="tag-home" wx:if="{{item.isHome}}">家</text>
+          <text class="tag-work" wx:if="{{item.isWork}}">公司</text>
         </view>
-        <view class="address-detail">
-          <text class="address-text">{{item.province}} {{item.city}} {{item.district}}</text>
-          <text class="address-text detail">{{item.detail}}</text>
+        <view class="addr-detail-box">
+          <text class="addr-region">{{item.province}} {{item.city}} {{item.district}}</text>
+          <text class="addr-detail">{{item.detail}}</text>
         </view>
       </view>
 
-      <!-- 操作区域 -->
-      <view class="address-actions">
-        <button class="action-btn edit" bindtap="onEditAddress" data-address="{{item}}">
-          <text class="fa fa-edit btn-icon"></text>
-          <text class="btn-text">编辑</text>
-        </button>
-        <button class="action-btn delete" bindtap="onDeleteAddress" data-address="{{item}}">
-          <text class="fa fa-trash-alt btn-icon"></text>
-          <text class="btn-text">删除</text>
-        </button>
+      <!-- 操作行 -->
+      <view class="action-row">
+        <view class="set-default-btn" wx:if="{{!item.isDefault}}" catchtap="onSetDefault" data-id="{{item.id}}">
+          <text class="set-default-text">设为默认</text>
+        </view>
+        <view class="action-spacer" wx:else></view>
+        <view class="edit-btn" catchtap="onEditAddress" data-address="{{item}}">
+          <text class="edit-icon -edit">✏️</text>
+          <text class="action-text">编辑</text>
+        </view>
+        <view class="delete-btn" catchtap="onDeleteAddress" data-id="{{item.id}}">
+          <text class="delete-icon -times">✕</text>
+          <text class="action-text">删除</text>
+        </view>
       </view>
     </view>
   </view>
 
   <!-- 空状态 -->
-  <view class="empty-state" wx:if="{{addresses.length === 0}}">
-    <view class="empty-icon fa fa-map-marker-alt"></view>
+  <view class="empty-state" wx:if="{{addresses.length === 0 && !isLoading}}">
+    <text class="empty-icon -map-marker-alt" style="font-size:80rpx;">📍</text>
     <text class="empty-title">还没有收货地址</text>
     <text class="empty-desc">添加您的第一个收货地址</text>
-    <button class="btn-primary" bindtap="onAddAddress">添加地址</button>
+    <button class="btn-primary" bindtap="onAddAddress">+ 添加地址</button>
+  </view>
+
+  <!-- 加载中 -->
+  <view class="loading-state" wx:if="{{isLoading}}">
+    <text class="loading-text">加载中...</text>
   </view>
 
   <!-- 底部安全区域 -->

@@ -10,6 +10,8 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
+import java.nio.file.Paths;
+
 @Configuration
 public class WebConfig extends WebMvcConfigurationSupport {
 
@@ -28,17 +30,19 @@ public class WebConfig extends WebMvcConfigurationSupport {
 
     @Override
     protected void addInterceptors(InterceptorRegistry registry) {
-        // JWT拦截器配置
+        // JWT拦截器配置 - 只拦截特定路径
         registry.addInterceptor(jwtInterceptor)
-                .addPathPatterns("/user/**", "/food/**", "/cart/**", "/order/**", "/review/**")
-                .excludePathPatterns("/user/register", "/user/login", "/food/all", "/food/popular", "/food/recommend", "/food/*/rating");
+                .addPathPatterns("/user/**", "/cart/**", "/order/**", "/review/**")
+                .excludePathPatterns("/user/register", "/user/login");
     }
 
     @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // 静态资源处理
+        // 静态资源处理 - 使用 file: 协议前缀（绝对路径）
+        // 注意：这里直接写中文路径，Spring Boot 会正确处理
+        String imagePath = "file:///D:/work/项目/food_wx/images/";
         registry.addResourceHandler("/images/**")
-                .addResourceLocations("file:./images/");
+                .addResourceLocations(imagePath);
         
         registry.addResourceHandler("/static/**")
                 .addResourceLocations("classpath:/static/");

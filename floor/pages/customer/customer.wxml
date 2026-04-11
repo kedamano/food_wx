@@ -1,0 +1,51 @@
+<!-- 客服中心页面 -->
+<view class="container">
+  <!-- 快捷操作 -->
+  <view class="quick-actions">
+    <view class="action-card" bindtap="onOnlineChat">
+      <view class="action-icon-wrap chat">
+        <text class="-comments action-icon-text">💬</text>
+      </view>
+      <text class="action-title">在线客服</text>
+      <text class="action-desc">平均响应时间 5 分钟</text>
+    </view>
+    <view class="action-card" bindtap="onCallService">
+      <view class="action-icon-wrap phone">
+        <text class="-phone action-icon-text">📞</text>
+      </view>
+      <text class="action-title">电话客服</text>
+      <text class="action-desc">{{servicePhone}}</text>
+    </view>
+    <view class="action-card" bindtap="onFeedback">
+      <view class="action-icon-wrap feedback">
+        <text class="-pen action-icon-text">✏️</text>
+      </view>
+      <text class="action-title">意见反馈</text>
+      <text class="action-desc">我们会认真对待每条反馈</text>
+    </view>
+  </view>
+
+  <!-- 服务时间 -->
+  <view class="service-time-section">
+    <text class="time-label">服务时间</text>
+    <text class="time-value">{{serviceTime}}（周一至周日）</text>
+  </view>
+
+  <!-- 常见问题 -->
+  <view class="faq-section">
+    <text class="section-title">常见问题</text>
+    <view class="faq-list">
+      <view class="faq-item {{expandedId === item.id ? 'expanded' : ''}}" wx:for="{{faqList}}" wx:key="id" bindtap="onToggleFaq" data-id="{{item.id}}">
+        <view class="faq-header">
+          <text class="faq-question">{{item.question}}</text>
+          <text class="faq-arrow {{expandedId === item.id ? 'up' : ''}}">›</text>
+        </view>
+        <view class="faq-answer" wx:if="{{expandedId === item.id}}">
+          <text class="answer-text">{{item.answer}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="safe-area-bottom"></view>
+</view>

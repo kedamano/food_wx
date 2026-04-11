@@ -36,6 +36,9 @@ public class ReviewController {
 
     private Integer getUserIdFromRequest(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
         if (token != null && !token.isEmpty()) {
             return jwtUtil.getUserIdFromToken(token);
         }

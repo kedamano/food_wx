@@ -1,0 +1,49 @@
+<!-- 积分记录 -->
+<view class="page">
+  <!-- 顶部积分概览 -->
+  <view class="points-overview">
+    <view class="overview-card">
+      <text class="overview-label">当前积分</text>
+      <text class="overview-value">{{userPoints}}</text>
+      <text class="overview-unit">分</text>
+    </view>
+  </view>
+
+  <!-- 筛选标签 -->
+  <view class="filter-bar">
+    <view class="filter-tab {{filterType === item.key ? 'active' : ''}}"
+          wx:for="{{filterTabs}}" wx:key="key"
+          bindtap="onFilterTap" data-key="{{item.key}}">
+      <text>{{item.name}}</text>
+    </view>
+    <view class="filter-right">
+      <text class="clear-btn" bindtap="onClearHistory">清空</text>
+    </view>
+  </view>
+
+  <!-- 记录列表 -->
+  <scroll-view class="record-list" scroll-y>
+    <view class="record-item" wx:for="{{historyList}}" wx:key="id">
+      <view class="record-icon">
+        <text class="icon-text">{{item.iconText || '\u2713'}}</text>
+      </view>
+      <view class="record-info">
+        <text class="record-desc">{{item.desc}}</text>
+        <text class="record-time">{{item.time}}</text>
+      </view>
+      <text class="record-points {{item.type === '收入' ? 'income' : 'expense'}}">{{item.points}}</text>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{isEmpty && !loading}}">
+      <text class="-clipboard-list empty-icon" style="font-size:80rpx;">📋</text>
+      <text class="empty-title">暂无记录</text>
+      <text class="empty-desc">完成签到或兑换商品后，积分变动会记录在这里</text>
+    </view>
+
+    <!-- 加载状态 -->
+    <view class="loading-state" wx:if="{{loading}}">
+      <text class="loading-text">加载中...</text>
+    </view>
+  </scroll-view>
+</view>

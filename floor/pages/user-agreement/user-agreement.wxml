@@ -2,7 +2,7 @@
 <scroll-view class="container" scroll-y>
   <view class="header">
     <view class="back-btn" bindtap="onBack">
-      <text class="fa fa-arrow-left"></text>
+      <text class="-arrow-left">‹</text>
     </view>
     <text class="header-title">用户协议</text>
     <view class="header-placeholder"></view>

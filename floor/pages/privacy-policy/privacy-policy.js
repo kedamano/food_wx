@@ -6,13 +6,13 @@ Page({
     lastUpdate: '2026年4月1日'
   },
 
-  onLoad() {
+  onLoad: function() {
     wx.setNavigationBarTitle({
       title: '隐私政策'
     });
   },
 
-  onBack() {
+  onBack: function() {
     wx.navigateBack();
   }
 });

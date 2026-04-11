@@ -1,139 +1,106 @@
 /**
  * 收货地址管理页面逻辑
  */
-const addressApi = require('../../api/address');
-const { showLoading, hideLoading, showError, showSuccess } = require('../../api/request');
+var addressApi = require('../../api/address');
 
 Page({
   data: {
-    // 地址列表
     addresses: [],
-    // 加载状态
     isLoading: true,
-    // 选择模式
-    isSelectMode: false,
+    isSelectMode: false
   },
 
-  // 页面加载
-  async onLoad(options) {
-    console.log('收货地址页面加载');
-
-    // 检查是否为选择模式
+  onLoad: function(options) {
     if (options.selectMode === 'true') {
       this.setData({ isSelectMode: true });
     }
-
-    // 加载地址列表
-    await this.loadAddresses();
+    this.loadAddresses();
   },
 
-  // 返回按钮点击
-  onBackClick() {
-    console.log('返回按钮点击');
-    wx.navigateBack({
-      delta: 1
+  onShow: function() {
+    // 每次显示时刷新，保证新增/编辑后数据更新
+    this.loadAddresses();
+  },
+
+  // 加载地址列表
+  loadAddresses: function() {
+    var that = this;
+    that.setData({ isLoading: true });
+    addressApi.getAddressList().then(function(addresses) {
+      that.setData({ addresses: addresses || [], isLoading: false });
+    }).catch(function(err) {
+      console.error('加载地址失败:', err);
+      that.setData({ isLoading: false });
+      wx.showToast({ title: '加载失败', icon: 'none' });
     });
   },
 
-  // 添加地址
-  onAddAddress() {
-    console.log('添加地址');
-    wx.navigateTo({
-      url: '/pages/address-edit/address-edit'
-    });
+  // 新建地址
+  onAddAddress: function() {
+    wx.navigateTo({ url: '/pages/address-edit/address-edit' });
   },
 
-  // 选择地址
-  onAddressSelect(e) {
-    const address = e.currentTarget.dataset.address;
-    console.log('选择地址：', address);
-
-    // 如果是在选择模式（例如从订单确认页过来），则返回选择的地址
-    const pages = getCurrentPages();
-    const prevPage = pages[pages.length - 2];
+  // 点击地址（选择模式返回，普通模式编辑）
+  onAddressSelect: function(e) {
+    var address = e.currentTarget.dataset.address;
+    var pages = getCurrentPages();
+    var prevPage = pages[pages.length - 2];
     if (prevPage && prevPage.route === 'pages/order-confirm/order-confirm') {
-      // 设置上一个页面的地址
-      prevPage.setData({
-        selectedAddress: address
-      });
+      prevPage.setData({ selectedAddress: address });
       wx.navigateBack();
       return;
     }
-
-    // 普通模式，进入地址详情
-    wx.navigateTo({
-      url: `/pages/address-detail/address-detail?id=${address.id}`
-    });
+    // 普通模式：直接进编辑
+    wx.navigateTo({ url: '/pages/address-edit/address-edit?id=' + address.id });
   },
 
   // 编辑地址
-  onEditAddress(e) {
-    const address = e.currentTarget.dataset.address;
-    console.log('编辑地址：', address);
-
-    wx.navigateTo({
-      url: `/pages/address-edit/address-edit?id=${address.id}`
-    });
+  onEditAddress: function(e) {
+    var address = e.currentTarget.dataset.address;
+    wx.navigateTo({ url: '/pages/address-edit/address-edit?id=' + address.id });
   },
 
-  // 删除地址
-  onDeleteAddress(e) {
-    const address = e.currentTarget.dataset.address;
-    console.log('删除地址：', address);
-
+  // 设为默认
+  onSetDefault: function(e) {
+    var id = e.currentTarget.dataset.id;
+    var that = this;
     wx.showModal({
-      title: '确认删除',
-      content: '确定要删除这个地址吗？',
-      success: (res) => {
+      title: '设为默认',
+      content: '确定将此地址设为默认地址吗？',
+      success: function(res) {
         if (res.confirm) {
-          this.deleteAddress(address.id);
+          addressApi.setDefaultAddress(id).then(function() {
+            that.loadAddresses();
+          });
         }
       }
     });
   },
 
   // 删除地址
-  async deleteAddress(addressId) {
-    try {
-      const result = await addressApi.deleteAddress(addressId);
-      if (result.success) {
-        // 重新加载地址列表
-        await this.loadAddresses();
-        showSuccess('删除成功');
-      } else {
-        showError('删除失败');
+  onDeleteAddress: function(e) {
+    var id = e.currentTarget.dataset.id;
+    var that = this;
+    wx.showModal({
+      title: '确认删除',
+      content: '确定要删除这个地址吗？',
+      success: function(res) {
+        if (res.confirm) {
+          addressApi.deleteAddress(id).then(function(result) {
+            if (result.success) {
+              wx.showToast({ title: '删除成功', icon: 'success' });
+              that.loadAddresses();
+            } else {
+              wx.showToast({ title: '删除失败', icon: 'none' });
+            }
+          });
+        }
       }
-    } catch (error) {
-      console.error('删除地址失败:', error);
-      showError('删除失败');
-    }
+    });
   },
 
-  // 加载地址列表
-  async loadAddresses() {
-    try {
-      showLoading('加载中...');
-      const addresses = await addressApi.getAddressList();
-      this.setData({
-        addresses,
-        isLoading: false,
-      });
-    } catch (error) {
-      console.error('加载地址失败:', error);
-      showError('加载地址失败');
-      this.setData({ isLoading: false });
-    } finally {
-      hideLoading();
-    }
-  },
-
-  // 下拉刷新
-  onPullDownRefresh() {
-    console.log('下拉刷新');
+  onPullDownRefresh: function() {
     this.loadAddresses();
-
-    setTimeout(() => {
-      wx.stopPullDownRefresh();
-    }, 1000);
+    wx.stopPullDownRefresh();
   }
 });

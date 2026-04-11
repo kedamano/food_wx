@@ -1,158 +1,177 @@
-<!-- 个人中心页面 -->
-<scroll-view class="scrollarea" scroll-y type="list">
+<!-- 个人中心 - 大众点评风格 -->
+<view class="page-container">
   <!-- 用户信息头部 -->
   <view class="user-header">
-    <view class="user-avatar" bindtap="onAvatarClick">
-      <text class="fa fa-user avatar-icon"></text>
-      <view class="avatar-status {{userInfo.isLoggedIn ? 'online' : 'offline'}}"></view>
-    </view>
-    <view class="user-info">
-      <text class="user-name">{{userInfo.isLoggedIn ? userInfo.name : '点击登录'}}</text>
-      <view class="user-level">
-        <text class="level-badge {{userInfo.isLoggedIn ? '' : 'guest'}}">{{userInfo.isLoggedIn ? userInfo.level : '普通会员'}}</text>
-        <text class="points-text" wx:if="{{userInfo.isLoggedIn}}">积分：{{userInfo.points}}</text>
+    <view class="header-bg"></view>
+    <view class="header-content">
+      <view class="user-avatar-wrap" bindtap="onAvatarClick">
+        <image class="user-avatar" src="{{userInfo.avatar || '/images/avatars/default.png'}}" mode="aspectFill"></image>
+        <view class="avatar-border" wx:if="{{userInfo.isLoggedIn}}"></view>
       </view>
+      <view class="user-info">
+        <text class="user-name" bindtap="onAvatarClick">{{userInfo.isLoggedIn ? userInfo.name : '点击登录/注册'}}</text>
+        <view class="user-level-row">
+          <view class="level-tag" wx:if="{{userInfo.isLoggedIn}}">
+            <image class="level-icon" src="/images/icons/crown.png" mode="aspectFit"></image>
+            <text>{{userInfo.level || 'Lv.1 美食达人'}}</text>
+          </view>
+          <text class="user-desc" wx:if="{{userInfo.isLoggedIn}}">积分 {{userInfo.points || 0}}</text>
+        </view>
+      </view>
+   
     </view>
-    <view class="settings-btn" bindtap="onSettingsClick">
-      <text class="fa fa-cog settings-icon"></text>
+
+    <!-- 数据统计条 -->
+    <view class="stats-bar" wx:if="{{userInfo.isLoggedIn}}">
+      <view class="stat-item" bindtap="onStatClick" data-stat="orders">
+        <text class="stat-num">{{userStats.totalOrders || 0}}</text>
+        <text class="stat-label">订单</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item" bindtap="onStatClick" data-stat="favorites">
+        <text class="stat-num">{{userStats.favoriteStores || 0}}</text>
+        <text class="stat-label">收藏</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item" bindtap="onStatClick" data-stat="spending">
+        <text class="stat-num">¥{{userStats.totalSpending || 0}}</text>
+        <text class="stat-label">消费</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item" bindtap="onMenuClick" data-menu="coupons">
+        <text class="stat-num highlight">{{userStats.couponCount || 0}}</text>
+        <text class="stat-label">优惠券</text>
+      </view>
     </view>
   </view>
 
-  <!-- 订单状态 -->
-  <view class="order-status-section">
+  <!-- 我的订单 -->
+  <view class="section-card order-section">
     <view class="section-header" bindtap="onViewAllOrders">
       <text class="section-title">我的订单</text>
-      <text class="view-all">查看全部 ></text>
-    </view>
-    <view class="status-grid">
-      <view class="status-item" bindtap="onOrderStatusClick" data-status="pending">
-        <view class="status-icon">
-          <text class="fa fa-credit-card icon-text"></text>
-          <text class="status-badge" wx:if="{{orderStats.pending > 0}}">{{orderStats.pending}}</text>
-        </view>
-        <text class="status-text">待付款</text>
-      </view>
-      <view class="status-item" bindtap="onOrderStatusClick" data-status="preparing">
-        <view class="status-icon">
-          <text class="fa fa-utensils icon-text"></text>
-          <text class="status-badge" wx:if="{{orderStats.preparing > 0}}">{{orderStats.preparing}}</text>
-        </view>
-        <text class="status-text">制作中</text>
-      </view>
-      <view class="status-item" bindtap="onOrderStatusClick" data-status="delivering">
-        <view class="status-icon">
-          <text class="fa fa-bicycle icon-text"></text>
-          <text class="status-badge" wx:if="{{orderStats.delivering > 0}}">{{orderStats.delivering}}</text>
-        </view>
-        <text class="status-text">配送中</text>
-      </view>
-      <view class="status-item" bindtap="onOrderStatusClick" data-status="completed">
-        <view class="status-icon">
-          <text class="fa fa-check-circle icon-text"></text>
-          <text class="status-badge" wx:if="{{orderStats.completed > 0}}">{{orderStats.completed}}</text>
-        </view>
-        <text class="status-text">已完成</text>
+      <view class="view-all">
+        <text class="view-all-text">全部订单</text>
+        <text class="arrow">›</text>
       </view>
     </view>
-  </view>
-
-  <!-- 统计数据 -->
-  <view class="stats-section">
-    <text class="section-title">我的数据</text>
-    <view class="stats-grid">
-      <view class="stat-item" bindtap="onStatClick" data-stat="orders">
-        <text class="stat-number">{{userStats.totalOrders || 0}}</text>
-        <text class="stat-label">累计订单</text>
+    <view class="order-grid">
+      <view class="order-item" bindtap="onOrderStatusClick" data-status="pending">
+        <view class="order-icon-wrap">
+          <image class="order-icon" src="/images/icons/creditcard.png" mode="aspectFit"></image>
+          <view class="order-badge" wx:if="{{orderStats.pending > 0}}">{{orderStats.pending}}</view>
+        </view>
+        <text class="order-text">待付款</text>
       </view>
-      <view class="stat-item" bindtap="onStatClick" data-stat="favorites">
-        <text class="stat-number">{{userStats.favoriteStores || 0}}</text>
-        <text class="stat-label">收藏商家</text>
+      <view class="order-item" bindtap="onOrderStatusClick" data-status="preparing">
+        <view class="order-icon-wrap">
+          <image class="order-icon" src="/images/icons/chef.png" mode="aspectFit"></image>
+          <view class="order-badge" wx:if="{{orderStats.preparing > 0}}">{{orderStats.preparing}}</view>
+        </view>
+        <text class="order-text">制作中</text>
       </view>
-      <view class="stat-item" bindtap="onStatClick" data-stat="spending">
-        <text class="stat-number">¥{{userStats.totalSpending || 0}}</text>
-        <text class="stat-label">累计消费</text>
+      <view class="order-item" bindtap="onOrderStatusClick" data-status="delivering">
+        <view class="order-icon-wrap">
+          <image class="order-icon" src="/images/icons/motorcycle.png" mode="aspectFit"></image>
+          <view class="order-badge" wx:if="{{orderStats.delivering > 0}}">{{orderStats.delivering}}</view>
+        </view>
+        <text class="order-text">配送中</text>
+      </view>
+      <view class="order-item" bindtap="onOrderStatusClick" data-status="completed">
+        <view class="order-icon-wrap">
+          <image class="order-icon" src="/images/icons/check.png" mode="aspectFit"></image>
+          <view class="order-badge" wx:if="{{orderStats.completed > 0}}">{{orderStats.completed}}</view>
+        </view>
+        <text class="order-text">已完成</text>
       </view>
     </view>
   </view>
 
-  <!-- 功能菜单 -->
-  <view class="menu-section">
-    <!-- 第一组：基础功能 -->
-    <view class="menu-group">
-      <text class="group-title">基础功能</text>
-      <view class="menu-item" bindtap="onMenuClick" data-menu="address">
-        <view class="menu-left">
-          <text class="fa fa-map-marker-alt menu-icon"></text>
-          <text class="menu-text">收货地址管理</text>
-        </view>
-        <text class="menu-arrow">→</text>
+  <!-- 常用工具 -->
+  <view class="section-card tools-section">
+    <view class="section-header">
+      <text class="section-title">常用工具</text>
+    </view>
+    <view class="tools-grid">
+      <view class="tool-item" bindtap="onMenuClick" data-menu="address">
+        <image class="tool-icon" src="/images/icons/location.png" mode="aspectFit"></image>
+        <text class="tool-text">收货地址</text>
       </view>
-      <view class="menu-item" bindtap="onMenuClick" data-menu="payment">
-        <view class="menu-left">
-          <text class="fa fa-credit-card menu-icon"></text>
-          <text class="menu-text">支付方式管理</text>
-        </view>
-        <text class="menu-arrow">→</text>
+      <view class="tool-item" bindtap="onMenuClick" data-menu="payment">
+        <image class="tool-icon" src="/images/icons/wallet.png" mode="aspectFit"></image>
+        <text class="tool-text">支付管理</text>
       </view>
-      <view class="menu-item" bindtap="onMenuClick" data-menu="coupons">
-        <view class="menu-left">
-          <text class="fa fa-ticket-alt menu-icon"></text>
-          <text class="menu-text">我的优惠券</text>
-          <text class="badge" wx:if="{{userStats.couponCount > 0}}">{{userStats.couponCount}}</text>
+      <view class="tool-item" bindtap="onMenuClick" data-menu="coupons">
+        <view class="coupon-tool-icon">
+          <image class="tool-icon" src="/images/icons/ticket.png" mode="aspectFit"></image>
+          <view class="coupon-dot" wx:if="{{userStats.couponCount > 0}}"></view>
         </view>
-        <text class="menu-arrow">→</text>
+        <text class="tool-text">优惠券</text>
+      </view>
+      <view class="tool-item" bindtap="onMenuClick" data-menu="reviews">
+        <image class="tool-icon" src="/images/icons/star.png" mode="aspectFit"></image>
+        <text class="tool-text">我的评价</text>
+      </view>
+      <view class="tool-item" bindtap="onMenuClick" data-menu="points">
+        <image class="tool-icon" src="/images/icons/gift.png" mode="aspectFit"></image>
+        <text class="tool-text">积分商城</text>
+      </view>
+      <view class="tool-item" bindtap="onMenuClick" data-menu="share">
+        <image class="tool-icon" src="/images/icons/group.png" mode="aspectFit"></image>
+        <text class="tool-text">邀请好友</text>
       </view>
     </view>
+  </view>
 
-    <!-- 第二组：互动功能 -->
-    <view class="menu-group">
-      <text class="group-title">互动功能</text>
-      <view class="menu-item" bindtap="onMenuClick" data-menu="reviews">
-        <view class="menu-left">
-          <text class="fa fa-star menu-icon"></text>
-          <text class="menu-text">我的评价</text>
-        </view>
-        <text class="menu-arrow">→</text>
-      </view>
-      <view class="menu-item" bindtap="onShareAppMessage" data-menu="share">
-        <view class="menu-left">
-          <text class="fa fa-user-friends menu-icon"></text>
-          <text class="menu-text">邀请好友</text>
-        </view>
-        <text class="menu-arrow">→</text>
-      </view>
-      <view class="menu-item" bindtap="onMenuClick" data-menu="points">
-        <view class="menu-left">
-          <text class="fa fa-gift menu-icon"></text>
-          <text class="menu-text">积分商城</text>
-        </view>
-        <text class="menu-arrow">→</text>
-      </view>
-    </view>
-
-    <!-- 第三组：系统功能 -->
-    <view class="menu-group">
-      <text class="group-title">系统功能</text>
+  <!-- 更多服务 -->
+  <view class="section-card menu-section">
+    <view class="menu-list">
       <view class="menu-item" bindtap="onMenuClick" data-menu="customer">
         <view class="menu-left">
-          <text class="fa fa-headset menu-icon"></text>
+          <image class="menu-icon" src="/images/icons/headset.png" mode="aspectFit"></image>
           <text class="menu-text">客服中心</text>
         </view>
-        <text class="menu-arrow">→</text>
+        <view class="menu-right">
+          <text class="menu-desc">在线客服</text>
+          <text class="menu-arrow">›</text>
+        </view>
       </view>
       <view class="menu-item" bindtap="onMenuClick" data-menu="settings">
         <view class="menu-left">
-          <text class="fa fa-cog menu-icon"></text>
+          <image class="menu-icon" src="/images/icons/settings.png" mode="aspectFit"></image>
           <text class="menu-text">设置</text>
         </view>
-        <text class="menu-arrow">→</text>
+        <view class="menu-right">
+          <text class="menu-arrow">›</text>
+        </view>
+      </view>
+      <view class="menu-item" bindtap="onClearCache">
+        <view class="menu-left">
+          <image class="menu-icon" src="/images/icons/clear.png" mode="aspectFit"></image>
+          <text class="menu-text">清除缓存</text>
+        </view>
+        <view class="menu-right">
+          <text class="menu-desc">{{cacheSize}}</text>
+          <text class="menu-arrow">›</text>
+        </view>
+      </view>
+      <view class="menu-item" bindtap="onAbout">
+        <view class="menu-left">
+          <image class="menu-icon" src="/images/icons/info.png" mode="aspectFit"></image>
+          <text class="menu-text">关于我们</text>
+        </view>
+        <view class="menu-right">
+          <text class="menu-desc">v1.0.0</text>
+          <text class="menu-arrow">›</text>
+        </view>
       </view>
     </view>
   </view>
 
-  <!-- 退出登录 -->
+  <!-- 退出登录按钮 -->
   <view class="logout-section" wx:if="{{userInfo.isLoggedIn}}">
     <button class="logout-btn" bindtap="onLogout">退出登录</button>
   </view>
-</scroll-view>
 
+  <!-- 底部安全距离 -->
+  <view class="bottom-safe"></view>
+</view>

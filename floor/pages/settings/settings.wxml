@@ -15,7 +15,7 @@
       <view class="setting-item" bindtap="onAccountInfo">
         <view class="item-left">
           <view class="item-icon account">
-            <text class="fa fa-user"></text>
+            <text class="-user">👤</text>
           </view>
           <text class="item-text">账号信息</text>
         </view>
@@ -24,7 +24,7 @@
       <view class="setting-item" bindtap="onSecurity">
         <view class="item-left">
           <view class="item-icon security">
-            <text class="fa fa-lock"></text>
+            <text class="-lock">🔒</text>
           </view>
           <text class="item-text">安全设置</text>
         </view>
@@ -33,7 +33,7 @@
       <view class="setting-item" bindtap="onPrivacy">
         <view class="item-left">
           <view class="item-icon privacy">
-            <text class="fa fa-shield-alt"></text>
+            <text class="-shield-alt">🛡</text>
           </view>
           <text class="item-text">隐私设置</text>
         </view>
@@ -49,7 +49,7 @@
       <view class="setting-item switch">
         <view class="item-left">
           <view class="item-icon notifications">
-            <text class="fa fa-bell"></text>
+            <text class="-bell">●</text>
           </view>
           <text class="item-text">订单通知</text>
         </view>
@@ -58,7 +58,7 @@
       <view class="setting-item switch">
         <view class="item-left">
           <view class="item-icon promotions">
-            <text class="fa fa-bullhorn"></text>
+            <text class="-bullhorn">●</text>
           </view>
           <text class="item-text">促销通知</text>
         </view>
@@ -67,7 +67,7 @@
       <view class="setting-item switch">
         <view class="item-left">
           <view class="item-icon customer">
-            <text class="fa fa-comment-dots"></text>
+            <text class="-comment-dots">●</text>
           </view>
           <text class="item-text">客服消息</text>
         </view>
@@ -83,7 +83,7 @@
       <view class="setting-item switch">
         <view class="item-left">
           <view class="item-icon location">
-            <text class="fa fa-globe"></text>
+            <text class="-globe">●</text>
           </view>
           <text class="item-text">自动定位</text>
         </view>
@@ -92,7 +92,7 @@
       <view class="setting-item switch">
         <view class="item-left">
           <view class="item-icon update">
-            <text class="fa fa-sync-alt"></text>
+            <text class="-sync-alt">🔄</text>
           </view>
           <text class="item-text">自动更新</text>
         </view>
@@ -101,7 +101,7 @@
       <view class="setting-item" bindtap="onLanguage">
         <view class="item-left">
           <view class="item-icon language">
-            <text class="fa fa-language"></text>
+            <text class="-language">●</text>
           </view>
           <text class="item-text">语言设置</text>
         </view>
@@ -113,7 +113,7 @@
       <view class="setting-item" bindtap="onClearCache">
         <view class="item-left">
           <view class="item-icon cache">
-            <text class="fa fa-broom"></text>
+            <text class="-broom">●</text>
           </view>
           <text class="item-text">清除缓存</text>
         </view>
@@ -132,7 +132,7 @@
       <view class="setting-item" bindtap="onAbout">
         <view class="item-left">
           <view class="item-icon about">
-            <text class="fa fa-info-circle"></text>
+            <text class="-info-circle">ℹ</text>
           </view>
           <text class="item-text">关于小程序</text>
         </view>
@@ -141,7 +141,7 @@
       <view class="setting-item" bindtap="onHelp">
         <view class="item-left">
           <view class="item-icon help">
-            <text class="fa fa-question-circle"></text>
+            <text class="-question-circle">●</text>
           </view>
           <text class="item-text">帮助中心</text>
         </view>
@@ -150,7 +150,7 @@
       <view class="setting-item" bindtap="onFeedback">
         <view class="item-left">
           <view class="item-icon feedback">
-            <text class="fa fa-comment-alt"></text>
+            <text class="-comment-alt">●</text>
           </view>
           <text class="item-text">意见反馈</text>
         </view>
@@ -159,7 +159,7 @@
       <view class="setting-item" bindtap="onVersion">
         <view class="item-left">
           <view class="item-icon version">
-            <text class="fa fa-sync-alt"></text>
+            <text class="-sync-alt">🔄</text>
           </view>
           <text class="item-text">检查更新</text>
         </view>
@@ -174,7 +174,7 @@
   <!-- 退出登录 -->
   <view class="logout-section">
     <button class="logout-btn" bindtap="onLogout">
-      <text class="fa fa-sign-out-alt btn-icon"></text>
+      <text class="-sign-out-alt btn-icon">●</text>
       <text class="btn-text">退出登录</text>
     </button>
   </view>

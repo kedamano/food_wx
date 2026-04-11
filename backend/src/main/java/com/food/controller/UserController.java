@@ -1,6 +1,8 @@
 package com.food.controller;
 
+import com.food.annotation.RequireRole;
 import com.food.dto.BaseResult;
+import com.food.dto.UserDTO;
 import com.food.entity.User;
 import com.food.service.UserService;
 import com.food.utils.JwtUtil;
@@ -28,6 +30,17 @@ public class UserController {
 
     @Autowired
     private SmsService smsService;
+
+    /**
+     * 从请求中提取Token（去掉Bearer前缀）
+     */
+    private String extractToken(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        return token;
+    }
 
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -91,7 +104,7 @@ public class UserController {
     }
 
     @PostMapping("/verify-code")
-    @ApiOperation(value = "验证验证码", notes = "验证手机验证码是否正确")
+    @ApiOperation(value = "验证验证码", notes = "验证手机验证码是否正确（验证成功后立即清除验证码）")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "phone", value = "手机号", required = true, paramType = "body"),
             @ApiImplicitParam(name = "code", value = "验证码", required = true, paramType = "body")
@@ -109,6 +122,9 @@ public class UserController {
         if (!com.food.utils.VerifyCodeUtil.verifyCode(phone, code)) {
             return BaseResult.error(400, "验证码错误或已过期");
         }
+
+        // 验证成功后立即清除验证码，防止重放攻击
+        com.food.utils.VerifyCodeUtil.clearVerifyCode(phone);
 
         // 验证成功
         return BaseResult.success("验证码验证成功");
@@ -241,10 +257,11 @@ public class UserController {
     @GetMapping("/info")
     @ApiOperation(value = "获取用户信息", notes = "根据Token获取用户信息")
     public BaseResult getUserInfo(HttpServletRequest request) {
-        String token = request.getHeader("Authorization");
+        String token = extractToken(request);
         if (token == null || token.isEmpty()) {
             return BaseResult.error(401, "未登录");
         }
+
 
         Integer userId = jwtUtil.getUserIdFromToken(token);
         if (userId == null) {
@@ -256,14 +273,47 @@ public class UserController {
 
     @GetMapping("/{userId}")
     @ApiOperation(value = "获取用户信息", notes = "根据用户ID获取用户信息")
-    public BaseResult getUserById(@PathVariable Integer userId) {
+    public BaseResult getUserById(@PathVariable Integer userId, HttpServletRequest request) {
         try {
+            // 验证登录状态
+            String token = extractToken(request);
+            if (token == null || token.isEmpty()) {
+                return BaseResult.error(401, "未登录");
+            }
+
+            Integer currentUserId = jwtUtil.getUserIdFromToken(token);
+            if (currentUserId == null) {
+                return BaseResult.error(401, "Token无效");
+            }
+
             User user = userService.getUserById(userId);
             if (user == null) {
                 return BaseResult.error(404, "用户不存在");
             }
-            user.setPassword(null); // 不返回密码
-            return BaseResult.success(user);
+
+            // 只能查看自己的信息，除非是管理员
+            User currentUser = userService.getUserById(currentUserId);
+            boolean isAdmin = currentUser != null && "ADMIN".equals(currentUser.getRole());
+            if (!currentUserId.equals(userId) && !isAdmin) {
+                return BaseResult.error(403, "无权查看其他用户信息");
+            }
+
+            // 转换为DTO，脱敏敏感信息
+            UserDTO userDTO = new UserDTO();
+            userDTO.setUserId(user.getUserId());
+            userDTO.setUsername(user.getUsername());
+            userDTO.setAvatar(user.getAvatar());
+            userDTO.setLevel(user.getLevel());
+            userDTO.setPoints(user.getPoints());
+            // 管理员可以看到完整手机号，普通用户只能看到脱敏后的
+            if (isAdmin || currentUserId.equals(userId)) {
+                userDTO.setPhone(UserDTO.maskPhone(user.getPhone()));
+            }
+            userDTO.setRegisterSource(user.getRegisterSource());
+            userDTO.setCreateTime(user.getCreateTime());
+            userDTO.setUpdateTime(user.getUpdateTime());
+
+            return BaseResult.success(userDTO);
         } catch (Exception e) {
             return BaseResult.error("获取用户信息失败: " + e.getMessage());
         }
@@ -272,7 +322,7 @@ public class UserController {
     @PutMapping("/{userId}/password")
     @ApiOperation(value = "修改密码", notes = "修改用户密码")
     public BaseResult updatePassword(@PathVariable Integer userId, @RequestBody Map<String, String> request, HttpServletRequest httpRequest) {
-        String token = httpRequest.getHeader("Authorization");
+        String token = extractToken(httpRequest);
         if (token == null || token.isEmpty()) {
             return BaseResult.error(401, "未登录");
         }
@@ -311,7 +361,7 @@ public class UserController {
     @PutMapping("/info")
     @ApiOperation(value = "更新用户信息", notes = "更新用户基本信息")
     public BaseResult updateUserInfo(@RequestBody User user, HttpServletRequest request) {
-        String token = request.getHeader("Authorization");
+        String token = extractToken(request);
         if (token == null || token.isEmpty()) {
             return BaseResult.error(401, "未登录");
         }
@@ -326,27 +376,49 @@ public class UserController {
     }
 
     @PutMapping("/points")
-    @ApiOperation(value = "更新用户积分", notes = "增加或减少用户积分")
+    @ApiOperation(value = "更新用户积分", notes = "增加或减少用户积分（仅管理员可用）")
     @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "目标用户ID", required = true, paramType = "body"),
             @ApiImplicitParam(name = "points", value = "积分变化值", required = true, paramType = "body"),
-            @ApiImplicitParam(name = "type", value = "操作类型：add-增加，subtract-减少", required = true, paramType = "body")
+            @ApiImplicitParam(name = "type", value = "操作类型：add-增加，subtract-减少", required = true, paramType = "body"),
+            @ApiImplicitParam(name = "reason", value = "操作原因", required = false, paramType = "body")
     })
+    @RequireRole("ADMIN")
     public BaseResult updateUserPoints(@RequestBody PointsRequest pointsRequest, HttpServletRequest request) {
-        String token = request.getHeader("Authorization");
-        if (token == null || token.isEmpty()) {
-            return BaseResult.error(401, "未登录");
+        // 从AOP中获取当前管理员信息
+        User adminUser = (User) request.getAttribute("currentUser");
+        Integer adminUserId = adminUser != null ? adminUser.getUserId() : null;
+
+        Integer targetUserId = pointsRequest.getUserId();
+        if (targetUserId == null) {
+            return BaseResult.error(400, "目标用户ID不能为空");
         }
 
-        Integer userId = jwtUtil.getUserIdFromToken(token);
-        if (userId == null) {
-            return BaseResult.error(401, "Token无效");
+        // 验证目标用户是否存在
+        User targetUser = userService.getUserById(targetUserId);
+        if (targetUser == null) {
+            return BaseResult.error(404, "目标用户不存在");
         }
 
+        // 计算积分变化
+        Integer pointsChange = pointsRequest.getPoints();
         if ("subtract".equals(pointsRequest.getType())) {
-            return userService.updateUserPoints(userId, -pointsRequest.getPoints());
-        } else {
-            return userService.updateUserPoints(userId, pointsRequest.getPoints());
+            pointsChange = -pointsChange;
+            // 检查积分是否足够
+            if (targetUser.getPoints() + pointsChange < 0) {
+                return BaseResult.error(400, "用户积分不足");
+            }
         }
+
+        // 记录积分变动日志（实际项目中应该写入数据库）
+        String reason = pointsRequest.getReason();
+        if (reason == null || reason.isEmpty()) {
+            reason = "管理员操作";
+        }
+        System.out.println("[积分变动] 管理员ID: " + adminUserId + ", 目标用户ID: " + targetUserId +
+                ", 变动: " + pointsChange + ", 原因: " + reason);
+
+        return userService.updateUserPoints(targetUserId, pointsChange);
     }
 
     @GetMapping("/points/{userId}")
@@ -374,21 +446,64 @@ public class UserController {
     }
 
     @PostMapping("/sign-in/{userId}")
-    @ApiOperation(value = "用户签到", notes = "用户每日签到获取积分")
-    public BaseResult signIn(@PathVariable Integer userId) {
+    @ApiOperation(value = "用户签到", notes = "用户每日签到获取积分（每天只能签到一次）")
+    public BaseResult signIn(@PathVariable Integer userId, HttpServletRequest request) {
         try {
-            // 检查今天是否已签到（这里简化处理，实际应查询签到记录表）
-            // 直接给用户增加积分
-            BaseResult result = userService.updateUserPoints(userId, 20);
-            
+            // 验证登录状态
+            String token = extractToken(request);
+            if (token == null || token.isEmpty()) {
+                return BaseResult.error(401, "未登录");
+            }
+
+            Integer currentUserId = jwtUtil.getUserIdFromToken(token);
+            if (currentUserId == null) {
+                return BaseResult.error(401, "Token无效");
+            }
+
+            // 只能为自己签到
+            if (!currentUserId.equals(userId)) {
+                return BaseResult.error(403, "无权为他人签到");
+            }
+
+            // 检查今天是否已经签到
+            if (com.food.utils.SignInUtil.hasSignedInToday(userId)) {
+                return BaseResult.error(400, "今天已经签到过了，明天再来吧~");
+            }
+
+            // 记录签到
+            if (!com.food.utils.SignInUtil.recordSignIn(userId)) {
+                return BaseResult.error(400, "今天已经签到过了");
+            }
+
+            // 计算连续签到天数
+            int consecutiveDays = com.food.utils.SignInUtil.getConsecutiveDays(userId);
+
+            // 计算奖励积分（连续签到有额外奖励）
+            int basePoints = com.food.utils.SignInUtil.SIGN_IN_POINTS;
+            int bonusPoints = 0;
+            if (consecutiveDays >= 7) {
+                bonusPoints = 10; // 连续7天额外奖励10积分
+            } else if (consecutiveDays >= 3) {
+                bonusPoints = 5;  // 连续3天额外奖励5积分
+            }
+            int totalPoints = basePoints + bonusPoints;
+
+            // 给用户增加积分
+            BaseResult result = userService.updateUserPoints(userId, totalPoints);
+
             if (result.getCode() == 200) {
                 Map<String, Object> response = new HashMap<>();
-                response.put("points", 20);
+                response.put("points", totalPoints);
+                response.put("basePoints", basePoints);
+                response.put("bonusPoints", bonusPoints);
+                response.put("consecutiveDays", consecutiveDays);
                 response.put("totalPoints", result.getData());
-                response.put("message", "签到成功，获得20积分");
+                response.put("message", bonusPoints > 0
+                        ? "连续签到" + consecutiveDays + "天，获得" + totalPoints + "积分（含" + bonusPoints + "积分奖励）"
+                        : "签到成功，获得" + totalPoints + "积分");
                 return BaseResult.success(response);
             }
-            
+
             return result;
         } catch (Exception e) {
             return BaseResult.error("签到失败: " + e.getMessage());
@@ -397,19 +512,8 @@ public class UserController {
 
     @GetMapping("/all")
     @ApiOperation(value = "获取所有用户", notes = "管理员获取所有用户列表")
+    @RequireRole("ADMIN")
     public BaseResult getAllUsers(HttpServletRequest request) {
-        // 验证是否是管理员
-        String token = request.getHeader("Authorization");
-        if (token == null || token.isEmpty()) {
-            return BaseResult.error(401, "未登录");
-        }
-
-        Integer userId = jwtUtil.getUserIdFromToken(token);
-        if (userId == null) {
-            return BaseResult.error(401, "Token无效");
-        }
-
-        // 实际项目中应该验证用户角色
         List<User> users = userService.getAllUsers();
         // 清除密码信息
         for (User user : users) {
@@ -420,19 +524,13 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     @ApiOperation(value = "删除用户", notes = "管理员删除用户")
+    @RequireRole("ADMIN")
     public BaseResult deleteUser(@PathVariable Integer userId, HttpServletRequest request) {
-        // 验证是否是管理员
-        String token = request.getHeader("Authorization");
-        if (token == null || token.isEmpty()) {
-            return BaseResult.error(401, "未登录");
+        // 防止管理员删除自己
+        Integer currentUserId = (Integer) request.getAttribute("currentUserId");
+        if (currentUserId != null && currentUserId.equals(userId)) {
+            return BaseResult.error(400, "不能删除当前登录的管理员账号");
         }
-
-        Integer currentUserId = jwtUtil.getUserIdFromToken(token);
-        if (currentUserId == null) {
-            return BaseResult.error(401, "Token无效");
-        }
-
-        // 实际项目中应该验证用户角色
         return userService.deleteUser(userId);
     }
 
@@ -460,8 +558,18 @@ public class UserController {
 
     // 内部类用于积分更新请求
     private static class PointsRequest {
-        private Integer points;
-        private String type;
+        private Integer userId;      // 目标用户ID
+        private Integer points;      // 积分变化值
+        private String type;         // 操作类型
+        private String reason;       // 操作原因
+
+        public Integer getUserId() {
+            return userId;
+        }
+
+        public void setUserId(Integer userId) {
+            this.userId = userId;
+        }
 
         public Integer getPoints() {
             return points;
@@ -477,6 +585,14 @@ public class UserController {
 
         public void setType(String type) {
             this.type = type;
+        }
+
+        public String getReason() {
+            return reason;
+        }
+
+        public void setReason(String reason) {
+            this.reason = reason;
         }
     }
 

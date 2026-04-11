@@ -1,12 +1,5 @@
 <!-- 安全设置页面 -->
 <view class="container">
-  <!-- 头部 -->
-  <view class="header">
-    <view class="back-btn" bindtap="onBack">←</view>
-    <text class="header-title">安全设置</text>
-    <view class="header-placeholder"></view>
-  </view>
-
   <!-- 安全等级 -->
   <view class="security-level">
     <view class="level-header">
@@ -27,7 +20,7 @@
     <view class="item-list">
       <view class="item" bindtap="onBindPhone">
         <view class="item-left">
-          <text class="fa fa-mobile-alt item-icon"></text>
+          <text class="-mobile-alt item-icon">📱</text>
           <view class="item-info">
             <text class="item-name">手机号</text>
             <text class="item-desc">{{phoneBound ? '已绑定' : '未绑定'}}</text>
@@ -35,13 +28,13 @@
         </view>
         <view class="item-right">
           <text class="bind-status {{phoneBound ? 'bound' : ''}}">{{phoneBound ? '已绑定' : '去绑定'}}</text>
-          <text class="item-arrow">→</text>
+          <text class="item-arrow">›</text>
         </view>
       </view>
 
       <view class="item" bindtap="onBindEmail">
         <view class="item-left">
-          <text class="fa fa-envelope item-icon"></text>
+          <text class="-envelope item-icon">✉️</text>
           <view class="item-info">
             <text class="item-name">邮箱</text>
             <text class="item-desc">{{emailBound ? '已绑定' : '未绑定'}}</text>
@@ -49,13 +42,13 @@
         </view>
         <view class="item-right">
           <text class="bind-status {{emailBound ? 'bound' : ''}}">{{emailBound ? '已绑定' : '去绑定'}}</text>
-          <text class="item-arrow">→</text>
+          <text class="item-arrow">›</text>
         </view>
       </view>
 
       <view class="item" bindtap="onBindWechat">
         <view class="item-left">
-          <text class="fa fa-comment-dots item-icon"></text>
+          <text class="-comment item-icon">💬</text>
           <view class="item-info">
             <text class="item-name">微信</text>
             <text class="item-desc">{{bindWechat ? '已绑定' : '未绑定'}}</text>
@@ -63,7 +56,7 @@
         </view>
         <view class="item-right">
           <text class="bind-status {{bindWechat ? 'bound' : ''}}">{{bindWechat ? '已绑定' : '去绑定'}}</text>
-          <text class="item-arrow">→</text>
+          <text class="item-arrow">›</text>
         </view>
       </view>
     </view>
@@ -75,14 +68,14 @@
     <view class="item-list">
       <view class="item" bindtap="onChangePassword">
         <view class="item-left">
-          <text class="fa fa-key item-icon"></text>
+          <text class="-key item-icon">●</text>
           <view class="item-info">
             <text class="item-name">登录密码</text>
             <text class="item-desc">{{passwordSet ? '已设置' : '未设置'}}</text>
           </view>
         </view>
         <view class="item-right">
-          <text class="item-arrow">→</text>
+          <text class="item-arrow">›</text>
         </view>
       </view>
     </view>
@@ -94,16 +87,18 @@
     <view class="item-list">
       <view class="item" bindtap="onDeviceManagement">
         <view class="item-left">
-          <text class="fa fa-mobile item-icon"></text>
+          <text class="-mobile-alt item-icon">📱</text>
           <view class="item-info">
-            <text class="item-name">设备管理</text>
+            <text class="item-name">登录设备</text>
             <text class="item-desc">查看登录设备</text>
           </view>
         </view>
         <view class="item-right">
-          <text class="item-arrow">→</text>
+          <text class="item-arrow">›</text>
         </view>
       </view>
     </view>
   </view>
+
+  <view class="safe-area-bottom"></view>
 </view>

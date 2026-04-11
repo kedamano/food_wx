@@ -21,6 +21,7 @@ public class User implements Serializable {
     private String registerSource; // 注册来源：normal-普通注册，wechat-微信注册
     private String inviteCode; // 邀请码
     private Integer invitedBy; // 邀请人ID
+    private String role; // 用户角色：ADMIN-管理员，USER-普通用户，MERCHANT-商家
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 

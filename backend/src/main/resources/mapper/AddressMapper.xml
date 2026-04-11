@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.food.mapper.AddressMapper">
+
+    <resultMap id="BaseResultMap" type="com.food.entity.Address">
+        <id column="address_id" jdbcType="INTEGER" property="addressId"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="province" jdbcType="VARCHAR" property="province"/>
+        <result column="city" jdbcType="VARCHAR" property="city"/>
+        <result column="district" jdbcType="VARCHAR" property="district"/>
+        <result column="detail" jdbcType="VARCHAR" property="detail"/>
+        <result column="full_address" jdbcType="VARCHAR" property="fullAddress"/>
+        <result column="tag" jdbcType="VARCHAR" property="tag"/>
+        <result column="is_default" jdbcType="INTEGER" property="isDefault"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="is_deleted" jdbcType="INTEGER" property="isDeleted"/>
+    </resultMap>
+
+    <sql id="BaseColumnList">
+        address_id, user_id, name, phone, province, city, district, detail, full_address, tag, is_default, create_time, update_time, is_deleted
+    </sql>
+
+    <!-- 插入地址 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="addressId">
+        INSERT INTO address (
+            user_id, name, phone, province, city, district, detail, full_address, tag, is_default, create_time, update_time, is_deleted
+        ) VALUES (
+            #{userId}, #{name}, #{phone}, #{province}, #{city}, #{district}, #{detail}, #{fullAddress}, #{tag}, #{isDefault}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0
+        )
+    </insert>
+
+    <!-- 更新地址 -->
+    <update id="update">
+        UPDATE address
+        SET name = #{name},
+            phone = #{phone},
+            province = #{province},
+            city = #{city},
+            district = #{district},
+            detail = #{detail},
+            full_address = #{fullAddress},
+            tag = #{tag},
+            is_default = #{isDefault},
+            update_time = CURRENT_TIMESTAMP
+        WHERE address_id = #{addressId}
+          AND user_id = #{userId}
+          AND is_deleted = 0
+    </update>
+
+    <!-- 根据ID查询地址 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM address
+        WHERE address_id = #{addressId}
+          AND is_deleted = 0
+    </select>
+
+    <!-- 根据用户ID查询地址列表 -->
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM address
+        WHERE user_id = #{userId}
+          AND is_deleted = 0
+        ORDER BY is_default DESC, create_time DESC
+    </select>
+
+    <!-- 查询用户的默认地址 -->
+    <select id="selectDefaultByUserId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM address
+        WHERE user_id = #{userId}
+          AND is_default = 1
+          AND is_deleted = 0
+        LIMIT 1
+    </select>
+
+    <!-- 删除地址（逻辑删除） -->
+    <update id="deleteById">
+        UPDATE address
+        SET is_deleted = 1,
+            update_time = CURRENT_TIMESTAMP
+        WHERE address_id = #{addressId}
+    </update>
+
+    <!-- 将用户的所有地址设为非默认 -->
+    <update id="clearDefaultByUserId">
+        UPDATE address
+        SET is_default = 0,
+            update_time = CURRENT_TIMESTAMP
+        WHERE user_id = #{userId}
+          AND is_deleted = 0
+    </update>
+
+    <!-- 设置默认地址 -->
+    <update id="setDefault">
+        UPDATE address
+        SET is_default = 1,
+            update_time = CURRENT_TIMESTAMP
+        WHERE address_id = #{addressId}
+          AND user_id = #{userId}
+          AND is_deleted = 0
+    </update>
+
+    <!-- 统计用户的地址数量 -->
+    <select id="countByUserId" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM address
+        WHERE user_id = #{userId}
+          AND is_deleted = 0
+    </select>
+
+</mapper>

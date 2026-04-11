@@ -1,0 +1,187 @@
+/* 积分记录页面 */
+page {
+  background-color: #F5F5F7;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 积分概览 */
+.points-overview {
+  padding: 30rpx;
+}
+
+.overview-card {
+  background: linear-gradient(135deg, #FF6633 0%, #FF8855 100%);
+  border-radius: 20rpx;
+  padding: 40rpx 30rpx;
+  display: flex;
+  align-items: baseline;
+  box-shadow: 0 4rpx 16rpx rgba(255, 102, 51, 0.25);
+}
+
+.overview-label {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.8);
+  margin-right: 20rpx;
+}
+
+.overview-value {
+  font-size: 64rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  line-height: 1;
+}
+
+.overview-unit {
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.8);
+  margin-left: 8rpx;
+}
+
+/* 筛选栏 */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  padding: 0 30rpx 20rpx;
+  gap: 16rpx;
+}
+
+.filter-tab {
+  padding: 12rpx 32rpx;
+  border-radius: 30rpx;
+  font-size: 26rpx;
+  color: #666666;
+  background: #FFFFFF;
+  border: 2rpx solid #EEEEEE;
+  transition: all 0.3s;
+}
+
+.filter-tab.active {
+  color: #FFFFFF;
+  background: #FF6633;
+  border-color: #FF6633;
+}
+
+.filter-right {
+  margin-left: auto;
+}
+
+.clear-btn {
+  font-size: 24rpx;
+  color: #999999;
+  padding: 12rpx 16rpx;
+}
+
+/* 记录列表 */
+.record-list {
+  flex: 1;
+  padding: 0 30rpx 30rpx;
+}
+
+.record-item {
+  display: flex;
+  align-items: center;
+  background: #FFFFFF;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+.record-icon {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 36rpx;
+  background: #FFF0EB;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.icon-text {
+  font-size: 36rpx;
+}
+
+.record-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.record-desc {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 6rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.record-time {
+  font-size: 22rpx;
+  color: #999999;
+}
+
+.record-points {
+  font-size: 32rpx;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-left: 16rpx;
+}
+
+.record-points.income {
+  color: #FF6633;
+}
+
+.record-points.expense {
+  color: #333333;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120rpx 0;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 12rpx;
+}
+
+.empty-desc {
+  font-size: 24rpx;
+  color: #999999;
+  text-align: center;
+  padding: 0 60rpx;
+}
+
+/* 加载状态 */
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60rpx;
+}
+
+.loading-text {
+  font-size: 26rpx;
+  color: #999999;
+}

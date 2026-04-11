@@ -1,0 +1,315 @@
+/* 搜索页样式 */
+.page-search {
+  min-height: 100vh;
+  background: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 搜索栏 */
+.search-header {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 24rpx;
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  gap: 16rpx;
+}
+
+.search-input-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: #f5f5f5;
+  border-radius: 36rpx;
+  padding: 0 24rpx;
+  height: 72rpx;
+  box-sizing: border-box;
+}
+
+.search-input-wrap .search-icon {
+  color: #999;
+  font-size: 28rpx;
+  margin-right: 12rpx;
+}
+
+.search-input {
+  flex: 1;
+  font-size: 28rpx;
+  height: 72rpx;
+  line-height: 72rpx;
+}
+
+.clear-btn {
+  color: #ccc;
+  font-size: 32rpx;
+  padding: 8rpx;
+}
+
+.cancel-btn {
+  color: #FF6633;
+  font-size: 28rpx;
+  white-space: nowrap;
+  padding: 8rpx 0;
+}
+
+/* 搜索历史/热门 */
+.history-section, .hot-section {
+  padding: 24rpx 32rpx;
+  background: #fff;
+  margin-top: 16rpx;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.clear-history {
+  font-size: 24rpx;
+  color: #999;
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+}
+
+.history-tags, .hot-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.history-tag, .hot-tag {
+  padding: 10rpx 24rpx;
+  background: #f5f5f5;
+  border-radius: 28rpx;
+  font-size: 26rpx;
+  color: #666;
+}
+
+.hot-tag {
+  color: #FF6633;
+  background: #FFF2E8;
+}
+
+/* 结果Tab */
+.result-tabs {
+  display: flex;
+  background: #fff;
+  border-bottom: 1rpx solid #eee;
+}
+
+.result-tab {
+  flex: 1;
+  text-align: center;
+  padding: 24rpx 0;
+  font-size: 30rpx;
+  color: #666;
+  position: relative;
+}
+
+.result-tab.active {
+  color: #FF6633;
+  font-weight: 600;
+}
+
+.result-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48rpx;
+  height: 4rpx;
+  background: #FF6633;
+  border-radius: 2rpx;
+}
+
+/* 结果列表 */
+.result-scroll {
+  flex: 1;
+  height: calc(100vh - 180rpx);
+}
+
+.result-list {
+  padding: 16rpx 24rpx;
+}
+
+/* 美食结果 */
+.food-result-item {
+  display: flex;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  margin-bottom: 16rpx;
+  gap: 20rpx;
+}
+
+.food-result-img {
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: 12rpx;
+  flex-shrink: 0;
+}
+
+.food-result-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.food-result-name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.food-result-meta {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  font-size: 24rpx;
+}
+
+.food-result-rating {
+  color: #FF6633;
+}
+
+.food-result-sales {
+  color: #999;
+}
+
+.food-result-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.food-result-price {
+  color: #FF6633;
+}
+
+.food-result-price .price-symbol {
+  font-size: 24rpx;
+}
+
+.food-result-price .price-num {
+  font-size: 36rpx;
+  font-weight: 700;
+}
+
+.food-result-category {
+  font-size: 22rpx;
+  color: #999;
+  background: #f5f5f5;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+}
+
+/* 商家结果 */
+.store-result-item {
+  display: flex;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  margin-bottom: 16rpx;
+  gap: 20rpx;
+}
+
+.store-result-img {
+  width: 180rpx;
+  height: 140rpx;
+  border-radius: 12rpx;
+  flex-shrink: 0;
+}
+
+.store-result-placeholder {
+  width: 180rpx;
+  height: 140rpx;
+  border-radius: 12rpx;
+  flex-shrink: 0;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ccc;
+  font-size: 48rpx;
+}
+
+.store-result-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.store-result-name {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.store-result-meta {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  font-size: 24rpx;
+}
+
+.store-result-rating {
+  color: #FF6633;
+}
+
+.store-result-distance {
+  color: #999;
+}
+
+.store-result-price {
+  font-size: 26rpx;
+  color: #666;
+}
+
+/* 空结果 */
+.empty-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 0;
+  color: #ccc;
+  gap: 16rpx;
+}
+
+.empty-result .fa-search {
+  font-size: 80rpx;
+  margin-bottom: 16rpx;
+}
+
+.empty-text {
+  font-size: 32rpx;
+  color: #999;
+}
+
+.empty-sub {
+  font-size: 26rpx;
+  color: #ccc;
+}

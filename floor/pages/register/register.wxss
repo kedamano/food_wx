@@ -1,6 +1,6 @@
 /* pages/register/register.wxss */
 page {
-  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+  background: linear-gradient(135deg, #FF6633 0%, #FF8855 100%);
   min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
@@ -17,7 +17,7 @@ page {
 .logo-section {
   text-align: center;
   padding: 60px 40px 40px;
-  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+  background: linear-gradient(135deg, #FF6633 0%, #FF8855 100%);
   margin-bottom: 40px;
   position: relative;
   overflow: hidden;
@@ -105,8 +105,8 @@ page {
 
 .item-input:focus {
   background: #FFFFFF;
-  border-color: #4CAF50;
-  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+  border-color: #FF6633;
+  box-shadow: 0 0 0 3px rgba(255, 102, 51, 0.1);
 }
 
 .input-placeholder {
@@ -135,7 +135,7 @@ page {
   top: 40px;
   height: 48px;
   padding: 0 20px;
-  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+  background: linear-gradient(135deg, #FF6633 0%, #FF8855 100%);
   color: #FFFFFF;
   border: none;
   border-radius: 12px;
@@ -200,7 +200,7 @@ page {
 
 .link {
   font-size: 14px;
-  color: #4CAF50;
+  color: #FF6633;
   font-weight: 500;
   cursor: pointer;
   margin: 0 4px;
@@ -214,7 +214,7 @@ page {
   left: 0;
   width: 100%;
   height: 1px;
-  background: #4CAF50;
+  background: #FF6633;
   transform: scaleX(0);
   transition: transform 0.3s ease;
 }
@@ -227,7 +227,7 @@ page {
 .register-btn {
   width: 100%;
   height: 56px;
-  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+  background: linear-gradient(135deg, #FF6633 0%, #FF8855 100%);
   color: #FFFFFF;
   border: none;
   border-radius: 28px;
@@ -235,7 +235,7 @@ page {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 8px 16px rgba(76, 175, 80, 0.3);
+  box-shadow: 0 8px 16px rgba(255, 102, 51, 0.3);
   margin-bottom: 20px;
 }
 
@@ -247,7 +247,7 @@ page {
 
 .register-btn:active {
   transform: translateY(2px);
-  box-shadow: 0 4px 8px rgba(76, 175, 80, 0.2);
+  box-shadow: 0 4px 8px rgba(255, 102, 51, 0.2);
 }
 
 /* 错误提示 */

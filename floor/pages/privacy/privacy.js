@@ -16,30 +16,30 @@ Page({
     }
   },
 
-  onLoad() {
+  onLoad: function() {
     this.loadPrivacySettings();
   },
 
   // 加载隐私设置
-  loadPrivacySettings() {
-    const savedSettings = wx.getStorageSync('privacySettings');
+  loadPrivacySettings: function() {
+    var savedSettings = wx.getStorageSync('privacySettings');
     if (savedSettings) {
       this.setData({ privacySettings: savedSettings });
     }
   },
 
   // 保存隐私设置到本地
-  savePrivacySettings() {
+  savePrivacySettings: function() {
     wx.setStorageSync('privacySettings', this.data.privacySettings);
   },
 
   // 开关变化
-  onSwitchChange(e) {
-    const setting = e.currentTarget.dataset.setting;
-    const value = e.detail.value;
+  onSwitchChange: function(e) {
+    var setting = e.currentTarget.dataset.setting;
+    var value = e.detail.value;
 
     this.setData({
-      [`privacySettings.${setting}`]: value
+      ['privacySettings.' + setting]: value
     });
 
     this.savePrivacySettings();
@@ -57,46 +57,48 @@ Page({
   },
 
   // 请求权限
-  requestPermission(permission) {
+  requestPermission: function(permission) {
+    var self = this;
     wx.showModal({
       title: '权限申请',
       content: permission === 'camera' ? '允许小程序使用您的相机权限' : '允许小程序使用您的麦克风权限',
-      success: (res) => {
+      success: function(res) {
         if (!res.confirm) {
           // 用户拒绝，关闭开关
-          const setting = permission === 'camera' ? 'allowCamera' : 'allowMicrophone';
-          this.setData({
-            [`privacySettings.${setting}`]: false
+          var setting = permission === 'camera' ? 'allowCamera' : 'allowMicrophone';
+          self.setData({
+            ['privacySettings.' + setting]: false
           });
-          this.savePrivacySettings();
+          self.savePrivacySettings();
         }
       }
     });
   },
 
   // 请求位置权限
-  requestLocationPermission() {
+  requestLocationPermission: function() {
+    var self = this;
     wx.getLocation({
       type: 'gcj02',
-      success: (res) => {
+      success: function(res) {
         console.log('位置获取成功', res);
       },
-      fail: (err) => {
+      fail: function(err) {
         wx.showToast({ title: '位置权限获取失败', icon: 'none' });
-        this.setData({
+        self.setData({
           'privacySettings.allowLocation': false
         });
-        this.savePrivacySettings();
+        self.savePrivacySettings();
       }
     });
   },
 
   // 清除位置历史
-  onClearLocationHistory() {
+  onClearLocationHistory: function() {
     wx.showModal({
       title: '清除位置历史',
       content: '确定要清除所有位置历史记录吗？',
-      success: (res) => {
+      success: function(res) {
         if (res.confirm) {
           wx.showToast({ title: '位置历史已清除', icon: 'success' });
         }
@@ -105,21 +107,21 @@ Page({
   },
 
   // 查看隐私政策
-  onPrivacyPolicy() {
+  onPrivacyPolicy: function() {
     wx.navigateTo({
       url: '/pages/privacy-policy/privacy-policy'
     });
   },
 
   // 查看用户协议
-  onUserAgreement() {
+  onUserAgreement: function() {
     wx.navigateTo({
       url: '/pages/user-agreement/user-agreement'
     });
   },
 
   // 返回
-  onBack() {
+  onBack: function() {
     wx.navigateBack();
   }
 });

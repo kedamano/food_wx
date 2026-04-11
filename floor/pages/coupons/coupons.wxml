@@ -70,7 +70,7 @@
     </view>
     <view class="recommend-list">
       <view class="recommend-card" wx:for="{{recommendCoupons}}" wx:key="id" bindtap="onRecommendCoupon" data-coupon="{{item}}">
-        <text class="fa fa-gift recommend-icon"></text>
+        <text class="-gift recommend-icon">🎁</text>
         <view class="recommend-info">
           <text class="recommend-name">{{item.name}}</text>
           <text class="recommend-discount">¥{{item.discount}}</text>
@@ -83,7 +83,7 @@
 
   <!-- 空状态 -->
   <view class="empty-state" wx:if="{{displayCoupons.length === 0}}">
-    <view class="empty-icon fa {{activeTab === 'available' ? 'fa-ticket-alt' : 'fa-clipboard'}}"></view>
+    <text class="empty-icon">{{activeTab === 'available' ? '🎫' : '📋'}}</text>
     <text class="empty-title">{{activeTab === 'available' ? '暂无可用优惠券' : '暂无优惠券记录'}}</text>
     <text class="empty-desc" wx:if="{{activeTab === 'available'}}">去积分商城兑换更多优惠券</text>
   </view>

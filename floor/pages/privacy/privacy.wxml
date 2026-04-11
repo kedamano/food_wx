@@ -1,78 +1,51 @@
 <!-- 隐私设置页面 -->
 <view class="container">
-  <!-- 头部 -->
-  <view class="header">
-    <view class="back-btn" bindtap="onBack">←</view>
-    <text class="header-title">隐私设置</text>
-    <view class="header-placeholder"></view>
-  </view>
-
   <!-- 权限设置 -->
   <view class="section">
     <text class="section-title">权限设置</text>
     <view class="setting-list">
       <view class="setting-item">
         <view class="item-left">
-          <text class="fa fa-map-marker-alt item-icon"></text>
+          <text class="-map-marker-alt item-icon">📍</text>
           <view class="item-info">
             <text class="item-name">位置权限</text>
             <text class="item-desc">允许访问您的位置信息</text>
           </view>
         </view>
-        <switch 
-          checked="{{privacySettings.allowLocation}}" 
-          bindchange="onSwitchChange" 
-          data-setting="allowLocation"
-          color="#4CAF50"
-        />
+        <switch checked="{{privacySettings.allowLocation}}" bindchange="onSwitchChange" data-setting="allowLocation" color="#FF6633" />
       </view>
 
       <view class="setting-item">
         <view class="item-left">
-          <text class="fa fa-camera item-icon"></text>
+          <text class="-camera item-icon">📷</text>
           <view class="item-info">
             <text class="item-name">相机权限</text>
             <text class="item-desc">允许使用相机拍照</text>
           </view>
         </view>
-        <switch 
-          checked="{{privacySettings.allowCamera}}" 
-          bindchange="onSwitchChange" 
-          data-setting="allowCamera"
-          color="#4CAF50"
-        />
+        <switch checked="{{privacySettings.allowCamera}}" bindchange="onSwitchChange" data-setting="allowCamera" color="#FF6633" />
       </view>
 
       <view class="setting-item">
         <view class="item-left">
-          <text class="fa fa-microphone item-icon"></text>
+          <text class="-microphone item-icon">●</text>
           <view class="item-info">
             <text class="item-name">麦克风权限</text>
             <text class="item-desc">允许使用麦克风录音</text>
           </view>
         </view>
-        <switch 
-          checked="{{privacySettings.allowMicrophone}}" 
-          bindchange="onSwitchChange" 
-          data-setting="allowMicrophone"
-          color="#4CAF50"
-        />
+        <switch checked="{{privacySettings.allowMicrophone}}" bindchange="onSwitchChange" data-setting="allowMicrophone" color="#FF6633" />
       </view>
 
       <view class="setting-item">
         <view class="item-left">
-          <text class="fa fa-bell item-icon"></text>
+          <text class="-bell item-icon">●</text>
           <view class="item-info">
             <text class="item-name">消息通知</text>
             <text class="item-desc">允许接收推送通知</text>
           </view>
         </view>
-        <switch 
-          checked="{{privacySettings.allowNotification}}" 
-          bindchange="onSwitchChange" 
-          data-setting="allowNotification"
-          color="#4CAF50"
-        />
+        <switch checked="{{privacySettings.allowNotification}}" bindchange="onSwitchChange" data-setting="allowNotification" color="#FF6633" />
       </view>
     </view>
   </view>
@@ -83,66 +56,46 @@
     <view class="setting-list">
       <view class="setting-item">
         <view class="item-left">
-          <text class="fa fa-eye item-icon"></text>
+          <text class="-eye item-icon">👁</text>
           <view class="item-info">
             <text class="item-name">显示在线状态</text>
             <text class="item-desc">允许他人查看您的在线状态</text>
           </view>
         </view>
-        <switch 
-          checked="{{privacySettings.showOnlineStatus}}" 
-          bindchange="onSwitchChange" 
-          data-setting="showOnlineStatus"
-          color="#4CAF50"
-        />
+        <switch checked="{{privacySettings.showOnlineStatus}}" bindchange="onSwitchChange" data-setting="showOnlineStatus" color="#FF6633" />
       </view>
 
       <view class="setting-item">
         <view class="item-left">
-          <text class="fa fa-clock item-icon"></text>
+          <text class="-clock item-icon">●</text>
           <view class="item-info">
             <text class="item-name">显示最后登录</text>
             <text class="item-desc">允许他人查看您的最后登录时间</text>
           </view>
         </view>
-        <switch 
-          checked="{{privacySettings.showLastLogin}}" 
-          bindchange="onSwitchChange" 
-          data-setting="showLastLogin"
-          color="#4CAF50"
-        />
+        <switch checked="{{privacySettings.showLastLogin}}" bindchange="onSwitchChange" data-setting="showLastLogin" color="#FF6633" />
       </view>
 
       <view class="setting-item">
         <view class="item-left">
-          <text class="fa fa-search item-icon"></text>
+          <text class="-search item-icon">🔍</text>
           <view class="item-info">
             <text class="item-name">手机号搜索</text>
             <text class="item-desc">允许通过手机号搜索到我</text>
           </view>
         </view>
-        <switch 
-          checked="{{privacySettings.allowSearchByPhone}}" 
-          bindchange="onSwitchChange" 
-          data-setting="allowSearchByPhone"
-          color="#4CAF50"
-        />
+        <switch checked="{{privacySettings.allowSearchByPhone}}" bindchange="onSwitchChange" data-setting="allowSearchByPhone" color="#FF6633" />
       </view>
 
       <view class="setting-item">
         <view class="item-left">
-          <text class="fa fa-robot item-icon"></text>
+          <text class="-robot item-icon">●</text>
           <view class="item-info">
             <text class="item-name">个性化推荐</text>
             <text class="item-desc">根据您的偏好推荐美食</text>
           </view>
         </view>
-        <switch 
-          checked="{{privacySettings.allowRecommendation}}" 
-          bindchange="onSwitchChange" 
-          data-setting="allowRecommendation"
-          color="#4CAF50"
-        />
+        <switch checked="{{privacySettings.allowRecommendation}}" bindchange="onSwitchChange" data-setting="allowRecommendation" color="#FF6633" />
       </view>
     </view>
   </view>
@@ -153,13 +106,13 @@
     <view class="setting-list">
       <view class="setting-item arrow" bindtap="onClearLocationHistory">
         <view class="item-left">
-          <text class="fa fa-trash-alt item-icon"></text>
+          <text class="-trash-alt item-icon">●</text>
           <view class="item-info">
             <text class="item-name">清除位置历史</text>
             <text class="item-desc">删除所有位置历史记录</text>
           </view>
         </view>
-        <text class="item-arrow">→</text>
+        <text class="item-arrow">›</text>
       </view>
     </view>
   </view>
@@ -170,19 +123,21 @@
     <view class="setting-list">
       <view class="setting-item arrow" bindtap="onPrivacyPolicy">
         <view class="item-left">
-          <text class="fa fa-file-alt item-icon"></text>
+          <text class="-file-alt item-icon">●</text>
           <text class="item-name">隐私政策</text>
         </view>
-        <text class="item-arrow">→</text>
+        <text class="item-arrow">›</text>
       </view>
 
       <view class="setting-item arrow" bindtap="onUserAgreement">
         <view class="item-left">
-          <text class="fa fa-file-signature item-icon"></text>
+          <text class="-file-signature item-icon">●</text>
           <text class="item-name">用户协议</text>
         </view>
-        <text class="item-arrow">→</text>
+        <text class="item-arrow">›</text>
       </view>
     </view>
   </view>
+
+  <view class="safe-area-bottom"></view>
 </view>

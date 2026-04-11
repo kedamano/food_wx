@@ -48,7 +48,7 @@
 }
 
 .device-item.current {
-  border: 2rpx solid #4CAF50;
+  border: 2rpx solid #FF6633;
 }
 
 .device-icon {
@@ -87,8 +87,8 @@
   margin-left: 16rpx;
   padding: 4rpx 12rpx;
   font-size: 22rpx;
-  color: #4CAF50;
-  background: rgba(76, 175, 80, 0.1);
+  color: #FF6633;
+  background: rgba(255, 102, 51, 0.1);
   border-radius: 8rpx;
 }
 

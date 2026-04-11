@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,9 @@ public class OrderController {
 
     private Integer getUserIdFromRequest(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
         if (token != null && !token.isEmpty()) {
             return jwtUtil.getUserIdFromToken(token);
         }
@@ -154,6 +158,17 @@ public class OrderController {
         return result;
     }
 
+    // 定义允许的状态转换规则
+    private static final Map<String, List<String>> ALLOWED_STATUS_TRANSITIONS = new HashMap<String, List<String>>() {{
+        put("待付款", Arrays.asList("已取消", "已支付"));
+        put("已支付", Arrays.asList("制作中", "已退款"));
+        put("制作中", Arrays.asList("配送中"));
+        put("配送中", Arrays.asList("已完成"));
+        put("已完成", Arrays.asList());
+        put("已取消", Arrays.asList());
+        put("已退款", Arrays.asList());
+    }};
+
     @PutMapping("/{orderId}/status")
     @ApiOperation(value = "更新订单状态", notes = "更新订单状态")
     @ApiImplicitParam(name = "status", value = "新状态", required = true, paramType = "body")
@@ -169,7 +184,16 @@ public class OrderController {
             return BaseResult.error(403, "无权操作该订单");
         }
 
-        return orderService.updateOrderStatus(orderId, statusRequest.getStatus());
+        String newStatus = statusRequest.getStatus();
+        String currentStatus = order.getStatus();
+
+        // 验证状态转换是否合法
+        List<String> allowedTransitions = ALLOWED_STATUS_TRANSITIONS.get(currentStatus);
+        if (allowedTransitions == null || !allowedTransitions.contains(newStatus)) {
+            return BaseResult.error(400, "非法的状态转换: " + currentStatus + " -> " + newStatus);
+        }
+
+        return orderService.updateOrderStatus(orderId, newStatus);
     }
 
     @PutMapping("/{orderId}/cancel")

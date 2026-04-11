@@ -3,16 +3,16 @@ USE food_wx;
 
 -- 插入用户数据
 INSERT INTO users (username, password, avatar, level, points, phone) VALUES
-('zhangsan', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBa.1fCj1Uhn8G', 'https://example.com/avatar1.png', '黄金会员', 1250, '13800138001'),
-('lisi', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBa.1fCj1Uhn8G', 'https://example.com/avatar2.png', '普通会员', 320, '13800138002'),
-('wangwu', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBa.1fCj1Uhn8G', 'https://example.com/avatar3.png', '白银会员', 780, '13800138003');
+('zhangsan', '$2a$10$lkDzJKpWZc10aEhdM6fGOOwEXbqE8N7zxXeVVX8elFREgnFa5XPqC', '/images/avatars/avatar1.png', '黄金会员', 1250, '13800138001'),
+('lisi', '$2a$10$lkDzJKpWZc10aEhdM6fGOOwEXbqE8N7zxXeVVX8elFREgnFa5XPqC', '/images/avatars/avatar2.png', '普通会员', 320, '13800138002'),
+('wangwu', '$2a$10$lkDzJKpWZc10aEhdM6fGOOwEXbqE8N7zxXeVVX8elFREgnFa5XPqC', '/images/avatars/avatar3.png', '白银会员', 780, '13800138003');
 
 -- 插入商家数据
 INSERT INTO stores (store_name, logo, address, phone, rating, delivery_time, delivery_fee) VALUES
-('川味人家', 'https://example.com/store1.png', '北京市朝阳区建国路88号', '010-88888888', 4.5, 30, 5.00),
-('面点王', 'https://example.com/store2.png', '北京市朝阳区建国路89号', '010-88888889', 4.8, 25, 3.00),
-('披萨达人', 'https://example.com/store3.png', '北京市朝阳区建国路90号', '010-88888890', 4.2, 35, 6.00),
-('汉堡世界', 'https://example.com/store4.png', '北京市朝阳区建国路91号', '010-88888891', 4.6, 20, 4.00);
+('川味人家', '/images/stores/store1.png', '北京市朝阳区建国路88号', '010-88888888', 4.5, 30, 5.00),
+('面点王', '/images/stores/store2.png', '北京市朝阳区建国路89号', '010-88888889', 4.8, 25, 3.00),
+('披萨达人', '/images/stores/store3.png', '北京市朝阳区建国路90号', '010-88888890', 4.2, 35, 6.00),
+('汉堡世界', '/images/stores/store4.png', '北京市朝阳区建国路91号', '010-88888891', 4.6, 20, 4.00);
 
 -- 插入分类数据
 INSERT INTO categories (category_name, icon, sort_order) VALUES
@@ -25,16 +25,16 @@ INSERT INTO categories (category_name, icon, sort_order) VALUES
 
 -- 插入菜品数据
 INSERT INTO foods (name, price, description, image, category_id, store_id, rating, sales, tags) VALUES
-('牛肉面', 25.00, '精选优质牛肉，搭配劲道面条，汤汁浓郁，口感丰富', 'https://example.com/beef_noodles.png', 1, 2, 4.8, 156, '["热销", "经典", "营养丰富"]'),
-('宫保鸡丁', 32.00, '传统川菜，鸡肉嫩滑，花生香脆，酸甜适中', 'https://example.com/kung_pao_chicken.png', 5, 1, 4.7, 203, '["热销", "经典"]'),
-('麻辣香锅', 45.00, '多种食材搭配，麻辣鲜香，回味无穷', 'https://example.com/mala_xiangguo.png', 5, 1, 4.6, 178, '["热销", "套餐"]'),
-('芝士披萨', 58.00, '进口芝士，香浓拉丝，口感醇厚', 'https://example.com/cheese_pizza.png', 2, 3, 4.5, 134, '["热销", "经典"]'),
-('牛肉汉堡', 28.00, '厚实牛肉饼，搭配新鲜蔬菜，营养丰富', 'https://example.com/beef_burger.png', 3, 4, 4.4, 189, '["热销", "套餐", "营养丰富"]'),
-('水果沙拉', 22.00, '新鲜水果，健康美味，低脂低卡', 'https://example.com/fruit_salad.png', 4, 2, 4.3, 112, '["营养丰富", "健康"]'),
-('鸡翅', 18.00, '外酥里嫩，香辣可口', 'https://example.com/chicken_wings.png', 5, 1, 4.5, 167, '["热销", "经典"]'),
-('冰淇淋', 12.00, '口感细腻，香甜可口', 'https://example.com/ice_cream.png', 4, 2, 4.2, 98, '["甜品", "热销"]'),
-('可乐', 8.00, '清爽解渴，经典饮品', 'https://example.com/cola.png', 4, 2, 4.0, 256, '["饮品", "经典"]'),
-('四川火锅', 88.00, '正宗川味火锅，麻辣鲜香，食材丰富', 'https://example.com/sichuan_cuisine.png', 5, 1, 4.9, 87, '["热销", "套餐", "经典"]');
+('牛肉面', 25.00, '精选优质牛肉，搭配劲道面条，汤汁浓郁，口感丰富', '/images/foods/beef_noodles.png', 1, 2, 4.8, 156, '["热销", "经典", "营养丰富"]'),
+('宫保鸡丁', 32.00, '传统川菜，鸡肉嫩滑，花生香脆，酸甜适中', '/images/foods/kung_pao_chicken.png', 5, 1, 4.7, 203, '["热销", "经典"]'),
+('麻辣香锅', 45.00, '多种食材搭配，麻辣鲜香，回味无穷', '/images/foods/mala_xiangguo.png', 5, 1, 4.6, 178, '["热销", "套餐"]'),
+('芝士披萨', 58.00, '进口芝士，香浓拉丝，口感醇厚', '/images/foods/cheese_pizza.png', 2, 3, 4.5, 134, '["热销", "经典"]'),
+('牛肉汉堡', 28.00, '厚实牛肉饼，搭配新鲜蔬菜，营养丰富', '/images/foods/beef_burger.png', 3, 4, 4.4, 189, '["热销", "套餐", "营养丰富"]'),
+('水果沙拉', 22.00, '新鲜水果，健康美味，低脂低卡', '/images/foods/fruit_salad.png', 4, 2, 4.3, 112, '["营养丰富", "健康"]'),
+('鸡翅', 18.00, '外酥里嫩，香辣可口', '/images/foods/chicken_wings.png', 5, 1, 4.5, 167, '["热销", "经典"]'),
+('冰淇淋', 12.00, '口感细腻，香甜可口', '/images/foods/ice_cream.png', 4, 2, 4.2, 98, '["甜品", "热销"]'),
+('可乐', 8.00, '清爽解渴，经典饮品', '/images/foods/cola.png', 4, 2, 4.0, 256, '["饮品", "经典"]'),
+('四川火锅', 88.00, '正宗川味火锅，麻辣鲜香，食材丰富', '/images/foods/sichuan_cuisine.png', 5, 1, 4.9, 87, '["热销", "套餐", "经典"]');
 
 -- 插入购物车数据
 INSERT INTO cart (user_id, food_id, quantity, store_id) VALUES
@@ -123,21 +123,21 @@ INSERT INTO order_details (order_id, food_id, food_name, price, quantity, total_
 -- 插入评价数据（为张三的已完成订单增加评价）
 INSERT INTO reviews (order_id, user_id, food_id, rating, content, images) VALUES
 -- 订单 1 的评价
-(1, 1, 1, 5, '牛肉面非常好吃，汤很浓郁，牛肉也很嫩，强烈推荐！', '["https://example.com/review1_1.jpg", "https://example.com/review1_2.jpg"]'),
+(1, 1, 1, 5, '牛肉面非常好吃，汤很浓郁，牛肉也很嫩，强烈推荐！', '["/images/foods/review_1.png", "/images/foods/review_2.png"]'),
 (1, 1, 9, 4, '可乐很解渴，配送也很快。', '[]'),
 -- 订单 2 的评价
-(2, 1, 2, 5, '宫保鸡丁很正宗，味道很棒！', '["https://example.com/review2_1.jpg"]'),
+(2, 1, 2, 5, '宫保鸡丁很正宗，味道很棒！', '["/images/foods/review_3.png"]'),
 (2, 1, 7, 4, '鸡翅外酥里嫩，很好吃。', '[]'),
 -- 订单 3 的评价
-(3, 1, 4, 5, '披萨芝士很多，拉丝效果很好，值得推荐！', '["https://example.com/review3_1.jpg", "https://example.com/review3_2.jpg"]'),
+(3, 1, 4, 5, '披萨芝士很多，拉丝效果很好，值得推荐！', '["/images/foods/review_1.png", "/images/foods/review_2.png"]'),
 -- 订单 4 的评价
 (4, 1, 5, 4, '牛肉汉堡分量足，味道不错，就是配送有点慢。', '[]'),
-(4, 1, 8, 5, '冰淇淋很好吃，孩子特别喜欢。', '["https://example.com/review4_1.jpg"]'),
+(4, 1, 8, 5, '冰淇淋很好吃，孩子特别喜欢。', '["/images/foods/review_3.png"]'),
 -- 订单 5 的评价
 (5, 1, 1, 5, '第二次购买了，味道一如既往的好！', '[]'),
-(5, 1, 6, 4, '水果沙拉很新鲜，健康美味。', '["https://example.com/review5_1.jpg"]'),
+(5, 1, 6, 4, '水果沙拉很新鲜，健康美味。', '["/images/foods/review_1.png"]'),
 -- 订单 6 的评价
-(6, 1, 10, 5, '四川火锅太正宗了，麻辣够味，食材新鲜！', '["https://example.com/review6_1.jpg", "https://example.com/review6_2.jpg", "https://example.com/review6_3.jpg"]'),
+(6, 1, 10, 5, '四川火锅太正宗了，麻辣够味，食材新鲜！', '["/images/foods/review_2.png", "/images/foods/review_3.png", "/images/foods/review_1.png"]'),
 (6, 1, 3, 5, '麻辣香锅也不错，量很大，吃得过瘾。', '[]');
 
 -- 插入用户地址数据（为张三增加更多地址）

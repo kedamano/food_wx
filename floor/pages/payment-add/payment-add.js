@@ -1,17 +1,21 @@
 /**
  * 新增支付方式页面逻辑
  */
-const paymentApi = require('../../api/payment');
-const { showLoading, hideLoading, showError, showSuccess } = require('../../api/request');
+var paymentApi = require('../../api/payment');
+var requestApi = require('../../api/request');
+var showLoading = requestApi.showLoading;
+var hideLoading = requestApi.hideLoading;
+var showError = requestApi.showError;
+var showSuccess = requestApi.showSuccess;
 
 Page({
   data: {
     // 支付方式类型
     paymentTypes: [
-      { id: 'WECHAT', name: '微信支付', icon: 'fa-weixin' },
-      { id: 'ALIPAY', name: '支付宝', icon: '💙' },
-      { id: 'BANK_CARD', name: '银行卡', icon: 'fa-credit-card' },
-      { id: 'BALANCE', name: '余额支付', icon: '💰' },
+      { id: 'WECHAT', name: '微信支付', icon: 'fa-comment-dollar', iconText: 'ð¬' },
+      { id: 'ALIPAY', name: '支付宝', icon: 'fa-money-bill-wave', iconText: 'ðµ' },
+      { id: 'BANK_CARD', name: '银行卡', icon: 'fa-credit-card', iconText: 'ð³' },
+      { id: 'BALANCE', name: '余额支付', icon: 'fa-wallet', iconText: 'ð' },
     ],
     // 表单数据
     formData: {
@@ -32,50 +36,50 @@ Page({
   },
 
   // 页面加载
-  onLoad(options) {
+  onLoad: function(options) {
     console.log('新增支付方式页面加载');
   },
 
   // 选择支付方式类型
-  onTypeSelect(e) {
-    const { index } = e.currentTarget.dataset;
-    const selectedType = this.data.paymentTypes[index];
-    
+  onTypeSelect: function(e) {
+    var index = e.currentTarget.dataset.index;
+    var selectedType = this.data.paymentTypes[index];
+
     this.setData({
       typeIndex: index,
       'formData.type': selectedType.id,
-      'formData.name': selectedType.name,
+      'formData.name': selectedType.name
     });
   },
 
   // 表单输入处理
-  onFormInput(e) {
-    const { field } = e.currentTarget.dataset;
-    const { value } = e.detail;
-    
+  onFormInput: function(e) {
+    var field = e.currentTarget.dataset.field;
+    var value = e.detail.value;
+
     this.setData({
-      [`formData.${field}`]: value,
+      ['formData.' + field]: value
     });
-    
+
     // 清除错误提示
     if (this.data.errors[field]) {
       this.setData({
-        [`errors.${field}`]: null,
+        ['errors.' + field]: null
       });
     }
   },
 
   // 切换默认支付方式
-  onToggleDefault(e) {
+  onToggleDefault: function(e) {
     this.setData({
-      'formData.isDefault': e.detail.value,
+      'formData.isDefault': e.detail.value
     });
   },
 
   // 表单验证
-  validateForm() {
-    const { formData } = this.data;
-    const errors = {};
+  validateForm: function() {
+    var formData = this.data.formData;
+    var errors = {};
 
     // 验证支付方式名称
     if (!formData.name || formData.name.trim().length < 2) {
@@ -107,41 +111,47 @@ Page({
       }
     }
 
-    this.setData({ errors });
+    this.setData({ errors: errors });
     return Object.keys(errors).length === 0;
   },
 
   // 保存支付方式
-  async onSavePayment() {
+  onSavePayment: function() {
+    var self = this;
     if (!this.validateForm()) {
       return;
     }
 
     try {
       showLoading('添加中...');
-      await paymentApi.createPaymentMethod(this.data.formData);
-      showSuccess('添加成功');
+      paymentApi.createPaymentMethod(this.data.formData).then(function(result) {
+        showSuccess('添加成功');
 
-      // 返回上一页并刷新列表
-      setTimeout(() => {
-        const pages = getCurrentPages();
-        const prevPage = pages[pages.length - 2];
-        if (prevPage && prevPage.route === 'pages/payment/payment') {
-          prevPage.loadPaymentMethods();
-        }
-        wx.navigateBack();
-      }, 1500);
+        // 返回上一页并刷新列表
+        setTimeout(function() {
+          var pages = getCurrentPages();
+          var prevPage = pages[pages.length - 2];
+          if (prevPage && prevPage.route === 'pages/payment/payment') {
+            prevPage.loadPaymentMethods();
+          }
+          wx.navigateBack();
+        }, 1500);
+      }).catch(function(error) {
+        console.error('保存支付方式失败:', error);
+        showError('添加失败');
+      }).finally(function() {
+        hideLoading();
+      });
     } catch (error) {
       console.error('保存支付方式失败:', error);
       showError('添加失败');
-    } finally {
       hideLoading();
     }
   },
 
   // 页面显示
-  onShow() {
+  onShow: function() {
     // 清除错误提示
     this.setData({ errors: {} });
-  },
+  }
 });

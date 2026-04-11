@@ -10,27 +10,27 @@ Page({
     pageSize: 10
   },
 
-  onLoad(options) {
+  onLoad: function(options) {
     console.log('订单页面加载，参数：', options);
-    const initialStatus = options.status || 'all';
+    var initialStatus = options.status || 'all';
     this.setData({ activeTab: initialStatus });
     this.loadStatusTabs();
     this.loadOrders();
   },
 
-  onBackClick() {
+  onBackClick: function() {
     wx.navigateBack({ delta: 1 });
   },
 
-  onTabChange(e) {
-    const status = e.currentTarget.dataset.status;
+  onTabChange: function(e) {
+    var status = e.currentTarget.dataset.status;
     this.setData({ activeTab: status, currentPage: 1, orders: [] });
     this.loadOrders();
   },
 
-  loadStatusTabs() {
-    const orderStats = { pending: 2, preparing: 1, delivering: 3, completed: 17 };
-    const tabs = [
+  loadStatusTabs: function() {
+    var orderStats = { pending: 2, preparing: 1, delivering: 3, completed: 17 };
+    var tabs = [
       { status: 'all', name: '全部', count: 23 },
       { status: 'pending', name: '待付款', count: orderStats.pending },
       { status: 'preparing', name: '制作中', count: orderStats.preparing },
@@ -40,23 +40,30 @@ Page({
     this.setData({ statusTabs: tabs });
   },
 
-  loadOrders() {
+  loadOrders: function() {
+    var self = this;
     wx.showLoading({ title: '加载中...' });
-    setTimeout(() => {
-      const mockOrders = this.getMockOrders();
-      const filteredOrders = this.filterOrdersByStatus(mockOrders);
-      this.setData({ orders: filteredOrders, isLoading: false, hasMore: false });
+    setTimeout(function() {
+      var mockOrders = self.getMockOrders();
+      var filteredOrders = self.filterOrdersByStatus(mockOrders);
+      self.setData({ orders: filteredOrders, isLoading: false, hasMore: false });
       wx.hideLoading();
     }, 1000);
   },
 
-  filterOrdersByStatus(allOrders) {
-    const { activeTab } = this.data;
+  filterOrdersByStatus: function(allOrders) {
+    var activeTab = this.data.activeTab;
     if (activeTab === 'all') return allOrders;
-    return allOrders.filter(order => order.status === activeTab);
+    var filtered = [];
+    for (var i = 0; i < allOrders.length; i++) {
+      if (allOrders[i].status === activeTab) {
+        filtered.push(allOrders[i]);
+      }
+    }
+    return filtered;
   },
 
-  getMockOrders() {
+  getMockOrders: function() {
     return [
       {
         orderId: '202401150001',
@@ -79,18 +86,18 @@ Page({
     ];
   },
 
-  onOrderDetail(e) {
-    const orderId = e.currentTarget.dataset.orderId;
+  onOrderDetail: function(e) {
+    var orderId = e.currentTarget.dataset.orderId;
     wx.showToast({ title: '订单详情开发中', icon: 'none' });
   },
 
-  onGoShopping() {
+  onGoShopping: function() {
     wx.switchTab({ url: '/pages/index/index' });
   },
 
-  onPullDownRefresh() {
+  onPullDownRefresh: function() {
     this.setData({ currentPage: 1 });
     this.loadOrders();
-    setTimeout(() => wx.stopPullDownRefresh(), 1000);
+    setTimeout(function() { wx.stopPullDownRefresh(); }, 1000);
   }
 });

@@ -7,11 +7,11 @@
 
 /* 头部样式 */
 .header {
-  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+  background: linear-gradient(135deg, #FF6633 0%, #FF8855 100%);
   padding: 40px 20px 30px;
   text-align: center;
   border-radius: 0 0 20px 20px;
-  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+  box-shadow: 0 4px 15px rgba(255, 102, 51, 0.3);
 }
 
 .header-title {
@@ -88,7 +88,7 @@
 .item-input:focus,
 .item-picker:focus,
 .item-textarea:focus {
-  border-color: #4CAF50;
+  border-color: #FF6633;
   background: #FFFFFF;
   outline: none;
 }
@@ -151,7 +151,7 @@
 .save-btn {
   width: 100%;
   padding: 15px;
-  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+  background: linear-gradient(135deg, #FF6633 0%, #FF8855 100%);
   color: #FFFFFF;
   border: none;
   border-radius: 25px;
@@ -159,7 +159,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+  box-shadow: 0 4px 15px rgba(255, 102, 51, 0.3);
 }
 
 .save-btn:active {

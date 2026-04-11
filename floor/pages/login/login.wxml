@@ -12,7 +12,7 @@
       <!-- 用户名/手机号输入 -->
       <view class="form-item">
         <view class="item-label">
-          <text class="fa fa-user label-icon"></text>
+          <text class="-user label-icon">👤</text>
           <text class="label-text">用户名</text>
         </view>
         <input 
@@ -28,7 +28,7 @@
       <!-- 密码输入 -->
       <view class="form-item">
         <view class="item-label">
-          <text class="label-icon">🔒</text>
+          <text class="-lock label-icon">🔒</text>
           <text class="label-text">密码</text>
         </view>
         <input 
@@ -40,7 +40,7 @@
           value="{{password}}"
           bindinput="onPasswordInput"
         />
-        <text class="fa {{showPassword ? 'fa-eye-slash' : 'fa-eye'}} password-toggle" bindtap="onTogglePassword"></text>
+        <text class="password-toggle" bindtap="onTogglePassword">{{showPassword ? '🙈' : '👁'}}</text>
       </view>
 
       <!-- 记住我 & 忘记密码 -->
@@ -71,7 +71,7 @@
       <text class="divider-text">其他登录方式</text>
       <view class="social-login">
         <button class="social-btn wechat" bindtap="onWeChatLogin">
-          <text class="fa fa-weixin social-icon"></text>
+          <text class="-comment social-icon">💬</text>
           <text class="social-text">微信</text>
         </button>
       </view>

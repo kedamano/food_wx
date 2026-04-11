@@ -1,93 +1,283 @@
-<!-- 商家详情页面 -->
-<view class="store-detail-page">
-  <!-- 头部导航 -->
-  <view class="header-nav">
-    <view class="nav-left" bindtap="onBackClick">
-      <text class="back-icon">←</text>
+<!-- 商家详情页 - 大众点评风格 -->
+<view class="page-store-detail">
+  <!-- 顶部大图 -->
+  <view class="store-hero">
+    <swiper class="hero-swiper" indicator-dots="{{true}}" indicator-color="rgba(255,255,255,0.4)" 
+            indicator-active-color="#fff" autoplay="{{true}}" interval="{{4000}}" circular="{{true}}"
+            style="height: 480rpx;" wx:if="{{storeImages.length > 0}}">
+      <swiper-item wx:for="{{storeImages}}" wx:key="index">
+        <image class="hero-img" src="{{item}}" mode="aspectFill"></image>
+      </swiper-item>
+    </swiper>
+    <view class="hero-placeholder" wx:else>
+      <text class="-store">🏪</text>
     </view>
-    <text class="nav-title">商家详情</text>
-    <view class="nav-right" bindtap="onShareClick">
-      <text class="share-icon">⋯</text>
+    
+    <!-- 浮动导航 -->
+    <view class="float-nav">
+      <view class="nav-btn" bindtap="goBack">
+        <text class="-arrow-left">‹</text>
+      </view>
+      <view class="nav-btn" bindtap="onShare">
+        <text class="-share-alt">↗</text>
+      </view>
+    </view>
+    
+    <!-- 图片计数 -->
+    <view class="img-count" wx:if="{{storeImages.length > 0}}">
+      <text>1/{{storeImages.length}}</text>
     </view>
   </view>
 
-  <!-- 商家信息 -->
-  <view class="store-header" wx:if="{{storeInfo}}">
-    <view class="store-banner">
-      <image class="banner-image" src="{{storeInfo.banner}}" mode="aspectFill"></image>
-    </view>
-    <view class="store-info-section">
+  <!-- 商家基本信息 -->
+  <view class="store-info-card card">
+    <view class="info-top">
       <text class="store-name">{{storeInfo.name}}</text>
-      <view class="store-tags">
-        <text class="tag">{{storeInfo.distance}}</text>
-        <text class="tag">{{storeInfo.deliveryTime}}</text>
-        <text class="tag">人均 ¥{{storeInfo.price}}</text>
+      <view class="collect-btn {{isCollected ? 'collected' : ''}}" bindtap="toggleCollect">
+        <text>{{isCollected ? '❤️' : '🤍'}}</text>
+        <text>{{isCollected ? '已收藏' : '收藏'}}</text>
       </view>
-      <view class="rating-wrapper">
-        <text class="rating">{{storeInfo.rating}}</text>
+    </view>
+    <view class="info-rating-row">
+      <view class="rating-score-box">
+        <text class="rating-big">{{storeInfo.rating}}</text>
         <text class="rating-label">评分</text>
       </view>
+      <view class="rating-detail">
+        <view class="stars-row">
+          <text class="-star star-filled" wx:for="{{5}}" wx:key="*this">⭐</text>
+        </view>
+        <text class="rating-count">{{storeInfo.reviews || 0}}条评价</text>
+      </view>
+      <view class="price-info">
+        <text class="price-num">¥{{storeInfo.price}}</text>
+        <text class="price-label">人均</text>
+      </view>
+    </view>
+    <!-- 标签 -->
+    <view class="info-tags" wx:if="{{storeInfo.tags && storeInfo.tags.length > 0}}">
+      <text class="info-tag" wx:for="{{storeInfo.tags}}" wx:key="*this">{{item}}</text>
+    </view>
+  </view>
+
+  <!-- 营业信息 & 地址 -->
+  <view class="store-meta-card card">
+    <view class="meta-row" wx:if="{{storeInfo.status}}">
+      <text class="meta-label">营业状态</text>
+      <text class="meta-value {{storeInfo.status === '营业中' ? 'open' : 'closed'}}">{{storeInfo.status}}</text>
+    </view>
+    <view class="meta-row" wx:if="{{storeInfo.address}}">
+      <text class="meta-label">地址</text>
+      <text class="meta-value address-text">{{storeInfo.address}}</text>
+      <text class="-angle-right meta-arrow">›</text>
+    </view>
+    <view class="meta-row" wx:if="{{storeInfo.phone}}">
+      <text class="meta-label">电话</text>
+      <text class="meta-value">{{storeInfo.phone}}</text>
+      <text class="-angle-right meta-arrow">›</text>
+    </view>
+    <view class="meta-row" wx:if="{{storeInfo.distance}}">
+      <text class="meta-label">距离</text>
+      <text class="meta-value">{{storeInfo.distance}}</text>
+    </view>
+    <view class="meta-row" wx:if="{{storeInfo.deliveryFee !== undefined}}">
+      <text class="meta-label">配送费</text>
+      <text class="meta-value">¥{{storeInfo.deliveryFee}}</text>
+    </view>
+  </view>
+
+  <!-- 优惠活动 -->
+  <view class="deals-card card" wx:if="{{deals.length > 0}}">
+    <view class="deals-header">
+      <text class="-ticket-alt deals-icon">🎫</text>
+      <text class="deals-title">优惠活动</text>
+    </view>
+    <view class="deal-item" wx:for="{{deals}}" wx:key="index">
+      <view class="deal-badge">{{item.badge}}</view>
+      <text class="deal-text">{{item.text}}</text>
     </view>
   </view>
 
   <!-- 商家公告 -->
-  <view class="notice-section" wx:if="{{storeInfo}}">
-    <view class="section-header">
-      <text class="fa fa-bullhorn section-icon"></text>
-      <text class="section-title">商家公告</text>
+  <view class="notice-card card" wx:if="{{storeInfo.notice}}">
+    <view class="notice-row">
+      <text class="-bullhorn notice-icon">●</text>
+      <text class="notice-text ellipsis">{{storeInfo.notice}}</text>
     </view>
-    <text class="notice-text">{{storeInfo.notice || '暂无公告'}}</text>
   </view>
 
-  <!-- 商品分类 -->
-  <view class="category-section">
-    <scroll-view class="category-scroll" scroll-x>
-      <view class="category-list">
-        <view class="category-item {{currentCategory === 0 ? 'active' : ''}}" bindtap="onCategoryTap" data-category="0">
-          <text class="category-name">全部</text>
-        </view>
-        <view class="category-item {{currentCategory === item.id ? 'active' : ''}}" wx:for="{{categories}}" wx:key="id" bindtap="onCategoryTap" data-category="{{item.id}}">
-          <text class="category-name">{{item.name}}</text>
-        </view>
-      </view>
-    </scroll-view>
+  <!-- Tab 切换：菜品 / 评价 -->
+  <view class="tab-bar sticky">
+    <view class="tab-item {{activeTab === 'menu' ? 'active' : ''}}" bindtap="switchTab" data-tab="menu">
+      <text class="tab-text">点餐</text>
+    </view>
+    <view class="tab-item {{activeTab === 'reviews' ? 'active' : ''}}" bindtap="switchTab" data-tab="reviews">
+      <text class="tab-text">评价</text>
+    </view>
+    <view class="tab-item {{activeTab === 'info' ? 'active' : ''}}" bindtap="switchTab" data-tab="info">
+      <text class="tab-text">商家信息</text>
+    </view>
   </view>
 
-  <!-- 商品列表 -->
-  <view class="food-section">
-    <view class="food-list">
-      <view class="food-item" wx:for="{{foodList}}" wx:key="id">
-        <view class="food-image">
-          <image class="food-img" src="{{item.image}}" mode="aspectFill"></image>
+  <!-- 点餐面板 -->
+  <view class="menu-panel" wx:if="{{activeTab === 'menu'}}">
+    <!-- 左侧分类 -->
+    <view class="menu-layout">
+      <scroll-view class="menu-left" scroll-y enhanced show-scrollbar="{{false}}">
+        <view class="menu-category {{currentCategory === item.id ? 'active' : ''}}" 
+              wx:for="{{categories}}" wx:key="id" bindtap="onCategoryTap" data-id="{{item.id}}">
+          <text>{{item.name}}</text>
         </view>
-        <view class="food-info">
-          <text class="food-name">{{item.name}}</text>
-          <text class="food-desc">{{item.description}}</text>
-          <view class="food-meta">
-            <text class="food-price">¥{{item.price}}</text>
-            <text class="food-sales">月售{{item.sales}}</text>
+      </scroll-view>
+      <!-- 右侧菜品列表 -->
+      <scroll-view class="menu-right" scroll-y enhanced show-scrollbar="{{false}}">
+        <view class="food-list">
+          <view class="menu-food-item" wx:for="{{foodList}}" wx:key="id">
+            <view class="menu-food-img">
+              <image class="menu-img" src="{{item.image}}" mode="aspectFill" wx:if="{{item.image}}"></image>
+              <view class="menu-img-placeholder" wx:else>
+                <text class="-utensils">🍴</text>
+              </view>
+            </view>
+            <view class="menu-food-info">
+              <text class="menu-food-name ellipsis">{{item.name}}</text>
+              <text class="menu-food-desc ellipsis" wx:if="{{item.description}}">{{item.description}}</text>
+              <text class="menu-food-sales" wx:if="{{item.sales}}">月售{{item.sales}}</text>
+              <view class="menu-food-bottom">
+                <text class="menu-food-price">
+                  <text class="price-symbol-sm">¥</text>{{item.price}}
+                </text>
+                <view class="menu-add-btn" bindtap="onAddToCart" data-item="{{item}}">
+                  <text>+</text>
+                </view>
+              </view>
+            </view>
           </view>
-          <button class="add-btn" bindtap="onAddToCart" data-item="{{item}}">+</button>
         </view>
-      </view>
+        <!-- 空状态 -->
+        <view class="empty-state" wx:if="{{foodList.length === 0}}">
+          <text class="-utensils empty-state-icon">🍴</text>
+          <text class="empty-state-text">暂无菜品</text>
+        </view>
+      </scroll-view>
     </view>
   </view>
 
-  <!-- 空状态提示 -->
-  <view class="empty-state" wx:if="{{foodList.length === 0}}">
-    <text class="fa fa-utensils empty-icon"></text>
-    <text class="empty-text">暂无商品</text>
+  <!-- 评价面板 -->
+  <view class="review-panel" wx:if="{{activeTab === 'reviews'}}">
+    <view class="review-summary">
+      <text class="review-total-score">{{storeInfo.rating}}</text>
+      <text class="review-total-label">综合评分</text>
+    </view>
+    <view class="review-tags-row">
+      <text class="review-filter-tag active">全部</text>
+      <text class="review-filter-tag">好评</text>
+      <text class="review-filter-tag">有图</text>
+      <text class="review-filter-tag">味道好</text>
+    </view>
+    <view class="review-list">
+      <view class="review-card" wx:for="{{reviewsList}}" wx:key="index">
+        <view class="review-user">
+          <view class="review-avatar">
+            <text>{{item.userName.charAt(0)}}</text>
+          </view>
+          <view class="review-user-info">
+            <text class="review-username">{{item.userName}}</text>
+            <view class="review-stars">
+              <text class="-star" wx:for="{{item.starCount || 5}}" wx:key="*this" wx:for-item="s">⭐</text>
+            </view>
+          </view>
+          <text class="review-date">{{item.time}}</text>
+        </view>
+        <text class="review-content">{{item.content}}</text>
+        <view class="review-imgs" wx:if="{{item.images && item.images.length > 0}}">
+          <image class="review-thumb" wx:for="{{item.images}}" wx:for-item="img" wx:key="*this" 
+                 src="{{img}}" mode="aspectFill"></image>
+        </view>
+      </view>
+    </view>
+    <view class="empty-state" wx:if="{{reviewsList.length === 0}}">
+      <text class="-comment-dots empty-state-icon">●</text>
+      <text class="empty-state-text">暂无评价</text>
+    </view>
+  </view>
+
+  <!-- 商家信息面板 -->
+  <view class="info-panel" wx:if="{{activeTab === 'info'}}">
+    <view class="info-detail-card card">
+      <view class="info-detail-row">
+        <text class="detail-label">商家名称</text>
+        <text class="detail-value">{{storeInfo.name}}</text>
+      </view>
+      <view class="info-detail-row" wx:if="{{storeInfo.address}}">
+        <text class="detail-label">详细地址</text>
+        <text class="detail-value">{{storeInfo.address}}</text>
+      </view>
+      <view class="info-detail-row" wx:if="{{storeInfo.phone}}">
+        <text class="detail-label">联系电话</text>
+        <text class="detail-value">{{storeInfo.phone}}</text>
+      </view>
+      <view class="info-detail-row">
+        <text class="detail-label">营业时间</text>
+        <text class="detail-value">{{storeInfo.businessHours || '10:00 - 22:00'}}</text>
+      </view>
+      <view class="info-detail-row" wx:if="{{storeInfo.notice}}">
+        <text class="detail-label">商家公告</text>
+        <text class="detail-value">{{storeInfo.notice}}</text>
+      </view>
+    </view>
   </view>
 
   <!-- 底部购物车栏 -->
-  <view class="bottom-cart" wx:if="{{cartCount > 0}}">
-    <view class="cart-left">
-      <view class="cart-icon-wrapper">
-        <text class="fa fa-shopping-cart cart-icon"></text>
-        <text class="cart-count">{{cartCount}}</text>
+  <view class="bottom-bar safe-bottom" wx:if="{{cartCount > 0}}">
+    <view class="cart-info" bindtap="onCartTap">
+      <view class="cart-icon-wrap">
+        <text class="-shopping-cart">🛒</text>
+        <text class="cart-badge">{{cartCount}}</text>
       </view>
-      <text class="cart-total">¥{{cartTotal}}</text>
+      <text class="cart-total">
+        <text class="price-symbol-sm">¥</text>{{cartTotal}}
+      </text>
+      <text class="cart-delivery" wx:if="{{storeInfo.deliveryFee}}">另需配送费¥{{storeInfo.deliveryFee}}</text>
     </view>
-    <button class="settle-btn" bindtap="onSettle">去结算</button>
+    <view class="settle-btn" bindtap="onSettle">去结算</view>
+  </view>
+</view>
+
+<!-- 购物车详情弹窗 -->
+<view class="cart-popup-mask" wx:if="{{showCartPopup}}" bindtap="hideCartPopup"></view>
+<view class="cart-popup {{showCartPopup ? 'cart-popup-show' : ''}}">
+  <view class="cart-popup-header">
+    <text class="cart-popup-title">购物车</text>
+    <text class="cart-popup-count" wx:if="{{cartPopupItems.length > 0}}">共{{cartPopupCount}}件</text>
+    <text class="cart-popup-clear" wx:if="{{cartPopupItems.length > 0}}" bindtap="clearCart">清空</text>
+  </view>
+  <scroll-view class="cart-popup-list" scroll-y enhanced show-scrollbar="{{false}}">
+    <view class="cart-popup-empty" wx:if="{{cartPopupItems.length === 0}}">
+      <text class="cart-empty-icon -shopping-cart" style="font-size:80rpx;">🛒</text>
+      <text class="cart-empty-text">购物车是空的</text>
+    </view>
+    <view class="cart-popup-item" wx:for="{{cartPopupItems}}" wx:key="foodId">
+      <image class="cart-item-img" src="{{item.image}}" mode="aspectFill"></image>
+      <view class="cart-item-info">
+        <text class="cart-item-name">{{item.name}}</text>
+        <text class="cart-item-price">¥{{item.price}}</text>
+      </view>
+      <view class="cart-item-right">
+        <text class="cart-item-subtotal">¥{{item.subtotal}}</text>
+        <view class="cart-item-qty">
+          <view class="qty-btn" bindtap="onCartItemMinus" data-index="{{index}}">-</view>
+          <text class="qty-num">{{item.quantity}}</text>
+          <view class="qty-btn qty-plus" bindtap="onCartItemPlus" data-index="{{index}}">+</view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+  <view class="cart-popup-footer" wx:if="{{cartPopupItems.length > 0}}">
+    <view class="cart-popup-total">
+      <text class="cart-total-label">合计</text>
+      <text class="cart-total-price">¥{{cartPopupTotal}}</text>
+    </view>
+    <view class="cart-popup-go" bindtap="goToCartFromPopup">去购物车</view>
   </view>
 </view>

@@ -1,121 +1,130 @@
 /**
  * API请求封装模块
- * 基于微信小程序wx.request封装，支持Promise和async/await
+ * 基于微信小程序wx.request封装，支持Promise
  */
 
-const CONFIG = {
-  // 后端API基础URL，实际使用时替换为真实地址
-  baseURL: 'https://api.example.com',
-  // 请求超时时间
+var CONFIG = {
+  baseURL: 'http://localhost:8080/api',
   timeout: 10000,
-  // 默认请求头
   header: {
     'Content-Type': 'application/json',
-  },
+  }
 };
 
 /**
  * 请求拦截器
  */
-const requestInterceptors = {
-  onFulfilled: (config) => {
-    // 添加token到请求头
-    const token = wx.getStorageSync('token');
-    if (token) {
-      config.header.Authorization = `Bearer ${token}`;
-    }
-
-    // 添加时间戳防止缓存
-    if (config.method === 'GET') {
-      config.params = {
-        ...config.params,
-        _t: Date.now(),
+var requestInterceptors = {
+  onFulfilled: function(config) {
+    // 确保 header 对象存在（不能直接引用 CONFIG.header，否则会污染全局配置）
+    if (!config.header) {
+      config.header = {
+        'Content-Type': 'application/json'
       };
     }
-
+    var token = wx.getStorageSync('token');
+    if (token) {
+      config.header.Authorization = 'Bearer ' + token;
+    }
+    if (config.method === 'GET') {
+      config.params = config.params || {};
+      config.params._t = Date.now();
+    }
     return config;
   },
-  onRejected: (error) => {
+  onRejected: function(error) {
     return Promise.reject(error);
-  },
+  }
 };
 
 /**
  * 响应拦截器
  */
-const responseInterceptors = {
-  onFulfilled: (response) => {
-    const { statusCode, data } = response;
+var responseInterceptors = {
+  onFulfilled: function(response) {
+    var statusCode = response.statusCode;
+    var data = response.data;
 
-    // 根据状态码处理响应
     if (statusCode >= 200 && statusCode < 300) {
-      // 业务成功处理：支持 code === 0、code === 200 或 success === true
+      if (!data) {
+        return Promise.reject({
+          message: '响应数据为空',
+          code: statusCode,
+          response: response
+        });
+      }
       if (data.code === 0 || data.code === 200 || data.success) {
-        // 返回完整的数据结构，包含 code、message、data
         return data;
       } else {
-        // 业务错误
         return Promise.reject({
           message: data.message || '请求失败',
           code: data.code,
-          response,
+          response: response
         });
       }
     } else if (statusCode === 401) {
-      // 未授权，清除 token 并跳转登录
       wx.clearStorageSync();
-      wx.navigateTo({
-        url: '/pages/login/login',
-      });
+      wx.navigateTo({ url: '/pages/login/login' });
       return Promise.reject({
         message: '登录已过期，请重新登录',
         code: 401,
-        response,
+        response: response
       });
     } else {
-      // HTTP 错误
       return Promise.reject({
-        message: `HTTP 错误：${statusCode}`,
+        message: 'HTTP 错误：' + statusCode,
         code: statusCode,
-        response,
+        response: response
       });
     }
   },
-  onRejected: (error) => {
+  onRejected: function(error) {
     return Promise.reject(error);
-  },
+  }
 };
 
 /**
  * 基础请求函数
  */
 function request(options) {
-  // 应用请求拦截器
-  let config = { ...options };
+  var config = {};
+  for (var key in options) {
+    config[key] = options[key];
+  }
   config = requestInterceptors.onFulfilled(config);
 
-  return new Promise((resolve, reject) => {
+  return new Promise(function(resolve, reject) {
+    var requestUrl = (config.url && config.url.indexOf('http') === 0) ? config.url : CONFIG.baseURL + config.url;
+
+    var mergedHeader = {};
+    var key;
+    for (key in CONFIG.header) mergedHeader[key] = CONFIG.header[key];
+    if (config.header) {
+      for (key in config.header) mergedHeader[key] = config.header[key];
+    }
+
     wx.request({
-      url: config.url?.startsWith('http') ? config.url : CONFIG.baseURL + config.url,
+      url: requestUrl,
       method: config.method || 'GET',
       data: config.data,
-      header: {
-        ...CONFIG.header,
-        ...config.header,
-      },
+      header: mergedHeader,
       timeout: config.timeout || CONFIG.timeout,
-      success: (response) => {
+      success: function(response) {
         try {
-          const result = responseInterceptors.onFulfilled(response);
-          resolve(result);
+          var result = responseInterceptors.onFulfilled(response);
+          if (result && typeof result.then === 'function') {
+            result.then(function(data) { resolve(data); }).catch(function(err) { reject(err); });
+          } else {
+            resolve(result);
+          }
         } catch (error) {
           reject(error);
         }
       },
-      fail: (error) => {
-        const rejectedError = responseInterceptors.onRejected(error);
+      fail: function(error) {
+        var rejectedError = responseInterceptors.onRejected(error);
         reject(rejectedError);
-      },
+      }
     });
   });
 }
@@ -123,115 +132,80 @@ function request(options) {
 /**
  * HTTP方法快捷函数
  */
-const api = {
-  get(url, params = {}) {
-    return request({
-      url,
-      method: 'GET',
-      data: params,
-    });
+var api = {
+  get: function(url, params) {
+    params = params || {};
+    return request({ url: url, method: 'GET', data: params });
   },
-
-  post(url, data = {}) {
-    return request({
-      url,
-      method: 'POST',
-      data,
-    });
+  post: function(url, data) {
+    data = data || {};
+    return request({ url: url, method: 'POST', data: data });
   },
-
-  put(url, data = {}) {
-    return request({
-      url,
-      method: 'PUT',
-      data,
-    });
+  put: function(url, data) {
+    data = data || {};
+    return request({ url: url, method: 'PUT', data: data });
   },
-
-  delete(url, data = {}) {
-    return request({
-      url,
-      method: 'DELETE',
-      data,
-    });
+  delete: function(url, data) {
+    data = data || {};
+    return request({ url: url, method: 'DELETE', data: data });
   },
+  upload: function(url, filePath, formData) {
+    formData = formData || {};
+    return new Promise(function(resolve, reject) {
+      var uploadHeader = {};
+      for (var hk in CONFIG.header) uploadHeader[hk] = CONFIG.header[hk];
+      uploadHeader.Authorization = 'Bearer ' + wx.getStorageSync('token');
 
-  upload(url, filePath, formData = {}) {
-    return new Promise((resolve, reject) => {
       wx.uploadFile({
         url: CONFIG.baseURL + url,
-        filePath,
+        filePath: filePath,
         name: 'file',
-        formData,
-        header: {
-          ...CONFIG.header,
-          Authorization: `Bearer ${wx.getStorageSync('token')}`,
-        },
-        success: (res) => {
+        formData: formData,
+        header: uploadHeader,
+        success: function(res) {
           try {
-            const data = JSON.parse(res.data);
-            const response = { ...res, data };
-            const result = responseInterceptors.onFulfilled(response);
+            var data = JSON.parse(res.data);
+            var response = {};
+            for (var key in res) response[key] = res[key];
+            response.data = data;
+            var result = responseInterceptors.onFulfilled(response);
             resolve(result);
           } catch (error) {
             reject(error);
           }
         },
-        fail: (error) => {
+        fail: function(error) {
           reject(error);
-        },
+        }
       });
     });
-  },
+  }
 };
 
-/**
- * 显示加载提示
- */
-function showLoading(title = '加载中...') {
-  wx.showLoading({
-    title,
-    mask: true,
-  });
+function showLoading(title) {
+  wx.showLoading({ title: title || '加载中...', mask: true });
 }
 
-/**
- * 隐藏加载提示
- */
 function hideLoading() {
   wx.hideLoading();
 }
 
-/**
- * 显示错误提示
- */
-function showError(message, duration = 2000) {
-  wx.showToast({
-    title: message,
-    icon: 'none',
-    duration,
-  });
+function showError(message, duration) {
+  wx.showToast({ title: message, icon: 'none', duration: duration || 2000 });
 }
 
-/**
- * 显示成功提示
- */
-function showSuccess(message, duration = 1500) {
-  wx.showToast({
-    title: message,
-    icon: 'success',
-    duration,
-  });
+function showSuccess(message, duration) {
+  wx.showToast({ title: message, icon: 'success', duration: duration || 1500 });
 }
 
 module.exports = {
-  CONFIG,
-  api,
-  request,
-  showLoading,
-  hideLoading,
-  showError,
-  showSuccess,
-  requestInterceptors,
-  responseInterceptors,
+  CONFIG: CONFIG,
+  api: api,
+  request: request,
+  showLoading: showLoading,
+  hideLoading: hideLoading,
+  showError: showError,
+  showSuccess: showSuccess,
+  requestInterceptors: requestInterceptors,
+  responseInterceptors: responseInterceptors
 };

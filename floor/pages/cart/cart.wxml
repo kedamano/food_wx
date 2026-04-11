@@ -15,7 +15,7 @@
   <view class="store-section" wx:if="{{cartItems.length > 0}}">
     <view class="store-header">
       <view class="store-info">
-        <text class="fa fa-store store-logo"></text>
+        <text class="-store store-logo">🏪</text>
         <view class="store-details">
           <text class="store-name">{{storeInfo.name}}</text>
           <view class="delivery-tags">
@@ -43,7 +43,7 @@
                  mode="aspectFill"
                  binderror="onImageError"
                  data-index="{{index}}"></image>
-          <text class="fa fa-utensils food-icon" wx:if="{{!item.image && !item.imageError}}"></text>
+          <text class="-utensils food-icon" wx:if="{{!item.image && !item.imageError}}">🍴</text>
         </view>
 
         <!-- 商品信息 -->
@@ -76,7 +76,7 @@
   <!-- 空购物车提示 -->
   <view class="empty-cart" wx:else>
     <view class="empty-content">
-      <text class="fa fa-shopping-cart empty-icon"></text>
+      <text class="-shopping-cart empty-icon">🛒</text>
       <text class="empty-text">购物车空空如也</text>
       <text class="empty-subtext">快去挑选心仪的美食吧</text>
       <button class="go-shopping-btn" bindtap="onGoShopping">去逛逛</button>
@@ -87,7 +87,7 @@
   <view class="coupon-section" wx:if="{{cartItems.length > 0}}">
     <view class="coupon-header" bindtap="onSelectCoupon">
       <view class="coupon-left">
-        <text class="fa fa-ticket-alt coupon-icon"></text>
+        <text class="-ticket-alt coupon-icon">🎫</text>
         <text class="section-title">优惠券</text>
       </view>
       <view class="coupon-info">
@@ -141,6 +141,44 @@
     </view>
   </view>
 </scroll-view>
+
+<!-- 优惠券选择弹窗 -->
+<view class="coupon-modal" wx:if="{{showCouponModal}}" bindtap="onCloseCouponModal">
+  <view class="coupon-modal-content" catchtap="">
+    <view class="coupon-modal-header">
+      <text class="coupon-modal-title">选择优惠券</text>
+      <text class="coupon-modal-close" bindtap="onCloseCouponModal">x</text>
+    </view>
+    <scroll-view class="coupon-list" scroll-y>
+      <!-- 不使用优惠券 -->
+      <view class="coupon-option {{!selectedCoupon ? 'coupon-selected' : ''}}" bindtap="onChooseCoupon" data-coupon="{{null}}">
+        <view class="coupon-option-left">
+          <text class="coupon-no-use">不使用优惠券</text>
+        </view>
+        <view class="coupon-option-check">
+          <text class="check-icon {{!selectedCoupon ? 'checked' : ''}}">✓</text>
+        </view>
+      </view>
+      <!-- 优惠券列表 -->
+      <view class="coupon-option {{selectedCoupon && selectedCoupon.id === item.id ? 'coupon-selected' : ''}} {{subtotal < item.minAmount ? 'coupon-disabled' : ''}}"
+            wx:for="{{coupons}}" wx:key="id" bindtap="onChooseCoupon" data-coupon="{{item}}">
+        <view class="coupon-option-left">
+          <view class="coupon-amount-wrap">
+            <text class="coupon-symbol">¥</text>
+            <text class="coupon-amount">{{item.discount}}</text>
+          </view>
+          <view class="coupon-desc">
+            <text class="coupon-name">{{item.name}}</text>
+            <text class="coupon-condition">{{item.condition}}，{{subtotal >= item.minAmount ? '可使用' : '未满足条件'}}</text>
+          </view>
+        </view>
+        <view class="coupon-option-check">
+          <text class="check-icon {{selectedCoupon && selectedCoupon.id === item.id ? 'checked' : ''}}">✓</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+</view>
 
 <!-- 底部结算栏 -->
 <view class="bottom-settle" wx:if="{{cartItems.length > 0}}">

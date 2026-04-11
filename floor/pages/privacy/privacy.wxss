@@ -1,35 +1,16 @@
 /* 隐私设置页面样式 */
+page {
+  background: #f5f5f7;
+}
+
 .container {
   min-height: 100vh;
-  background: #f5f5f5;
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 40rpx 30rpx 20rpx;
-  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
-  color: #fff;
-}
-
-.back-btn {
-  font-size: 36rpx;
-  padding: 10rpx 20rpx;
-}
-
-.header-title {
-  font-size: 34rpx;
-  font-weight: bold;
-}
-
-.header-placeholder {
-  width: 80rpx;
+  padding-top: 20rpx;
 }
 
 /* 区块 */
 .section {
-  margin: 20rpx;
+  margin: 0 24rpx 20rpx;
 }
 
 .section-title {
@@ -56,10 +37,6 @@
 
 .setting-item:last-child {
   border-bottom: none;
-}
-
-.setting-item.arrow {
-  cursor: pointer;
 }
 
 .item-left {
@@ -93,4 +70,8 @@
   font-size: 28rpx;
   color: #ccc;
   margin-left: 10rpx;
+}
+
+.safe-area-bottom {
+  height: 40rpx;
 }

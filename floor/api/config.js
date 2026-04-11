@@ -1,6 +1,5 @@
 // API 接口配置文件
 module.exports = {
-  // 环境配置
   environments: {
     development: {
       baseURL: 'http://localhost:8080/api',
@@ -11,11 +10,9 @@ module.exports = {
       timeout: 15000
     }
   },
-  
-  // 当前环境（小程序环境）
+
   currentEnv: 'development',
-  
-  // API 接口定义
+
   endpoints: {
     food: {
       detail: '/food/:id',
@@ -50,24 +47,39 @@ module.exports = {
     store: {
       nearby: '/store/nearby',
       detail: '/store/:id'
+    },
+    address: {
+      list: '/address/list',
+      detail: '/address/:id',
+      default: '/address/default',
+      add: '/address/add',
+      update: '/address/update',
+      delete: '/address/delete/:id',
+      setDefault: '/address/set-default/:id'
     }
   },
-  
-  // 获取完整 API 地址
-  getApiUrl(endpoint, params = {}) {
-    const env = this.environments[this.currentEnv];
-    let url = env.baseURL + endpoint;
-    
-    // 替换路径参数
-    Object.keys(params).forEach(key => {
-      url = url.replace(`:${key}`, params[key]);
-    });
-    
+
+  getApiUrl: function(endpoint, params) {
+    params = params || {};
+    var env = this.environments[this.currentEnv];
+    var url = env.baseURL + endpoint;
+    var keys = Object.keys(params);
+    for (var i = 0; i < keys.length; i++) {
+      url = url.replace(':' + keys[i], params[keys[i]]);
+    }
     return url;
   },
-  
-  // 获取超时时间
-  getTimeout() {
+
+  getTimeout: function() {
     return this.environments[this.currentEnv].timeout;
   }
 };
+
+// 地址相关API URL（快捷访问）
+module.exports.ADDRESS_LIST = module.exports.endpoints.address.list;
+module.exports.ADDRESS_DETAIL = module.exports.endpoints.address.detail;
+module.exports.ADDRESS_DEFAULT = module.exports.endpoints.address.default;
+module.exports.ADDRESS_ADD = module.exports.endpoints.address.add;
+module.exports.ADDRESS_UPDATE = module.exports.endpoints.address.update;
+module.exports.ADDRESS_DELETE = module.exports.endpoints.address.delete;
+module.exports.ADDRESS_SET_DEFAULT = module.exports.endpoints.address.setDefault;

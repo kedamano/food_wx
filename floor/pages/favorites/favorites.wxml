@@ -1,0 +1,59 @@
+<!-- 收藏商家页面 -->
+<scroll-view class="container" scroll-y>
+  <!-- 头部 -->
+  <view class="header-section">
+    <view class="header-content">
+      <text class="header-title">收藏商家</text>
+      <text class="header-subtitle">{{favoriteStores.length}}家收藏</text>
+    </view>
+  </view>
+
+  <!-- 收藏列表 -->
+  <view class="store-list">
+    <view class="store-card" wx:for="{{favoriteStores}}" wx:key="storeId" bindtap="onStoreDetail" data-store-id="{{item.storeId}}">
+      <view class="store-image">
+        <image class="store-img" src="{{item.image}}" mode="aspectFill" lazy-load></image>
+      </view>
+      <view class="store-info">
+        <text class="store-name">{{item.name}}</text>
+        <view class="store-meta">
+          <view class="rating-row">
+            <text class="rating-star">★</text>
+            <text class="rating-num">{{item.rating}}</text>
+            <text class="monthly-sales">月售{{item.monthlySales}}</text>
+          </view>
+        </view>
+        <view class="store-tags">
+          <text class="tag" wx:for="{{item.tags}}" wx:for-item="tag" wx:key="index">{{tag}}</text>
+        </view>
+        <view class="store-delivery">
+          <text class="delivery-info" wx:if="{{item.deliveryFee > 0}}">配送¥{{item.deliveryFee}}</text>
+          <text class="delivery-info free" wx:else>免配送费</text>
+          <text class="delivery-divider">|</text>
+          <text class="delivery-info">{{item.deliveryTime}}</text>
+          <text class="delivery-divider">|</text>
+          <text class="delivery-info">{{item.distance}}</text>
+        </view>
+      </view>
+      <view class="favorite-btn" catchtap="onCancelFavorite" data-store-id="{{item.storeId}}" data-name="{{item.name}}">
+        <text class="fav-icon">★</text>
+        <text class="fav-text">已收藏</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{empty && !loading}}">
+    <text class="empty-icon">★</text>
+    <text class="empty-title">还没有收藏商家</text>
+    <text class="empty-desc">去首页逛逛，收藏喜欢的商家</text>
+    <button class="go-btn" bindtap="goShopping">去逛逛</button>
+  </view>
+
+  <!-- 加载中 -->
+  <view class="loading-state" wx:if="{{loading}}">
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <view class="safe-area-bottom"></view>
+</scroll-view>

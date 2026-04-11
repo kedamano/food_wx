@@ -1,7 +1,6 @@
 /**
  * 登录设备管理页面
  */
-const app = getApp();
 
 Page({
   data: {
@@ -10,120 +9,127 @@ Page({
     currentDeviceId: 'current-device-id'
   },
 
-  onLoad() {
+  onLoad: function() {
     this.loadDevices();
   },
 
-  // 加载设备列表
-  loadDevices() {
+  // 加载设备列表（从本地存储 + 系统信息）
+  loadDevices: function() {
     this.setData({ loading: true });
-    
-    // 模拟设备数据
-    const devices = [
-      {
-        id: 'current-device-id',
-        name: '当前设备',
-        type: 'iPhone 14 Pro',
-        platform: 'iOS',
-        location: '北京市朝阳区',
-        lastTime: new Date().toLocaleString(),
-        isCurrent: true
-      },
-      {
-        id: 'device-2',
-        name: 'Windows 电脑',
-        type: 'Chrome 浏览器',
-        platform: 'Windows',
-        location: '北京市海淀区',
-        lastTime: '2026-04-05 14:30:00',
-        isCurrent: false
-      },
-      {
-        id: 'device-3',
-        name: 'iPad Pro',
-        type: 'iPad Pro 12.9',
-        platform: 'iPadOS',
-        location: '北京市东城区',
-        lastTime: '2026-04-03 09:15:00',
-        isCurrent: false
-      }
-    ];
 
+    // 获取当前设备信息
+    var systemInfo = wx.getSystemInfoSync();
+    var currentDevice = {
+      id: 'current-device-id',
+      name: '当前设备',
+      type: systemInfo.model || '未知设备',
+      platform: systemInfo.platform || '未知',
+      location: '',
+      lastTime: new Date().toLocaleString(),
+      isCurrent: true
+    };
+
+    // 从本地存储读取其他设备
+    var otherDevices = wx.getStorageSync('other_devices') || [];
+    var devices = [currentDevice].concat(otherDevices);
     this.setData({
       devices: devices,
-      loading: false
+      loading: false,
+      currentDeviceId: 'current-device-id'
     });
   },
 
   // 解绑设备
-  onUnbindDevice(e) {
-    const deviceId = e.currentTarget.dataset.deviceId;
-    const device = this.data.devices.find(d => d.id === deviceId);
+  onUnbindDevice: function(e) {
+    var deviceId = e.currentTarget.dataset.deviceId;
+    var device = null;
+    for (var i = 0; i < this.data.devices.length; i++) {
+      if (this.data.devices[i].id === deviceId) {
+        device = this.data.devices[i];
+        break;
+      }
+    }
     
     if (!device) return;
     
+    var self = this;
     wx.showModal({
       title: '确认解绑',
-      content: `确定要解绑设备"${device.name}"吗？解绑后该设备需要重新登录。`,
-      success: (res) => {
+      content: '确定要解绑设备"' + device.name + '"吗？解绑后该设备需要重新登录。',
+      success: function(res) {
         if (res.confirm) {
-          this.unbindDevice(deviceId);
+          self.unbindDevice(deviceId);
         }
       }
     });
   },
 
   // 解绑设备操作
-  unbindDevice(deviceId) {
+  unbindDevice: function(deviceId) {
+    var self = this;
     wx.showLoading({ title: '解绑中...' });
-    
-    setTimeout(() => {
+
+    setTimeout(function() {
       wx.hideLoading();
-      
-      // 从列表中移除
-      const devices = this.data.devices.filter(d => d.id !== deviceId);
-      this.setData({ devices: devices });
-      
-      wx.showToast({
-        title: '解绑成功',
-        icon: 'success'
-      });
+
+      // 从列表中移除并更新本地存储
+      var devices = [];
+      for (var i = 0; i < self.data.devices.length; i++) {
+        if (self.data.devices[i].id !== deviceId) {
+          devices.push(self.data.devices[i]);
+        }
+      }
+      var otherDevices = [];
+      for (var j = 0; j < devices.length; j++) {
+        if (!devices[j].isCurrent) {
+          otherDevices.push(devices[j]);
+        }
+      }
+      wx.setStorageSync('other_devices', otherDevices);
+      self.setData({ devices: devices });
+
+      wx.showToast({ title: '解绑成功', icon: 'success' });
     }, 500);
   },
 
   // 全部解绑
-  onUnbindAll() {
+  onUnbindAll: function() {
+    var self = this;
     wx.showModal({
       title: '全部解绑',
       content: '确定要解绑所有设备吗？解绑后所有设备都需要重新登录。',
-      success: (res) => {
+      success: function(res) {
         if (res.confirm) {
-          this.unbindAllDevices();
+          self.unbindAllDevices();
         }
       }
     });
   },
 
   // 全部解绑操作
-  unbindAllDevices() {
+  unbindAllDevices: function() {
+    var self = this;
     wx.showLoading({ title: '解绑中...' });
-    
-    setTimeout(() => {
+
+    setTimeout(function() {
       wx.hideLoading();
-      
-      // 只保留当前设备
-      const devices = this.data.devices.filter(d => d.isCurrent);
-      this.setData({ devices: devices });
-      
-      wx.showToast({
-        title: '全部解绑成功',
-        icon: 'success'
-      });
+
+      // 只保留当前设备并更新本地存储
+      var devices = [];
+      for (var i = 0; i < self.data.devices.length; i++) {
+        if (self.data.devices[i].isCurrent) {
+          devices.push(self.data.devices[i]);
+        }
+      }
+      wx.setStorageSync('other_devices', []);
+      self.setData({ devices: devices });
+
+      wx.showToast({ title: '全部解绑成功', icon: 'success' });
     }, 500);
   },
 
   // 返回
-  onBack() {
+  onBack: function() {
     wx.navigateBack();
   }
 });

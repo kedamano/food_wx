@@ -1,0 +1,54 @@
+<!-- 消费明细页面 -->
+<scroll-view class="container" scroll-y>
+  <!-- 头部 -->
+  <view class="header-section">
+    <view class="header-content">
+      <text class="header-title">消费明细</text>
+      <text class="header-subtitle">累计消费 ¥{{totalSpendingStr}}</text>
+    </view>
+  </view>
+
+  <!-- 月份筛选 -->
+  <view class="filter-section">
+    <view class="filter-scroll">
+      <view class="filter-item {{currentMonth === item ? 'active' : ''}}"
+            wx:for="{{months}}" wx:key="index"
+            bindtap="onFilterMonth" data-month="{{item}}">
+        <text class="filter-text">{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 消费列表 -->
+  <view class="spending-list">
+    <view class="spending-card" wx:for="{{spendingList}}" wx:key="orderId" bindtap="onOrderDetail" data-order-id="{{item.orderId}}">
+      <view class="card-left">
+        <view class="store-icon-wrap">
+          <text class="store-icon-text">·</text>
+        </view>
+      </view>
+      <view class="card-content">
+        <view class="card-header">
+          <text class="store-name">{{item.storeName}}</text>
+          <text class="amount">-¥{{item.amountStr}}</text>
+        </view>
+        <text class="item-names">{{item.items}}</text>
+        <text class="spending-time">{{item.date}} {{item.time}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{empty && !loading}}">
+    <text class="empty-icon">¥</text>
+    <text class="empty-title">暂无消费记录</text>
+    <text class="empty-desc">完成订单后即可查看消费明细</text>
+  </view>
+
+  <!-- 加载中 -->
+  <view class="loading-state" wx:if="{{loading}}">
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <view class="safe-area-bottom"></view>
+</scroll-view>

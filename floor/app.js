@@ -1,41 +1,28 @@
 // app.js
 App({
-  onLaunch() {
-    // 展示本地存储能力
-    const logs = wx.getStorageSync('logs') || []
-    logs.unshift(Date.now())
-    wx.setStorageSync('logs', logs)
+  onLaunch: function() {
+    var logs = wx.getStorageSync('logs') || [];
+    logs.unshift(Date.now());
+    wx.setStorageSync('logs', logs);
 
-    // 登录
     wx.login({
-      success: res => {
-        // 发送 res.code 到后台换取 openId, sessionKey, unionId
+      success: function(res) {
+        // 发送 res.code 到后台换取 openId
       }
-    })
+    });
 
-    // 初始化全局数据
-    this.initGlobalData()
-
-    // 初始化认证请求
-    this.initAuthRequest()
-
-    // 加载用户信息
-    this.loadUserInfo()
+    this.initGlobalData();
+    this.initAuthRequest();
+    this.loadUserInfo();
   },
 
-  // 初始化全局数据
-  initGlobalData() {
-    // 购物车数据
+  initGlobalData: function() {
     if (!this.globalData.cart) {
-      this.globalData.cart = []
+      this.globalData.cart = [];
     }
-
-    // 购物车数量
     if (!this.globalData.cartCount) {
-      this.globalData.cartCount = 0
+      this.globalData.cartCount = 0;
     }
-
-    // 用户信息
     if (!this.globalData.userInfo) {
       this.globalData.userInfo = {
         isLoggedIn: false,
@@ -45,53 +32,37 @@ App({
         points: 0,
         phone: '',
         email: ''
-      }
+      };
     }
-
-    // 当前订单
     if (!this.globalData.currentOrder) {
-      this.globalData.currentOrder = null
+      this.globalData.currentOrder = null;
     }
-
-    // 搜索历史
     if (!this.globalData.searchHistory) {
-      this.globalData.searchHistory = []
+      this.globalData.searchHistory = [];
     }
-
-    // 收藏商家
     if (!this.globalData.favoriteStores) {
-      this.globalData.favoriteStores = []
+      this.globalData.favoriteStores = [];
     }
-
-    // 收货地址
     if (!this.globalData.addresses) {
-      this.globalData.addresses = []
+      this.globalData.addresses = [];
     }
-
-    // 优惠券
     if (!this.globalData.coupons) {
-      this.globalData.coupons = []
+      this.globalData.coupons = [];
     }
-
-    // 加载状态
     if (!this.globalData.loadingStatus) {
       this.globalData.loadingStatus = {
         banners: false,
         foods: false,
         stores: false,
         categories: false
-      }
+      };
     }
-
-    // 最后请求记录
     if (!this.globalData.lastRequest) {
-      this.globalData.lastRequest = null
+      this.globalData.lastRequest = null;
     }
-
-    console.log('全局数据初始化完成')
+    console.log('全局数据初始化完成');
   },
 
-  // 全局数据
   globalData: {
     userInfo: null,
     token: null,
@@ -102,8 +73,8 @@ App({
     currentOrder: null
   },
 
-  // 全局错误处理
-  globalErrorHandle(error, showToast = true) {
+  globalErrorHandle: function(error, showToast) {
+    if (showToast === undefined) showToast = true;
     console.error('全局错误:', error);
     if (showToast) {
       wx.showToast({
@@ -113,37 +84,29 @@ App({
     }
   },
 
-  // 网络错误处理
-  handleNetworkError(error) {
+  handleNetworkError: function(error) {
     console.log('网络错误：', error);
-    // 可以在这里添加重试逻辑
+    var self = this;
     wx.showModal({
       title: '网络连接失败',
       content: '请检查网络设置后重试',
       confirmText: '重试',
-      success: (res) => {
+      success: function(res) {
         if (res.confirm) {
-          // 触发重试逻辑
-          this.retryLastRequest();
+          self.retryLastRequest();
         }
       }
     });
   },
 
-  // 认证错误处理
-  handleAuthError(error) {
+  handleAuthError: function(error) {
     console.log('认证错误：', error);
-    // 清除用户信息，跳转到登录页
     this.userLogout();
-    wx.navigateTo({
-      url: '/pages/login/login'
-    });
+    wx.navigateTo({ url: '/pages/login/login' });
   },
 
-  // 业务错误处理
-  handleBusinessError(error) {
+  handleBusinessError: function(error) {
     console.log('业务错误：', error);
-    // 显示具体的业务错误信息
     if (error.data && error.data.details) {
       wx.showModal({
         title: '操作提示',
@@ -153,10 +116,8 @@ App({
     }
   },
 
-  // 未知错误处理
-  handleUnknownError(error) {
+  handleUnknownError: function(error) {
     console.log('未知错误：', error);
-    // 记录错误日志
     wx.setStorageSync('errorLog', {
       timestamp: new Date().toISOString(),
       error: error.toString(),
@@ -164,219 +125,150 @@ App({
     });
   },
 
-  // 重试最后一次请求
-  retryLastRequest() {
-    const lastRequest = this.globalData.lastRequest;
+  retryLastRequest: function() {
+    var lastRequest = this.globalData.lastRequest;
     if (lastRequest) {
       wx.showLoading({ title: '重试中...' });
-      // 重新执行请求
-      lastRequest().finally(() => {
+      lastRequest().finally(function() {
         wx.hideLoading();
       });
     }
   },
 
-  // 包装请求方法，自动处理错误和认证
-  wrapRequest(requestFn, options = {}) {
-    return async (...args) => {
-      const startTime = Date.now();
-
+  wrapRequest: function(requestFn, options) {
+    options = options || {};
+    var self = this;
+    return function() {
+      var args = Array.prototype.slice.call(arguments);
+      var startTime = Date.now();
       try {
-        // 记录请求
-        this.globalData.lastRequest = () => requestFn(...args);
-
-        // 执行请求
-        const result = await requestFn(...args);
-
-        // 记录请求时间
-        const duration = Date.now() - startTime;
-        console.log(`请求完成：${requestFn.name}，耗时：${duration}ms`);
-
+        self.globalData.lastRequest = function() { return requestFn.apply(null, args); };
+        var result = requestFn.apply(null, args);
+        var duration = Date.now() - startTime;
+        console.log('请求完成：' + (requestFn.name || 'anonymous') + '，耗时：' + duration + 'ms');
         return result;
       } catch (error) {
-        // 统一错误处理
-        this.globalErrorHandle(error, options.showToast);
-
-        // 抛出错误给调用者
+        self.globalErrorHandle(error, options.showToast);
         throw error;
       }
     };
   },
 
-  // 导入 API 配置
   apiConfig: require('./api/config'),
 
-  // 获取带认证头的请求配置
-  getAuthHeaderConfig() {
-    const token = this.globalData.token || wx.getStorageSync('token');
+  getAuthHeaderConfig: function() {
+    var token = this.globalData.token || wx.getStorageSync('token');
     if (token) {
       return {
         'Authorization': token,
         'Content-Type': 'application/json'
       };
     }
-    return {
-      'Content-Type': 'application/json'
-    };
+    return { 'Content-Type': 'application/json' };
   },
 
-  // 统一处理 API 路径
-  resolveApiUrl(url) {
-    // 如果已经是完整 URL，直接返回
-    if (url && url.startsWith('http')) {
-      return url;
-    }
-
-    // 处理以/开头的路径
-    if (url && url.startsWith('/')) {
-      return `http://localhost:8080/api${url}`;
-    }
-
-    // 处理命名空间路径，如 'food/detail/5'
+  resolveApiUrl: function(url) {
+    if (url && url.indexOf('http') === 0) return url;
+    if (url && url.indexOf('/') === 0) return 'http://localhost:8080/api' + url;
     if (url) {
-      const parts = url.split('/');
+      var parts = url.split('/');
       if (parts.length >= 2) {
-        const endpoint = this.apiConfig.endpoints[parts[0]]?.[parts[1]];
-        if (endpoint) {
-          // 提取参数
-          const params = {};
-          parts.slice(2).forEach((part, index) => {
-            if (index % 2 === 0 && parts[index + 3]) {
-              params[part] = parts[index + 3];
+        var ns = this.apiConfig.endpoints[parts[0]];
+        if (ns) {
+          var endpoint = ns[parts[1]];
+          if (endpoint) {
+            var params = {};
+            for (var i = 2; i < parts.length - 1; i += 2) {
+              if (parts[i + 1]) params[parts[i]] = parts[i + 1];
             }
-          });
-          return this.apiConfig.getApiUrl(endpoint, params);
+            return this.apiConfig.getApiUrl(endpoint, params);
+          }
         }
       }
     }
-
-    // 默认处理
-    return `http://localhost:8080/api${url || ''}`;
+    return 'http://localhost:8080/api' + (url || '');
   },
 
-  // 创建带认证头的请求函数
-  createAuthRequest(originalRequest) {
-    return (options) => {
-      // 确保有 header 配置
-      if (!options.header) {
-        options.header = {};
+  resolveImageUrl: function(url) {
+    if (!url) return '';
+    if (url.indexOf('http://') === 0 || url.indexOf('https://') === 0) return url;
+    // 使用完整 URL（微信小程序需要）
+    if (url.indexOf('/images/') === 0) return 'http://localhost:8080/api' + url;
+    if (url.indexOf('/') === 0) return 'http://localhost:8080/api' + url;
+    return url;
+  },
+
+  createAuthRequest: function(originalRequest) {
+    var self = this;
+    return function(options) {
+      if (!options.header) options.header = {};
+      options.url = self.resolveApiUrl(options.url);
+      var authHeaders = self.getAuthHeaderConfig();
+      console.log('请求：' + (options.method || 'GET') + ' ' + options.url);
+
+      var successCallback = options.success;
+      var failCallback = options.fail;
+      var completeCallback = options.complete;
+
+      var extendedOptions = {};
+      for (var key in options) {
+        extendedOptions[key] = options[key];
       }
+      extendedOptions.header = {};
+      for (var hk in options.header) {
+        extendedOptions.header[hk] = options.header[hk];
+      }
+      var authHeaders = self.getAuthHeaderConfig();
+      for (hk in authHeaders) {
+        extendedOptions.header[hk] = authHeaders[hk];
+      }
+      extendedOptions.timeout = self.apiConfig.getTimeout();
 
-      // 统一处理 API 路径
-      options.url = this.resolveApiUrl(options.url);
-
-      // 添加认证头
-      const authHeaders = this.getAuthHeaderConfig();
-      Object.assign(options.header, authHeaders);
-
-      // 记录请求信息
-      console.log(`请求：${options.method || 'GET'} ${options.url}`);
-      console.log(`请求头：`, options.header);
-
-      // 保存回调函数
-      const successCallback = options.success;
-      const failCallback = options.fail;
-      const completeCallback = options.complete;
-
-      const promise = new Promise((resolve, reject) => {
+      var promise = new Promise(function(resolve, reject) {
         console.log('开始发送请求...');
-        originalRequest({
-          ...options,
-          timeout: this.apiConfig.getTimeout(),
-          success: (res) => {
-            console.log(`响应：${res.statusCode} ${options.url}`);
-            console.log(`响应数据：`, res.data);
-            console.log('响应数据 code:', res.data?.code);
-            console.log('响应数据 message:', res.data?.message);
-            
-            if (res.statusCode === 200) {
-              // 检查是否是认证错误
-              if (res.data && (res.data.code === 401 || res.data.message === '未登录')) {
-                // Token 过期或无效
-                console.log('检测到认证错误，拒绝 Promise');
-                this.handleAuthError({ message: '未登录', code: 'AUTH_ERROR' });
-                reject(new Error('未登录'));
-              } else if (res.data && res.data.code === 200) {
-                // 标准成功响应：返回 res.data，这样调用方可以直接获取到 code、data 等
-                console.log('登录成功，准备 resolve，数据:', res.data);
-                
-                // 先执行回调函数（如果存在）
-                if (successCallback) {
-                  console.log('执行 success 回调');
-                  successCallback(res.data);
-                }
-                
-                // 再 resolve Promise
-                resolve(res.data);
-                console.log('resolve 已调用');
-              } else if (res.statusCode === 200 && (!res.data || !res.data.code)) {
-                // 兼容处理：如果没有 data 或 data.code，但 statusCode 是 200，也认为是成功
-                console.log('兼容模式，返回数据:', res.data || res);
-                
-                if (successCallback) {
-                  console.log('执行 success 回调（兼容模式）');
-                  successCallback(res.data || res);
-                }
-                
-                resolve(res.data || res);
-              } else {
-                // 其他情况
-                console.log('其他情况，拒绝 Promise');
-                if (failCallback) {
-                  failCallback(new Error(res.data.message || '请求失败'));
-                }
-                reject(new Error(res.data.message || '请求失败'));
-              }
+        extendedOptions.success = function(res) {
+          console.log('响应：' + res.statusCode + ' ' + options.url);
+          if (res.statusCode === 200) {
+            if (res.data && (res.data.code === 401 || res.data.message === '未登录')) {
+              self.handleAuthError({ message: '未登录', code: 'AUTH_ERROR' });
+              reject(new Error('未登录'));
+            } else if (res.data && res.data.code === 200) {
+              if (successCallback) successCallback(res.data);
+              resolve(res.data);
+            } else if (res.statusCode === 200 && (!res.data || !res.data.code)) {
+              if (successCallback) successCallback(res.data || res);
+              resolve(res.data || res);
             } else {
-              console.log('状态码不是 200，拒绝 Promise:', res.statusCode);
-              if (failCallback) {
-                failCallback(new Error(`请求失败：${res.statusCode}`));
-              }
-              reject(new Error(`请求失败：${res.statusCode}`));
+              if (failCallback) failCallback(new Error(res.data.message || '请求失败'));
+              reject(new Error(res.data.message || '请求失败'));
             }
-          },
-          fail: (err) => {
-            console.log('请求失败，进入 fail 回调');
-            console.error(`请求失败：`, err);
-            if (failCallback) {
-              console.log('执行 fail 回调');
-              failCallback(err);
-            }
-            reject(err);
-          },
-          complete: () => {
-            console.log('请求完成（complete 回调）');
-            if (completeCallback) {
-              completeCallback();
-            }
+          } else {
+            if (failCallback) failCallback(new Error('请求失败：' + res.statusCode));
+            reject(new Error('请求失败：' + res.statusCode));
           }
-        });
+        };
+        extendedOptions.fail = function(err) {
+          console.error('请求失败：', err);
+          if (failCallback) failCallback(err);
+          reject(err);
+        };
+        extendedOptions.complete = function() {
+          if (completeCallback) completeCallback();
+        };
+        originalRequest(extendedOptions);
       });
 
-      // 添加日志，查看 Promise 状态
-      console.log('Promise 已创建，返回:', promise);
-      
-      // 返回 Promise，支持 .then() 和 .catch()
-      return promise.then(result => {
-        console.log('Promise.then 被调用，结果:', result);
-        return result;
-      }).catch(error => {
-        console.error('Promise.catch 被调用，错误:', error);
-        throw error;
-      });
+      return promise.then(function(result) { return result; }).catch(function(error) { throw error; });
     };
   },
 
-  // 初始化认证请求
-  initAuthRequest() {
+  initAuthRequest: function() {
     this.authRequest = this.createAuthRequest(wx.request);
   },
 
-  // 加载用户信息
-  loadUserInfo() {
-    const token = wx.getStorageSync('token');
-    const userInfo = wx.getStorageSync('userInfo');
-
+  loadUserInfo: function() {
+    var token = wx.getStorageSync('token');
+    var userInfo = wx.getStorageSync('userInfo');
     if (token && userInfo) {
       this.globalData.token = token;
       this.globalData.userInfo = userInfo;
@@ -384,100 +276,77 @@ App({
     }
   },
 
-  // 更新购物车
-  updateCart(cartItems) {
-    this.globalData.cart = cartItems
-    this.globalData.cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
-
-    // 保存到本地存储
-    wx.setStorageSync('cart', cartItems)
-    wx.setStorageSync('cartCount', this.globalData.cartCount)
-
-    // 触发购物车更新事件
-    const pages = getCurrentPages()
-    const currentPage = pages[pages.length - 1]
-
-    // 如果当前是购物车页面，更新数据
-    if (currentPage.route === 'pages/cart/cart') {
-      currentPage.setData({
-        cartItems: cartItems
-      })
+  updateCart: function(cartItems) {
+    this.globalData.cart = cartItems;
+    var totalCount = 0;
+    for (var i = 0; i < cartItems.length; i++) {
+      totalCount += cartItems[i].quantity;
     }
+    this.globalData.cartCount = totalCount;
+    wx.setStorageSync('cart', cartItems);
+    wx.setStorageSync('cartCount', this.globalData.cartCount);
 
-    // 更新所有页面的底部导航栏
-    pages.forEach(page => {
-      const tabBar = page.selectComponent('#tabbar')
-      if (tabBar) {
-        tabBar.updateCartCount(this.globalData.cartCount)
-      }
-    })
-
-    // 触发全局购物车更新事件
-    this.triggerEvent('cartUpdated', {
-      cartItems: cartItems,
-      cartCount: this.globalData.cartCount
-    })
+    var pages = getCurrentPages();
+    var currentPage = pages[pages.length - 1];
+    if (currentPage && currentPage.route === 'pages/cart/cart' && typeof currentPage.useGlobalCartData === 'function') {
+      currentPage.useGlobalCartData();
+    }
+    for (var j = 0; j < pages.length; j++) {
+      var tabBar = pages[j].selectComponent('#tabbar');
+      if (tabBar) tabBar.updateCartCount(this.globalData.cartCount);
+    }
   },
 
-  // 添加商品到购物车
-  addToCart(foodItem) {
-    const cart = this.globalData.cart
-    const existingItem = cart.find(item => item.foodId === foodItem.foodId)
-
-    if (existingItem) {
-      existingItem.quantity += foodItem.quantity
+  addToCart: function(foodItem) {
+    var cart = this.globalData.cart;
+    var existingIndex = -1;
+    for (var i = 0; i < cart.length; i++) {
+      if (cart[i].foodId === foodItem.foodId) { existingIndex = i; break; }
+    }
+    if (existingIndex >= 0) {
+      cart[existingIndex].quantity += foodItem.quantity;
     } else {
-      cart.push(foodItem)
+      cart.push(foodItem);
     }
-
-    this.updateCart(cart)
-
-    wx.showToast({
-      title: '已加入购物车',
-      icon: 'success'
-    })
+    this.updateCart(cart);
+    wx.showToast({ title: '已加入购物车', icon: 'success' });
   },
 
-  // 从购物车移除商品
-  removeFromCart(foodId) {
-    const cart = this.globalData.cart
-    const updatedCart = cart.filter(item => item.foodId !== foodId)
-
-    this.updateCart(updatedCart)
+  removeFromCart: function(foodId) {
+    var cart = this.globalData.cart;
+    var updatedCart = [];
+    for (var i = 0; i < cart.length; i++) {
+      if (cart[i].foodId !== foodId) updatedCart.push(cart[i]);
+    }
+    this.updateCart(updatedCart);
   },
 
-  // 更新购物车商品数量
-  updateCartItemQuantity(foodId, quantity) {
-    const cart = this.globalData.cart
-    const item = cart.find(item => item.foodId === foodId)
-
-    if (item) {
-      item.quantity = quantity
-      this.updateCart(cart)
+  updateCartItemQuantity: function(foodId, quantity) {
+    var cart = this.globalData.cart;
+    for (var i = 0; i < cart.length; i++) {
+      if (cart[i].foodId === foodId) {
+        cart[i].quantity = quantity;
+        this.updateCart(cart);
+        break;
+      }
     }
   },
 
-  // 清空购物车
-  clearCart() {
-    this.globalData.cart = []
-    this.globalData.cartCount = 0
+  clearCart: function() {
+    this.globalData.cart = [];
+    this.globalData.cartCount = 0;
   },
 
-  // 用户登录
-  userLogin(userInfo) {
-    this.globalData.userInfo = {
-      ...userInfo,
-      isLoggedIn: true
-    }
-
-    // 保存到本地存储
-    wx.setStorageSync('userInfo', this.globalData.userInfo)
-
-    console.log('用户登录成功：', this.globalData.userInfo)
+  userLogin: function(userInfo) {
+    var merged = {};
+    for (var key in userInfo) merged[key] = userInfo[key];
+    merged.isLoggedIn = true;
+    this.globalData.userInfo = merged;
+    wx.setStorageSync('userInfo', this.globalData.userInfo);
+    console.log('用户登录成功：', this.globalData.userInfo);
   },
 
-  // 用户退出登录
-  userLogout() {
+  userLogout: function() {
     this.globalData.userInfo = {
       isLoggedIn: false,
       name: '',
@@ -486,117 +355,103 @@ App({
       points: 0,
       phone: '',
       email: ''
+    };
+    wx.removeStorageSync('userInfo');
+    this.clearCart();
+    console.log('用户退出登录');
+  },
+
+  updateUserInfo: function(userInfo) {
+    var merged = {};
+    var existing = this.globalData.userInfo || {};
+    for (var key in existing) merged[key] = existing[key];
+    for (var k in userInfo) merged[k] = userInfo[k];
+    this.globalData.userInfo = merged;
+    wx.setStorageSync('userInfo', this.globalData.userInfo);
+    console.log('用户信息更新：', this.globalData.userInfo);
+  },
+
+  addSearchHistory: function(keyword) {
+    var history = this.globalData.searchHistory;
+    var filteredHistory = [];
+    for (var i = 0; i < history.length; i++) {
+      if (history[i] !== keyword) filteredHistory.push(history[i]);
     }
-
-    // 清除本地存储
-    wx.removeStorageSync('userInfo')
-
-    // 清空购物车
-    this.clearCart()
-
-    console.log('用户退出登录')
+    filteredHistory.unshift(keyword);
+    this.globalData.searchHistory = filteredHistory.slice(0, 10);
+    wx.setStorageSync('searchHistory', this.globalData.searchHistory);
   },
 
-  // 更新用户信息
-  updateUserInfo(userInfo) {
-    this.globalData.userInfo = {
-      ...this.globalData.userInfo,
-      ...userInfo
-    }
-
-    // 保存到本地存储
-    wx.setStorageSync('userInfo', this.globalData.userInfo)
-
-    console.log('用户信息更新：', this.globalData.userInfo)
+  clearSearchHistory: function() {
+    this.globalData.searchHistory = [];
+    wx.removeStorageSync('searchHistory');
   },
 
-  // 添加搜索历史
-  addSearchHistory(keyword) {
-    const history = this.globalData.searchHistory
-    const filteredHistory = history.filter(item => item !== keyword)
-    filteredHistory.unshift(keyword)
-
-    // 最多保存10条搜索历史
-    this.globalData.searchHistory = filteredHistory.slice(0, 10)
-
-    // 保存到本地存储
-    wx.setStorageSync('searchHistory', this.globalData.searchHistory)
-  },
-
-  // 清除搜索历史
-  clearSearchHistory() {
-    this.globalData.searchHistory = []
-    wx.removeStorageSync('searchHistory')
-  },
-
-  // 添加收藏商家
-  addFavoriteStore(storeId) {
-    const favorites = this.globalData.favoriteStores
-    if (!favorites.includes(storeId)) {
-      favorites.push(storeId)
-      wx.setStorageSync('favoriteStores', favorites)
-      console.log('收藏商家：', storeId)
+  addFavoriteStore: function(storeId) {
+    var favorites = this.globalData.favoriteStores;
+    if (favorites.indexOf(storeId) === -1) {
+      favorites.push(storeId);
+      wx.setStorageSync('favoriteStores', favorites);
     }
   },
 
-  // 取消收藏商家
-  removeFavoriteStore(storeId) {
-    const favorites = this.globalData.favoriteStores
-    const updatedFavorites = favorites.filter(id => id !== storeId)
-    this.globalData.favoriteStores = updatedFavorites
-    wx.setStorageSync('favoriteStores', updatedFavorites)
-    console.log('取消收藏商家：', storeId)
-  },
-
-  // 检查是否收藏商家
-  isFavoriteStore(storeId) {
-    return this.globalData.favoriteStores.includes(storeId)
-  },
-
-  // 添加收货地址
-  addAddress(address) {
-    const addresses = this.globalData.addresses
-    addresses.push(address)
-    this.globalData.addresses = addresses
-    wx.setStorageSync('addresses', addresses)
-    console.log('添加收货地址：', address)
-  },
-
-  // 更新收货地址
-  updateAddress(addressId, address) {
-    const addresses = this.globalData.addresses
-    const index = addresses.findIndex(addr => addr.id === addressId)
-    if (index !== -1) {
-      addresses[index] = address
-      this.globalData.addresses = addresses
-      wx.setStorageSync('addresses', addresses)
-      console.log('更新收货地址：', address)
+  removeFavoriteStore: function(storeId) {
+    var favorites = this.globalData.favoriteStores;
+    var updatedFavorites = [];
+    for (var i = 0; i < favorites.length; i++) {
+      if (favorites[i] !== storeId) updatedFavorites.push(favorites[i]);
     }
+    this.globalData.favoriteStores = updatedFavorites;
+    wx.setStorageSync('favoriteStores', updatedFavorites);
   },
 
-  // 删除收货地址
-  deleteAddress(addressId) {
-    const addresses = this.globalData.addresses
-    const updatedAddresses = addresses.filter(addr => addr.id !== addressId)
-    this.globalData.addresses = updatedAddresses
-    wx.setStorageSync('addresses', updatedAddresses)
-    console.log('删除收货地址：', addressId)
+  isFavoriteStore: function(storeId) {
+    return this.globalData.favoriteStores.indexOf(storeId) !== -1;
   },
 
-  // 设置默认地址
-  setDefaultAddress(addressId) {
-    const addresses = this.globalData.addresses
-    addresses.forEach(addr => {
-      addr.isDefault = addr.id === addressId
-    })
-    this.globalData.addresses = addresses
-    wx.setStorageSync('addresses', addresses)
-    console.log('设置默认地址：', addressId)
+  addAddress: function(address) {
+    var addresses = this.globalData.addresses;
+    addresses.push(address);
+    this.globalData.addresses = addresses;
+    wx.setStorageSync('addresses', addresses);
   },
 
-  // 获取默认地址
-  getDefaultAddress() {
-    return this.globalData.addresses.find(addr => addr.isDefault) || null
+  updateAddress: function(addressId, address) {
+    var addresses = this.globalData.addresses;
+    for (var i = 0; i < addresses.length; i++) {
+      if (addresses[i].id === addressId) {
+        addresses[i] = address;
+        break;
+      }
+    }
+    this.globalData.addresses = addresses;
+    wx.setStorageSync('addresses', addresses);
+  },
+
+  deleteAddress: function(addressId) {
+    var addresses = this.globalData.addresses;
+    var updatedAddresses = [];
+    for (var i = 0; i < addresses.length; i++) {
+      if (addresses[i].id !== addressId) updatedAddresses.push(addresses[i]);
+    }
+    this.globalData.addresses = updatedAddresses;
+    wx.setStorageSync('addresses', updatedAddresses);
+  },
+
+  setDefaultAddress: function(addressId) {
+    var addresses = this.globalData.addresses;
+    for (var i = 0; i < addresses.length; i++) {
+      addresses[i].isDefault = (addresses[i].id === addressId);
+    }
+    this.globalData.addresses = addresses;
+    wx.setStorageSync('addresses', addresses);
+  },
+
+  getDefaultAddress: function() {
+    var addresses = this.globalData.addresses;
+    for (var i = 0; i < addresses.length; i++) {
+      if (addresses[i].isDefault) return addresses[i];
+    }
+    return null;
   }
-})
-
+});

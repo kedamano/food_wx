@@ -1,4 +1,4 @@
-/* 收货地址管理 - 现代化CSS */
+/* 收货地址管理 */
 page {
   background-color: #F5F5F7;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -6,91 +6,93 @@ page {
 
 .container {
   padding: 20rpx;
+  min-height: 100vh;
 }
 
-/* 头部 */
+/* ===== 头部 ===== */
 .header {
-  background: linear-gradient(135deg, #4CAF50 0%, #81C784 100%);
+  background: linear-gradient(135deg, #FF6633 0%, #FF8855 100%);
   border-radius: 20rpx;
   padding: 30rpx;
   margin-bottom: 20rpx;
-  box-shadow: 0 4rpx 12rpx rgba(76, 175, 80, 0.2);
+  box-shadow: 0 4rpx 12rpx rgba(255, 102, 51, 0.2);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.header-content {
+.header-left {
   flex: 1;
+  min-width: 0;
 }
 
 .header-title {
   font-size: 36rpx;
   font-weight: 600;
   color: #FFFFFF;
+  display: block;
   margin-bottom: 8rpx;
 }
 
 .header-subtitle {
   font-size: 24rpx;
   color: rgba(255, 255, 255, 0.8);
+  display: block;
 }
 
 .add-btn {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.25);
   border-radius: 30rpx;
-  padding: 12rpx 24rpx;
-  transition: all 0.3s ease;
+  padding: 14rpx 28rpx;
+  border: none;
+  flex-shrink: 0;
+  margin-left: 16rpx;
 }
 
-.add-btn:active {
-  transform: scale(0.95);
-}
+.add-btn::after { border: none; }
 
-.btn-icon {
-  font-size: 28rpx;
-  margin-right: 8rpx;
+.btn-plus {
+  font-size: 32rpx;
+  color: #FFFFFF;
+  margin-right: 6rpx;
+  line-height: 1;
 }
 
 .btn-text {
-  font-size: 24rpx;
+  font-size: 26rpx;
   color: #FFFFFF;
   font-weight: 500;
 }
 
-/* 地址列表 */
+/* ===== 地址卡片 ===== */
 .address-list {
   padding-bottom: 20rpx;
 }
 
 .address-card {
   background: #FFFFFF;
-  border-radius: 20rpx;
+  border-radius: 16rpx;
   margin-bottom: 20rpx;
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
   overflow: hidden;
-  transition: all 0.3s ease;
   border: 2rpx solid transparent;
   position: relative;
 }
 
-.address-card.default {
-  border-color: #4CAF50;
-}
-
-.address-card:active {
-  transform: scale(0.98);
+.default-card {
+  border-color: #FF6633;
 }
 
 .default-badge {
-  background: #4CAF50;
+  background: #FF6633;
   padding: 6rpx 16rpx;
   border-radius: 0 0 12rpx 0;
   position: absolute;
   top: 0;
   left: 0;
+  z-index: 1;
 }
 
 .badge-text {
@@ -99,18 +101,20 @@ page {
   font-weight: 500;
 }
 
+/* 地址内容区 */
 .address-content {
-  padding: 30rpx;
+  padding: 30rpx 30rpx 16rpx;
 }
 
-.user-info {
+.user-row {
   display: flex;
   align-items: center;
-  margin-bottom: 16rpx;
+  margin-bottom: 14rpx;
+  padding-top: 8rpx;
 }
 
 .user-name {
-  font-size: 28rpx;
+  font-size: 30rpx;
   font-weight: 600;
   color: #333333;
   margin-right: 16rpx;
@@ -118,126 +122,153 @@ page {
 
 .user-phone {
   font-size: 26rpx;
-  color: #666666;
+  color: #555555;
+  flex: 1;
 }
 
-.address-tags {
-  display: flex;
-  gap: 8rpx;
-  margin-left: auto;
-}
-
-.tag {
+.tag-home {
+  font-size: 20rpx;
+  background: #FFF0EB;
+  color: #FF6633;
   padding: 4rpx 12rpx;
   border-radius: 6rpx;
-  font-size: 20rpx;
-  font-weight: 500;
+  margin-left: 8rpx;
 }
 
-.tag.work {
+.tag-work {
+  font-size: 20rpx;
   background: #E8F4FF;
   color: #2196F3;
+  padding: 4rpx 12rpx;
+  border-radius: 6rpx;
+  margin-left: 8rpx;
 }
 
-.tag.home {
-  background: #E8F5E8;
-  color: #4CAF50;
-}
-
-.address-detail {
+.addr-detail-box {
   background: #F9F9F9;
-  padding: 20rpx;
-  border-radius: 12rpx;
+  padding: 18rpx;
+  border-radius: 10rpx;
 }
 
-.address-text {
+.addr-region {
   font-size: 26rpx;
-  color: #666666;
-  line-height: 1.6;
+  color: #555;
+  display: block;
+  margin-bottom: 6rpx;
+}
+
+.addr-detail {
+  font-size: 24rpx;
+  color: #888;
   display: block;
 }
 
-.address-text.detail {
-  font-size: 24rpx;
-  color: #999999;
-  margin-top: 8rpx;
-}
-
-.address-actions {
+/* ===== 操作行 ===== */
+.action-row {
   display: flex;
-  padding: 20rpx 30rpx;
-  gap: 16rpx;
+  align-items: center;
+  padding: 16rpx 20rpx;
   border-top: 1rpx solid #F0F0F0;
+  gap: 12rpx;
 }
 
-.action-btn {
+.action-spacer {
   flex: 1;
+}
+
+.set-default-btn {
+  flex: 1;
+  padding: 10rpx 0;
+}
+
+.set-default-text {
+  font-size: 24rpx;
+  color: #FF6633;
+}
+
+.edit-btn,
+.delete-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16rpx;
-  border-radius: 12rpx;
-  font-size: 24rpx;
-  font-weight: 500;
-  transition: all 0.3s ease;
+  padding: 10rpx 24rpx;
+  border-radius: 10rpx;
+  gap: 6rpx;
 }
 
-.action-btn.edit {
-  background: #E8F5E8;
-  color: #4CAF50;
+.edit-btn {
+  background: #FFF0EB;
 }
 
-.action-btn.delete {
+.delete-btn {
   background: #FFE8E8;
+}
+
+.edit-icon {
+  font-size: 26rpx;
+  color: #FF6633;
+}
+
+.delete-icon {
+  font-size: 26rpx;
   color: #FF6B6B;
 }
 
-.action-btn:active {
-  transform: scale(0.95);
+.action-text {
+  font-size: 24rpx;
+  font-weight: 500;
 }
 
-/* 空状态 */
+.edit-btn .action-text { color: #FF6633; }
+.delete-btn .action-text { color: #FF6B6B; }
+
+/* ===== 空状态 ===== */
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   padding: 100rpx 40rpx;
 }
 
 .empty-icon {
-  font-size: 96rpx;
-  margin-bottom: 32rpx;
-  color: #CCCCCC;
+  font-size: 80rpx;
+  margin-bottom: 28rpx;
 }
 
 .empty-title {
   font-size: 32rpx;
   font-weight: 500;
   color: #333333;
-  margin-bottom: 16rpx;
+  margin-bottom: 14rpx;
 }
 
 .empty-desc {
   font-size: 26rpx;
   color: #999999;
   margin-bottom: 40rpx;
-  text-align: center;
 }
 
 .btn-primary {
-  background: #4CAF50;
+  background: #FF6633;
   color: #FFFFFF;
-  padding: 16rpx 48rpx;
-  border-radius: 12rpx;
-  font-size: 26rpx;
+  padding: 18rpx 56rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx;
   font-weight: 500;
-  transition: all 0.3s ease;
+  border: none;
 }
 
-.btn-primary:active {
-  transform: scale(0.95);
-  background: #45a049;
+.btn-primary::after { border: none; }
+
+/* 加载 */
+.loading-state {
+  text-align: center;
+  padding: 60rpx;
+}
+
+.loading-text {
+  font-size: 26rpx;
+  color: #999;
 }
 
 /* 底部安全区域 */

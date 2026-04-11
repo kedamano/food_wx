@@ -1,7 +1,7 @@
 /**
  * 安全设置页面逻辑
  */
-const app = getApp();
+var app = getApp();
 
 Page({
   data: {
@@ -13,8 +13,8 @@ Page({
     lastLoginTime: '2024-01-15 10:30'
   },
 
-  onLoad() {
-    const app = getApp();
+  onLoad: function() {
+    var app = getApp();
     this.setData({
       userId: app.globalData.userId || 1
     });
@@ -22,35 +22,36 @@ Page({
   },
 
   // 加载安全信息
-  loadSecurityInfo() {
-    const userId = this.data.userId;
+  loadSecurityInfo: function() {
+    var userId = this.data.userId;
     if (!userId) return;
 
     app.authRequest({
-      url: `/user/${userId}`,
+      url: '/user/' + userId,
       method: 'GET'
-    }).then(res => {
+    }).then(function(res) {
       if (res && res.code === 200 && res.data) {
         this.setData({
           phoneBound: !!res.data.phone,
           emailBound: !!res.data.email
         });
       }
-    }).catch(err => {
+    }).catch(function(err) {
       console.error('获取安全信息失败', err);
     });
   },
 
   // 修改密码
-  onChangePassword() {
+  onChangePassword: function() {
+    var self = this;
     wx.showModal({
       title: '修改密码',
       editable: true,
       placeholderText: '请输入新密码（至少6位）',
-      success: (res) => {
+      success: function(res) {
         if (res.confirm && res.content) {
           if (res.content.length >= 6) {
-            this.updatePassword(res.content);
+            self.updatePassword(res.content);
           } else {
             wx.showToast({ title: '密码至少6位', icon: 'none' });
           }
@@ -60,33 +61,34 @@ Page({
   },
 
   // 更新密码
-  updatePassword(newPassword) {
+  updatePassword: function(newPassword) {
     app.authRequest({
-      url: `/user/${this.data.userId}/password`,
+      url: '/user/' + this.data.userId + '/password',
       method: 'PUT',
       data: { password: newPassword }
-    }).then(res => {
+    }).then(function(res) {
       if (res && res.code === 200) {
         wx.showToast({ title: '密码修改成功', icon: 'success' });
       } else {
         wx.showToast({ title: res.message || '修改失败', icon: 'none' });
       }
-    }).catch(err => {
+    }).catch(function(err) {
       console.error('修改密码失败', err);
       wx.showToast({ title: '修改失败', icon: 'none' });
     });
   },
 
   // 绑定/修改手机号
-  onBindPhone() {
+  onBindPhone: function() {
+    var self = this;
     wx.showModal({
       title: '绑定手机号',
       editable: true,
       placeholderText: '请输入手机号',
-      success: (res) => {
+      success: function(res) {
         if (res.confirm && res.content) {
           if (/^1[3-9]\d{9}$/.test(res.content)) {
-            this.bindPhone(res.content);
+            self.bindPhone(res.content);
           } else {
             wx.showToast({ title: '手机号格式不正确', icon: 'none' });
           }
@@ -96,34 +98,35 @@ Page({
   },
 
   // 绑定手机号
-  bindPhone(phone) {
+  bindPhone: function(phone) {
     app.authRequest({
-      url: `/user/${this.data.userId}`,
+      url: '/user/' + this.data.userId,
       method: 'PUT',
       data: { phone: phone }
-    }).then(res => {
+    }).then(function(res) {
       if (res && res.code === 200) {
         this.setData({ phoneBound: true });
         wx.showToast({ title: '手机号绑定成功', icon: 'success' });
       } else {
         wx.showToast({ title: '绑定失败', icon: 'none' });
       }
-    }).catch(err => {
+    }).catch(function(err) {
       console.error('绑定手机号失败', err);
       wx.showToast({ title: '绑定失败', icon: 'none' });
     });
   },
 
   // 绑定邮箱
-  onBindEmail() {
+  onBindEmail: function() {
+    var self = this;
     wx.showModal({
       title: '绑定邮箱',
       editable: true,
       placeholderText: '请输入邮箱地址',
-      success: (res) => {
+      success: function(res) {
         if (res.confirm && res.content) {
           if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(res.content)) {
-            this.bindEmail(res.content);
+            self.bindEmail(res.content);
           } else {
             wx.showToast({ title: '邮箱格式不正确', icon: 'none' });
           }
@@ -133,40 +136,40 @@ Page({
   },
 
   // 绑定邮箱
-  bindEmail(email) {
+  bindEmail: function(email) {
     app.authRequest({
-      url: `/user/${this.data.userId}`,
+      url: '/user/' + this.data.userId,
       method: 'PUT',
       data: { email: email }
-    }).then(res => {
+    }).then(function(res) {
       if (res && res.code === 200) {
         this.setData({ emailBound: true });
         wx.showToast({ title: '邮箱绑定成功', icon: 'success' });
       } else {
         wx.showToast({ title: '绑定失败', icon: 'none' });
       }
-    }).catch(err => {
+    }).catch(function(err) {
       console.error('绑定邮箱失败', err);
       wx.showToast({ title: '绑定失败', icon: 'none' });
     });
   },
 
   // 绑定微信
-  onBindWechat() {
+  onBindWechat: function() {
     // 微信小程序中，微信绑定通常由微信自动处理
     wx.showToast({ title: '微信已自动绑定', icon: 'success' });
     this.setData({ bindWechat: true });
   },
 
   // 登录设备管理
-  onDeviceManagement() {
+  onDeviceManagement: function() {
     wx.navigateTo({
       url: '/pages/device-management/device-management'
     });
   },
 
   // 返回
-  onBack() {
+  onBack: function() {
     wx.navigateBack();
   }
 });

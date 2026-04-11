@@ -1,70 +1,99 @@
-<!-- 用户评价 - 精致版 -->
+<!-- 全部评价页面 -->
 <scroll-view class="container" scroll-y>
-  <!-- 头部 -->
+  <!-- 头部：评分概览 -->
   <view class="header-section">
-    <view class="header-content">
-      <text class="header-title">我的评价</text>
-      <text class="header-subtitle">管理您的评价记录</text>
+    <view class="back-btn" bindtap="onBackClick">
+      <text class="back-icon">←</text>
     </view>
-    <view class="review-stats">
-      <text class="stat-text">共{{reviewStats.total}}条评价</text>
+    <view class="header-body">
+      <view class="avg-score-block">
+        <text class="avg-score">{{reviewStats.avgRating}}</text>
+        <view class="avg-stars">
+          <text class="star" wx:for="{{5}}" wx:for-item="s" wx:key="*this">{{s <= reviewStats.avgRating ? '★' : '☆'}}</text>
+        </view>
+        <text class="total-label">共{{reviewStats.total}}条评价</text>
+      </view>
+      <view class="score-bars">
+        <view class="bar-row">
+          <text class="bar-label">好评</text>
+          <view class="bar-track">
+            <view class="bar-fill bar-good" style="width:{{reviewStats.total > 0 ? reviewStats.fiveStarCount / reviewStats.total * 100 : 0}}%"></view>
+          </view>
+          <text class="bar-count">{{reviewStats.fiveStarCount}}</text>
+        </view>
+        <view class="bar-row">
+          <text class="bar-label">中评</text>
+          <view class="bar-track">
+            <view class="bar-fill bar-mid" style="width:{{reviewStats.total > 0 ? reviewStats.fourStarCount / reviewStats.total * 100 : 0}}%"></view>
+          </view>
+          <text class="bar-count">{{reviewStats.fourStarCount}}</text>
+        </view>
+        <view class="bar-row">
+          <text class="bar-label">差评</text>
+          <view class="bar-track">
+            <view class="bar-fill bar-bad" style="width:{{reviewStats.total > 0 ? reviewStats.threeStarCount / reviewStats.total * 100 : 0}}%"></view>
+          </view>
+          <text class="bar-count">{{reviewStats.threeStarCount}}</text>
+        </view>
+        <view class="img-tag" wx:if="{{reviewStats.withImage > 0}}">
+          <text class="img-tag-text"><text class="-camera" style="margin-right:8rpx;">📷</text>{{reviewStats.withImage}}条有图</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 筛选 Tab -->
+  <view class="filter-tabs">
+    <view
+      class="filter-tab {{currentFilter === item.key ? 'active' : ''}}"
+      wx:for="{{filterTabs}}" wx:key="key"
+      bindtap="onFilterChange"
+      data-key="{{item.key}}"
+    >
+      <text>{{item.label}}</text>
     </view>
   </view>
 
   <!-- 评价列表 -->
-  <view class="review-list">
-    <view class="review-card" wx:for="{{reviews}}" wx:key="id" bindtap="onReviewDetail" data-review="{{item}}">
-      <!-- 商家信息 -->
-      <view class="store-section">
-        <view class="store-info">
-          <text class="fa fa-store store-icon"></text>
-          <text class="store-name">{{item.storeName}}</text>
-          <text class="review-time">{{item.reviewTime}}</text>
+  <view class="review-list" wx:if="{{reviews.length > 0}}">
+    <view class="review-card" wx:for="{{reviews}}" wx:key="id">
+      <view class="review-top">
+        <view class="avatar">
+          <text class="avatar-text">{{item.avatarText}}</text>
         </view>
-        <view class="order-info">
-          <text class="order-foods">{{item.foodNames}}</text>
-        </view>
-      </view>
-
-      <!-- 评价内容 -->
-      <view class="review-section">
-        <view class="review-rating">
-          <view class="stars">
-            <text class="fa {{item <= item.rating ? 'fa-star' : 'fa-star-o'}} star"></text>
+        <view class="user-info">
+          <text class="user-name">{{item.userName}}</text>
+          <view class="stars-row">
+            <text class="star-filled" wx:for="{{item.stars}}" wx:for-item="s" wx:key="*this">★</text>
           </view>
-          <text class="rating-text">{{item.rating}}分</text>
         </view>
-        <text class="review-content">{{item.content}}</text>
+        <text class="review-time">{{item.time}}</text>
       </view>
-
-      <!-- 评价图片 -->
-      <view class="review-images" wx:if="{{item.images.length > 0}}">
-        <view class="image-grid">
-          <image class="review-image" wx:for="{{item.images}}" wx:key="index" src="{{item}}" mode="aspectFill" lazy-load></image>
-        </view>
-      </view>
-
-      <!-- 操作按钮 -->
-      <view class="action-section">
-        <button class="action-btn edit" bindtap="onEditReview" data-review="{{item}}">
-          <text class="fa fa-edit btn-icon"></text>
-          <text class="btn-text">修改</text>
-        </button>
-        <button class="action-btn delete" bindtap="onDeleteReview" data-review="{{item}}">
-          <text class="fa fa-trash-alt btn-icon"></text>
-          <text class="btn-text">删除</text>
-        </button>
+      <text class="review-content">{{item.content}}</text>
+      <view class="review-images" wx:if="{{item.images && item.images.length > 0}}">
+        <image
+          class="review-img"
+          wx:for="{{item.images}}"
+          wx:for-item="img"
+          wx:key="*this"
+          src="{{img}}"
+          mode="aspectFill"
+        ></image>
       </view>
     </view>
   </view>
 
-  <!-- 空状态 -->
-  <view class="empty-state" wx:if="{{reviews.length === 0}}">
-    <text class="fa fa-star empty-icon"></text>
-    <text class="empty-title">还没有评价</text>
-    <text class="empty-desc">完成订单后可以添加评价哦！</text>
+  <!-- 加载中 -->
+  <view class="empty-state" wx:if="{{isLoading}}">
+    <text class="empty-title">加载中...</text>
   </view>
 
-  <!-- 底部安全区域 -->
+  <!-- 无评价 -->
+  <view class="empty-state" wx:if="{{!isLoading && reviews.length === 0}}">
+    <text class="-comments empty-icon" style="font-size:80rpx;">💬</text>
+    <text class="empty-title">暂无评价</text>
+    <text class="empty-desc">快来抢沙发吧~</text>
+  </view>
+
   <view class="safe-area-bottom"></view>
 </scroll-view>

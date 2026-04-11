@@ -1,21 +1,23 @@
-<!-- 积分商城 - 精致版 -->
+<!-- 积分商城 -->
 <scroll-view class="container" scroll-y>
   <!-- 积分头部 -->
   <view class="points-header">
     <view class="points-card">
       <view class="points-content">
-        <text class="points-label">我的积分</text>
-        <view class="points-balance">
-          <text class="points-number">{{userPoints}}</text>
-          <text class="points-text">分</text>
+        <view>
+          <text class="points-label">我的积分</text>
+          <view class="points-balance">
+            <text class="points-number">{{userPoints}}</text>
+            <text class="points-text">分</text>
+          </view>
         </view>
         <view class="points-actions">
           <button class="action-btn" bindtap="onGetPoints">
-            <text class="fa fa-calendar-check btn-icon"></text>
+            <text class="btn-icon -check">✓</text>
             <text class="btn-text">签到</text>
           </button>
           <button class="action-btn" bindtap="onPointsRule">
-            <text class="fa fa-info-circle btn-icon"></text>
+            <text class="btn-icon -info-circle">ℹ</text>
             <text class="btn-text">规则</text>
           </button>
         </view>
@@ -36,13 +38,13 @@
   <!-- 今日任务 -->
   <view class="tasks-section">
     <view class="section-header">
-      <text class="section-title"><text class="fa fa-bullseye"></text> 今日任务</text>
+      <text class="section-title"><text class="-bullseye" style="margin-right:8rpx;">🎯</text>今日任务</text>
       <text class="section-desc">完成得积分</text>
     </view>
     <view class="task-list">
       <view class="task-card {{item.completed ? 'completed' : ''}}" wx:for="{{dailyTasks}}" wx:key="id" bindtap="onTaskClick" data-task="{{item}}">
         <view class="task-icon">
-          <text class="icon">{{item.icon}}</text>
+          <text class="icon">{{item.iconText || '✓'}}</text>
         </view>
         <view class="task-content">
           <text class="task-name">{{item.name}}</text>
@@ -58,7 +60,7 @@
   <!-- 积分商品 -->
   <view class="products-section">
     <view class="section-header">
-      <text class="section-title"><text class="fa fa-gift"></text> 积分兑换</text>
+      <text class="section-title"><text class="-gift" style="margin-right:8rpx;">🎁</text>积分兑换</text>
       <view class="sort-options" bindtap="onSortClick">
         <text class="sort-text">{{sortText}}</text>
         <text class="sort-icon">▼</text>
@@ -68,7 +70,7 @@
       <view class="product-card" wx:for="{{products}}" wx:key="id" bindtap="onProductClick" data-product="{{item}}">
         <view class="product-image">
           <image class="product-img" src="{{item.image}}" mode="aspectFill" lazy-load></image>
-          <text class="product-icon" wx:if="{{!item.image}}">{{item.icon}}</text>
+          <text class="product-icon" wx:if="{{!item.image}}" style="font-size:64rpx;">{{item.iconText || '\uD83C\uDFAB'}}</text>
           <view class="stock-badge" wx:if="{{item.stock <= 10}}">
             <text class="stock-text">仅剩{{item.stock}}件</text>
           </view>
@@ -87,20 +89,23 @@
   <!-- 积分记录 -->
   <view class="history-section">
     <view class="section-header" bindtap="onViewHistory">
-      <text class="section-title"><text class="fa fa-chart-bar"></text> 积分记录</text>
+      <text class="section-title"><text class="-chart-bar" style="margin-right:8rpx;">●</text>积分记录</text>
       <text class="view-all">查看全部 →</text>
     </view>
-    <view class="history-list">
+    <view class="history-list" wx:if="{{recentHistory.length > 0}}">
       <view class="history-item" wx:for="{{recentHistory}}" wx:key="id">
         <view class="history-icon">
-          <text class="icon">{{item.icon}}</text>
+          <text class="icon">{{item.iconText || '\u2713'}}</text>
         </view>
         <view class="history-content">
-          <text class="history-type">{{item.type}}</text>
+          <text class="history-type">{{item.desc || item.type}}</text>
           <text class="history-time">{{item.time}}</text>
         </view>
         <text class="history-points {{item.type === '收入' ? 'income' : 'expense'}}">{{item.points}}</text>
       </view>
+    </view>
+    <view class="history-empty" wx:else>
+      <text class="empty-text">暂无积分记录，去签到获取积分吧～</text>
     </view>
   </view>
 

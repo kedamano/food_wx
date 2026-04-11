@@ -1,92 +1,65 @@
 /**
  * 评价相关API接口
  */
-const { api, showLoading, hideLoading } = require('./request');
-const mockData = require('../../mock/mockData');
+var requestHelper = require('./request');
+var api = requestHelper.api;
+var showLoading = requestHelper.showLoading;
+var hideLoading = requestHelper.hideLoading;
 
 /**
  * 获取用户评价列表
+ * @param {number} userId - 用户ID
  * @param {Object} params - 查询参数
  * @returns {Promise}
  */
-function getUserReviews(params = {}) {
+function getUserReviews(userId, params) {
   showLoading('加载中...');
-
-  // 开发模式使用模拟数据
-  if (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        hideLoading();
-        
-        const { page = 1, pageSize = 10 } = params;
-        const reviews = [...mockData.reviews.userReviews];
-        
-        // 分页处理
-        const start = (page - 1) * pageSize;
-        const end = start + parseInt(pageSize);
-        const pagedReviews = reviews.slice(start, end);
-
-        resolve({
-          list: pagedReviews,
-          total: reviews.length,
-          page,
-          pageSize,
-        });
-      }, 300);
-    });
-  }
-
-  return api.get('/reviews/user', params)
-    .finally(() => {
+  return api.get('/review/user/' + userId, params || {})
+    .then(function(res) {
       hideLoading();
+      return res;
+    })
+    .catch(function(err) {
+      hideLoading();
+      return Promise.reject(err);
     });
 }
 
 /**
- * 获取商家评价列表
- * @param {Object} params - 查询参数
+ * 获取菜品评价列表
+ * @param {number} foodId - 菜品ID
+ * @param {Object} params - 查询参数 { page, limit }
  * @returns {Promise}
  */
-function getStoreReviews(params = {}) {
+function getFoodReviews(foodId, params) {
   showLoading('加载中...');
-
-  // 开发模式使用模拟数据
-  if (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        hideLoading();
-        
-        const { storeId, page = 1, pageSize = 10 } = params;
-        let reviews = [...mockData.reviews.storeReviews];
-        
-        // 按商家筛选
-        if (storeId) {
-          reviews = reviews.filter(review => 
-            mockData.stores.list.find(store => 
-              store.id === parseInt(storeId)
-            )
-          );
-        }
-        
-        // 分页处理
-        const start = (page - 1) * pageSize;
-        const end = start + parseInt(pageSize);
-        const pagedReviews = reviews.slice(start, end);
-
-        resolve({
-          list: pagedReviews,
-          total: reviews.length,
-          page,
-          pageSize,
-        });
-      }, 300);
-    });
-  }
-
-  return api.get('/reviews/store', params)
-    .finally(() => {
+  return api.get('/review/food/' + foodId, params || {})
+    .then(function(res) {
       hideLoading();
+      return res;
+    })
+    .catch(function(err) {
+      hideLoading();
+      return Promise.reject(err);
     });
+}
+
+/**
+ * 获取菜品评分信息
+ * @param {number} foodId - 菜品ID
+ * @returns {Promise}
+ */
+function getFoodRating(foodId) {
+  return api.get('/review/food/' + foodId + '/rating');
+}
+
+/**
+ * 获取菜品评价统计
+ * @param {number} foodId - 菜品ID
+ * @returns {Promise}
+ */
+function getReviewStatistics(foodId) {
+  return api.get('/review/food/' + foodId + '/statistics');
 }
 
 /**
@@ -96,93 +69,99 @@ function getStoreReviews(params = {}) {
  */
 function createReview(data) {
   showLoading('提交中...');
-
-  // 开发模式使用模拟数据
-  if (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        hideLoading();
-        
-        const newReview = {
-          id: Date.now(),
-          userId: 1,
-          userName: '美食爱好者',
-          userAvatar: '',
-          orderId: data.orderId,
-          foodName: data.foodName,
-          rating: data.rating,
-          content: data.content,
-          images: data.images || [],
-          createTime: new Date().toISOString(),
-          isAnonymous: data.isAnonymous || false,
-          reply: null,
-          ...data,
-        };
-        
-        resolve(newReview);
-      }, 1000);
-    });
-  }
-
-  return api.post('/reviews', data)
-    .finally(() => {
+  return api.post('/review', data)
+    .then(function(res) {
       hideLoading();
+      return res;
+    })
+    .catch(function(err) {
+      hideLoading();
+      return Promise.reject(err);
     });
 }
 
 /**
- * 回复评价
- * @param {string} reviewId - 评价ID
- * @param {Object} data - 回复数据
+ * 为订单创建评价
+ * @param {number} orderId - 订单ID
+ * @param {Object} data - 评价数据
  * @returns {Promise}
  */
-function replyReview(reviewId, data) {
-  showLoading('回复中...');
-
-  // 开发模式使用模拟数据
-  if (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        hideLoading();
-        resolve({ success: true, message: '回复成功' });
-      }, 500);
-    });
-  }
-
-  return api.post(`/reviews/${reviewId}/reply`, data)
-    .finally(() => {
+function createReviewForOrder(orderId, data) {
+  showLoading('提交中...');
+  return api.post('/review/order/' + orderId, data)
+    .then(function(res) {
       hideLoading();
+      return res;
+    })
+    .catch(function(err) {
+      hideLoading();
+      return Promise.reject(err);
+    });
+}
+
+/**
+ * 更新评价
+ * @param {Object} data - 评价数据（含 reviewId）
+ * @returns {Promise}
+ */
+function updateReview(data) {
+  showLoading('更新中...');
+  return api.put('/review', data)
+    .then(function(res) {
+      hideLoading();
+      return res;
+    })
+    .catch(function(err) {
+      hideLoading();
+      return Promise.reject(err);
     });
 }
 
 /**
  * 删除评价
- * @param {string} reviewId - 评价ID
+ * @param {number} reviewId - 评价ID
  * @returns {Promise}
  */
 function deleteReview(reviewId) {
   showLoading('删除中...');
-
-  // 开发模式使用模拟数据
-  if (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        hideLoading();
-        resolve({ success: true, message: '删除成功' });
-      }, 500);
-    });
-  }
-
-  return api.delete(`/reviews/${reviewId}`)
-    .finally(() => {
+  return api.delete('/review/' + reviewId)
+    .then(function(res) {
       hideLoading();
+      return res;
+    })
+    .catch(function(err) {
+      hideLoading();
+      return Promise.reject(err);
     });
+}
+
+/**
+ * 获取评价详情
+ * @param {number} reviewId - 评价ID
+ * @returns {Promise}
+ */
+function getReviewDetail(reviewId) {
+  return api.get('/review/' + reviewId);
+}
+
+/**
+ * 获取订单的评价
+ * @param {number} orderId - 订单ID
+ * @returns {Promise}
+ */
+function getOrderReviews(orderId) {
+  return api.get('/review/order/' + orderId);
 }
 
 module.exports = {
   getUserReviews,
-  getStoreReviews,
+  getFoodReviews,
+  getFoodRating,
+  getReviewStatistics,
   createReview,
-  replyReview,
+  createReviewForOrder,
+  updateReview,
   deleteReview,
+  getReviewDetail,
+  getOrderReviews
 };

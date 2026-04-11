@@ -60,9 +60,11 @@ swagger:
     email: food@example.com
 
 # JWT配置
+# secret: 从环境变量 JWT_SECRET 读取，生产环境必须设置
+# 设置方式: export JWT_SECRET=your_secret_key_here
 jwt:
-  secret: food_wx_secret_key_2024
-  expiration: 86400000  # 24小时
+  secret: ${JWT_SECRET:food_wx_secret_key_2024}  # 默认仅用于开发环境，生产环境必须设置 JWT_SECRET 环境变量
+  expiration: 2592000000  # 30天 (30 * 24 * 60 * 60 * 1000)
 
 # 阿里云短信服务配置
 aliyun:

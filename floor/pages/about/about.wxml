@@ -1,16 +1,11 @@
 <!-- 关于小程序页面 -->
 <view class="container">
-  <!-- 头部 -->
-  <view class="header">
-    <view class="back-btn" bindtap="onBack">←</view>
-    <text class="header-title">关于我们</text>
-    <view class="header-placeholder"></view>
-  </view>
-
   <!-- Logo区域 -->
   <view class="logo-section">
-    <image class="logo" src="/images/logo.png" mode="aspectFit" />
-    <text class="app-name">美食小程序</text>
+    <view class="logo-circle">
+      <text class="logo-emoji -utensils" style="font-size:80rpx;">🍴</text>
+    </view>
+    <text class="app-name">美食探店</text>
     <text class="slogan">年轻人的美食天堂</text>
     <view class="version-badge">
       <text class="version-text">v{{version}}</text>
@@ -22,7 +17,7 @@
     <text class="section-title">功能特点</text>
     <view class="features-grid">
       <view class="feature-item" wx:for="{{features}}" wx:key="index">
-        <text class="fa {{item.icon}} feature-icon"></text>
+        <text feature-icon>{{iconText || "🍴"}}</text>
         <text class="feature-title">{{item.title}}</text>
         <text class="feature-desc">{{item.desc}}</text>
       </view>
@@ -47,23 +42,25 @@
 
   <!-- 操作按钮 -->
   <view class="action-section">
-    <button class="action-btn" bindtap="onCheckUpdate">
-      <text class="fa fa-sync-alt btn-icon"></text>
+    <view class="action-btn" bindtap="onCheckUpdate">
+      <text class="btn-icon -sync-alt">🔄</text>
       <text class="btn-text">检查更新</text>
-    </button>
-    <button class="action-btn" bindtap="onContact">
-      <text class="fa fa-phone btn-icon"></text>
+    </view>
+    <view class="action-btn" bindtap="onContact">
+      <text class="btn-icon -phone">📞</text>
       <text class="btn-text">联系我们</text>
-    </button>
-    <button class="action-btn" bindtap="onLicense">
-      <text class="fa fa-file-alt btn-icon"></text>
+    </view>
+    <view class="action-btn" bindtap="onLicense">
+      <text class="btn-icon -file-alt">●</text>
       <text class="btn-text">开源许可</text>
-    </button>
+    </view>
   </view>
 
   <!-- 底部版权 -->
   <view class="copyright">
-    <text class="copyright-text">© 2024 美食小程序</text>
+    <text class="copyright-text">© 2024 美食探店</text>
     <text class="copyright-text">All Rights Reserved</text>
   </view>
+
+  <view class="safe-area-bottom"></view>
 </view>

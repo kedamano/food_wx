@@ -1,67 +1,71 @@
 /**
  * 用户相关API接口
  */
-const { api, showLoading, hideLoading } = require('./request');
-
-// 模拟数据
-const mockData = {
-  user: {
-    info: {
-      id: 1,
-      name: '美食爱好者',
-      level: '黄金会员',
-      points: 1280,
-      avatar: '',
-      phone: '13800138000',
-      email: 'user@example.com',
-      createTime: '2024-01-01T00:00:00Z',
-    },
-    stats: {
-      totalOrders: 23,
-      favoriteStores: 12,
-      totalSpending: 1580.50,
-      couponCount: 5,
-      reviewCount: 18,
-      addressCount: 3,
-    },
-    orderStats: {
-      pending: 2,
-      preparing: 1,
-      delivering: 3,
-      completed: 17,
-    },
-  },
-};
+var requestHelper = require('./request');
+var api = requestHelper.api;
+var showLoading = requestHelper.showLoading;
+var hideLoading = requestHelper.hideLoading;
 
 /**
  * 用户登录
- * @param {Object} data - 登录数据
+ * @param {Object} data - 登录数据 { username, password }
  * @returns {Promise}
  */
 function login(data) {
   showLoading('登录中...');
-  
-  // 总是使用模拟数据（微信小程序环境）
-  return new Promise((resolve) => {
-    setTimeout(() => {
+  return api.post('/user/login', data)
+    .then(function(res) {
       hideLoading();
-      const authInfo = {
-        token: 'mock-token-' + Date.now(),
-        refreshToken: 'mock-refresh-token-' + Date.now(),
-        userInfo: mockData.user.info,
-      };
-      resolve(authInfo);
-    }, 1000);
-  });
+      return res;
+    })
+    .catch(function(err) {
+      hideLoading();
+      return Promise.reject(err);
+    });
 }
 
 /**
- * 获取用户信息
+ * 用户注册
+ * @param {Object} data - 注册数据 { username, password, phone, verifyCode }
+ * @returns {Promise}
+ */
+function register(data) {
+  showLoading('注册中...');
+  return api.post('/user/register', data)
+    .then(function(res) {
+      hideLoading();
+      return res;
+    })
+    .catch(function(err) {
+      hideLoading();
+      return Promise.reject(err);
+    });
+}
+
+/**
+ * 微信注册
+ * @param {Object} data - 微信注册数据 { code, username, phone }
+ * @returns {Promise}
+ */
+function wechatRegister(data) {
+  showLoading('注册中...');
+  return api.post('/user/wechat-register', data)
+    .then(function(res) {
+      hideLoading();
+      return res;
+    })
+    .catch(function(err) {
+      hideLoading();
+      return Promise.reject(err);
+    });
+}
+
+/**
+ * 获取用户信息（根据Token）
  * @returns {Promise}
  */
 function getUserInfo() {
-  // 微信小程序环境总是使用模拟数据
-  return Promise.resolve(mockData.user.info);
+  return api.get('/user/info');
 }
 
 /**
@@ -71,30 +75,23 @@ function getUserInfo() {
  */
 function updateUserInfo(data) {
   showLoading('更新中...');
-  
-  // 开发模式使用模拟数据
-  if (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        hideLoading();
-        resolve(data);
-      }, 500);
-    });
-  }
-
   return api.put('/user/info', data)
-    .finally(() => {
+    .then(function(res) {
       hideLoading();
+      return res;
+    })
+    .catch(function(err) {
+      hideLoading();
+      return Promise.reject(err);
     });
 }
 
 /**
- * 获取用户统计数据
+ * 获取用户统计数据（从订单统计接口获取）
  * @returns {Promise}
  */
 function getUserStats() {
-  // 微信小程序环境总是使用模拟数据
-  return Promise.resolve(mockData.user.stats);
+  return api.get('/order/statistics');
 }
 
 /**
@@ -102,12 +99,7 @@ function getUserStats() {
  * @returns {Promise}
  */
 function getUserOrderStats() {
-  // 开发模式使用模拟数据
-  if (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) {
-    return Promise.resolve(mockData.user.orderStats);
-  }
-
-  return api.get('/user/order-stats');
+  return api.get('/order/statistics');
 }
 
 /**
@@ -115,7 +107,7 @@ function getUserOrderStats() {
  * @returns {Promise}
  */
 function logout() {
-  // 微信小程序环境总是使用模拟数据
+  // 后端无退出接口，前端清除登录态
   return Promise.resolve({ success: true });
 }
 
@@ -125,7 +117,7 @@ function logout() {
  * @returns {Promise}
  */
 function refreshToken(refreshToken) {
-  return api.post('/auth/refresh', { refreshToken });
+  return api.post('/auth/refresh', { refreshToken: refreshToken });
 }
 
 /**
@@ -133,11 +125,11 @@ function refreshToken(refreshToken) {
  * @returns {boolean}
  */
 function checkLoginStatus() {
-  const token = wx.getStorageSync('token');
-  const userInfo = wx.getStorageSync('userInfo');
+  var token = wx.getStorageSync('token');
+  var userInfo = wx.getStorageSync('userInfo');
 
   // 同步到全局变量
-  const app = getApp();
+  var app = getApp();
   app.globalData.token = token;
   app.globalData.userInfo = userInfo;
 
@@ -154,7 +146,7 @@ function saveAuthInfo(authInfo) {
   wx.setStorageSync('userInfo', authInfo.userInfo);
 
   // 同步到全局变量
-  const app = getApp();
+  var app = getApp();
   app.globalData.token = authInfo.token;
   app.globalData.userInfo = authInfo.userInfo;
 }
@@ -168,7 +160,7 @@ function clearAuthInfo() {
   wx.removeStorageSync('userInfo');
 
   // 清除全局变量
-  const app = getApp();
+  var app = getApp();
   app.globalData.token = null;
   app.globalData.userInfo = null;
 }
@@ -179,13 +171,16 @@ function clearAuthInfo() {
  * @param {string} type - 验证码类型：register-注册，forget-忘记密码
  * @returns {Promise}
  */
-function sendVerifyCode(phone, type = 'forget') {
+function sendVerifyCode(phone, type) {
   showLoading('发送中...');
-  
-  // 微信小程序环境直接调用真实API
-  return api.post('/user/send-verify-code', { phone, type })
-    .finally(() => {
+  return api.post('/user/send-verify-code', { phone: phone, type: type || 'forget' })
+    .then(function(res) {
       hideLoading();
+      return res;
+    })
+    .catch(function(err) {
+      hideLoading();
+      return Promise.reject(err);
     });
 }
 
@@ -197,21 +192,14 @@ function sendVerifyCode(phone, type = 'forget') {
  */
 function verifyCode(phone, code) {
   showLoading('验证中...');
-  
-  // 开发模式使用模拟数据
-  if (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        hideLoading();
-        // 模拟验证成功（实际项目中应该根据验证码验证）
-        resolve({ success: true, message: '验证码验证成功' });
-      }, 500);
-    });
-  }
-
-  return api.post('/user/verify-code', { phone, code })
-    .finally(() => {
+  return api.post('/user/verify-code', { phone: phone, code: code })
+    .then(function(res) {
       hideLoading();
+      return res;
+    })
+    .catch(function(err) {
+      hideLoading();
+      return Promise.reject(err);
     });
 }
 
@@ -224,36 +212,60 @@ function verifyCode(phone, code) {
  */
 function resetPassword(phone, code, newPassword) {
   showLoading('重置中...');
-  
-  // 开发模式使用模拟数据
-  if (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        hideLoading();
-        // 模拟重置成功
-        resolve({ success: true, message: '密码重置成功' });
-      }, 1000);
-    });
-  }
-
-  return api.post('/user/reset-password', { phone, code, newPassword })
-    .finally(() => {
+  return api.post('/user/reset-password', { phone: phone, code: code, newPassword: newPassword })
+    .then(function(res) {
       hideLoading();
+      return res;
+    })
+    .catch(function(err) {
+      hideLoading();
+      return Promise.reject(err);
+    });
+}
+
+/**
+ * 获取用户积分信息
+ * @param {number} userId - 用户ID
+ * @returns {Promise}
+ */
+function getUserPointsInfo(userId) {
+  return api.get('/user/points/' + userId);
+}
+
+/**
+ * 用户签到
+ * @param {number} userId - 用户ID
+ * @returns {Promise}
+ */
+function signIn(userId) {
+  showLoading('签到中...');
+  return api.post('/user/sign-in/' + userId)
+    .then(function(res) {
+      hideLoading();
+      return res;
+    })
+    .catch(function(err) {
+      hideLoading();
+      return Promise.reject(err);
     });
 }
 
 module.exports = {
-  login,
-  getUserInfo,
-  updateUserInfo,
-  getUserStats,
-  getUserOrderStats,
-  logout,
-  refreshToken,
-  checkLoginStatus,
-  saveAuthInfo,
-  clearAuthInfo,
-  sendVerifyCode,
-  verifyCode,
-  resetPassword
+  login: login,
+  register: register,
+  wechatRegister: wechatRegister,
+  getUserInfo: getUserInfo,
+  updateUserInfo: updateUserInfo,
+  getUserStats: getUserStats,
+  getUserOrderStats: getUserOrderStats,
+  logout: logout,
+  refreshToken: refreshToken,
+  checkLoginStatus: checkLoginStatus,
+  saveAuthInfo: saveAuthInfo,
+  clearAuthInfo: clearAuthInfo,
+  sendVerifyCode: sendVerifyCode,
+  verifyCode: verifyCode,
+  resetPassword: resetPassword,
+  getUserPointsInfo: getUserPointsInfo,
+  signIn: signIn
 };

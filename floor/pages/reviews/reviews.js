@@ -1,180 +1,156 @@
-// 用户评价页面逻辑
+// 全部评价页面逻辑
+
 Page({
   data: {
-    // 评价列表
+    foodId: null,
+    foodName: '',
     reviews: [],
-    // 评价统计
+    allReviews: [],
     reviewStats: {
       total: 0,
+      avgRating: 0,
       withImage: 0,
-      avgRating: 0
+      fiveStarCount: 0,
+      fourStarCount: 0,
+      threeStarCount: 0
     },
-    // 加载状态
+    currentFilter: 'all', // all / good / medium / bad / withImage
+    filterTabs: [
+      { key: 'all', label: '全部' },
+      { key: 'good', label: '好评' },
+      { key: 'medium', label: '中评' },
+      { key: 'bad', label: '差评' },
+      { key: 'withImage', label: '有图' }
+    ],
     isLoading: true
   },
 
-  // 页面加载
-  onLoad(options) {
-    console.log('用户评价页面加载');
-
-    // 加载评价数据
-    this.loadReviews();
+  onLoad: function(options) {
+    var foodId = options.foodId || null;
+    var foodName = options.foodName || '该商品';
+    this.setData({ foodId: foodId, foodName: foodName });
+    this.loadReviews(foodId);
   },
 
-  // 返回按钮点击
-  onBackClick() {
-    console.log('返回按钮点击');
-    wx.navigateBack({
-      delta: 1
-    });
+  onBackClick: function() {
+    wx.navigateBack({ delta: 1 });
   },
 
-  // 筛选评价
-  onFilterReviews() {
-    console.log('筛选评价');
-    wx.showActionSheet({
-      itemList: ['全部评价', '好评', '中评', '差评', '有图评价'],
-      success: (res) => {
-        const filterType = ['all', 'good', 'medium', 'bad', 'withImage'][res.tapIndex];
-        console.log('筛选类型：', filterType);
-        this.filterReviews(filterType);
-      }
-    });
+  // 切换筛选 tab
+  onFilterChange: function(e) {
+    var key = e.currentTarget.dataset.key;
+    this.setData({ currentFilter: key });
+    this.applyFilter(key);
   },
 
-  // 评价详情
-  onReviewDetail(e) {
-    const review = e.currentTarget.dataset.review;
-    console.log('评价详情：', review);
-    
-    wx.navigateTo({
-      url: `/pages/review-detail/review-detail?id=${review.id}`
-    });
-  },
-
-  // 修改评价
-  onEditReview(e) {
-    e.stopPropagation();
-    const review = e.currentTarget.dataset.review;
-    console.log('修改评价：', review);
-    
-    wx.navigateTo({
-      url: `/pages/review-edit/review-edit?id=${review.id}`
-    });
-  },
-
-  // 删除评价
-  onDeleteReview(e) {
-    e.stopPropagation();
-    const review = e.currentTarget.dataset.review;
-    console.log('删除评价：', review);
-    
-    wx.showModal({
-      title: '确认删除',
-      content: '确定要删除这条评价吗？删除后将无法恢复。',
-      success: (res) => {
-        if (res.confirm) {
-          this.deleteReview(review.id);
-        }
-      }
-    });
-  },
-
-  // 删除评价
-  deleteReview(reviewId) {
-    console.log('删除评价ID：', reviewId);
-    
-    const updatedReviews = this.data.reviews.filter(item => item.id !== reviewId);
-    this.setData({ reviews: updatedReviews });
-    
-    wx.showToast({
-      title: '删除成功',
-      icon: 'success'
-    });
-  },
-
-  // 筛选评价
-  filterReviews(filterType) {
-    let filteredReviews = this.data.allReviews || this.data.reviews;
-    
+  // 应用筛选
+  applyFilter: function(filterType) {
+    var self = this;
+    var list = (this.data.allReviews || []).slice();
+    var filtered = [];
     switch (filterType) {
       case 'good':
-        filteredReviews = filteredReviews.filter(item => item.rating >= 4);
+        for (var i = 0; i < list.length; i++) {
+          if (list[i].rating >= 4) filtered.push(list[i]);
+        }
         break;
       case 'medium':
-        filteredReviews = filteredReviews.filter(item => item.rating >= 2 && item.rating < 4);
+        for (var j = 0; j < list.length; j++) {
+          if (list[j].rating >= 2 && list[j].rating < 4) filtered.push(list[j]);
+        }
         break;
       case 'bad':
-        filteredReviews = filteredReviews.filter(item => item.rating < 2);
+        for (var k = 0; k < list.length; k++) {
+          if (list[k].rating < 2) filtered.push(list[k]);
+        }
         break;
       case 'withImage':
-        filteredReviews = filteredReviews.filter(item => item.images.length > 0);
+        for (var m = 0; m < list.length; m++) {
+          if (list[m].images && list[m].images.length > 0) filtered.push(list[m]);
+        }
+        break;
+      default:
+        filtered = list;
         break;
     }
-    
-    this.setData({
-      reviews: filteredReviews
-    });
+    this.setData({ reviews: filtered });
   },
 
-  // 加载评价数据
-  loadReviews() {
-    // 模拟评价数据
-    const mockReviews = [
-      {
-        id: 1,
-        storeName: '川味人家',
-        foodNames: '经典牛肉面 x2',
-        rating: 5,
-        content: '味道真的很棒！牛肉炖得很烂，面条很有劲道，汤也很好喝。强烈推荐！',
-        reviewTime: '2024-01-15',
-        images: [
-          '/images/foods/review_1.png',
-          '/images/foods/review_2.png'
-        ]
-      },
-      {
-        id: 2,
-        storeName: '披萨大师',
-        foodNames: '芝士培根披萨',
-        rating: 4,
-        content: '披萨很香，芝士很多，配送也很快。就是价格稍微贵了点。',
-        reviewTime: '2024-01-14',
-        images: []
-      },
-      {
-        id: 3,
-        storeName: '汉堡王',
-        foodNames: '香辣鸡腿堡套餐',
-        rating: 3,
-        content: '味道还可以，但是分量有点少，吃完还想再来一份。',
-        reviewTime: '2024-01-13',
-        images: []
+  // 加载评价
+  loadReviews: function(foodId) {
+    var self = this;
+    self.setData({ isLoading: true });
+
+    if (!foodId) {
+      self.setData({ reviews: [], allReviews: [], reviewStats: { total: 0, avgRating: '0.0', withImage: 0, fiveStarCount: 0, fourStarCount: 0, threeStarCount: 0 }, isLoading: false });
+      return;
+    }
+
+    app.authRequest({
+      url: '/review/food/' + foodId,
+      method: 'GET'
+    }).then(function(res) {
+      self.setData({ isLoading: false });
+      if (res && res.code === 200 && res.data) {
+        var rawList = Array.isArray(res.data) ? res.data : [];
+        var list = [];
+        for (var ri = 0; ri < rawList.length; ri++) {
+          var r = rawList[ri];
+          var rating = r.rating || 5;
+          var stars = [];
+          for (var si = 0; si < rating; si++) stars.push(si + 1);
+          list.push({
+            id: r.reviewId || r.id,
+            userName: r.userName || r.nickname || '匿名用户',
+            avatarText: (r.userName || r.nickname || '匿')[0],
+            rating: rating,
+            time: r.createTime || '',
+            content: r.content || '',
+            images: r.images || [],
+            stars: stars
+          });
+        }
+
+        var total = list.length;
+        var ratingSum = 0;
+        for (var ti = 0; ti < list.length; ti++) {
+          ratingSum += list[ti].rating;
+        }
+        var avgRating = total > 0 ? (ratingSum / total).toFixed(1) : '0.0';
+        var withImage = 0;
+        for (var wi = 0; wi < list.length; wi++) {
+          if (list[wi].images && list[wi].images.length > 0) withImage++;
+        }
+        var fiveStarCount = 0;
+        for (var fi = 0; fi < list.length; fi++) {
+          if (list[fi].rating === 5) fiveStarCount++;
+        }
+        var fourStarCount = 0;
+        for (var fri = 0; fri < list.length; fri++) {
+          if (list[fri].rating === 4) fourStarCount++;
+        }
+        var threeStarCount = 0;
+        for (var tii = 0; tii < list.length; tii++) {
+          if (list[tii].rating <= 3) threeStarCount++;
+        }
+
+        self.setData({
+          reviews: list,
+          allReviews: list,
+          reviewStats: { total: total, avgRating: avgRating, withImage: withImage, fiveStarCount: fiveStarCount, fourStarCount: fourStarCount, threeStarCount: threeStarCount },
+          isLoading: false
+        });
+      } else {
+        self.setData({ reviews: [], allReviews: [], reviewStats: { total: 0, avgRating: '0.0', withImage: 0, fiveStarCount: 0, fourStarCount: 0, threeStarCount: 0 }, isLoading: false });
       }
-    ];
-
-    // 计算统计数据
-    const stats = {
-      total: mockReviews.length,
-      withImage: mockReviews.filter(item => item.images.length > 0).length,
-      avgRating: (mockReviews.reduce((sum, item) => sum + item.rating, 0) / mockReviews.length).toFixed(1)
-    };
-
-    this.setData({
-      reviews: mockReviews,
-      allReviews: mockReviews,
-      reviewStats: stats,
-      isLoading: false
+    }).catch(function(err) {
+      console.error('加载评价失败', err);
+      self.setData({ reviews: [], allReviews: [], reviewStats: { total: 0, avgRating: '0.0', withImage: 0, fiveStarCount: 0, fourStarCount: 0, threeStarCount: 0 }, isLoading: false });
     });
   },
 
-  // 下拉刷新
-  onPullDownRefresh() {
-    console.log('下拉刷新');
-    this.loadReviews();
-
-    setTimeout(() => {
-      wx.stopPullDownRefresh();
-    }, 1000);
+  onPullDownRefresh: function() {
+    this.loadReviews(this.data.foodId);
+    wx.stopPullDownRefresh();
   }
 });

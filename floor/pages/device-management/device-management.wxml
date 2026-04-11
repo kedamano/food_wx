@@ -3,7 +3,7 @@
   <!-- 头部 -->
   <view class="header">
     <view class="back-btn" bindtap="onBack">
-      <text class="fa fa-arrow-left"></text>
+      <text class="-arrow-left">‹</text>
     </view>
     <text class="header-title">登录设备</text>
     <view class="header-placeholder"></view>
@@ -16,7 +16,7 @@
           wx:key="id"
           wx:for-item="item">
       <view class="device-icon">
-        <text class="fa {{item.platform === 'iOS' || item.platform === 'iPadOS' ? 'fa-apple' : 'fa-desktop'}}"></text>
+        <text>{{item.platform === 'iOS' || item.platform === 'iPadOS' ? '\uD83C\uDF4E' : '\uD83D\uDDA5\uFE0F'}}</text>
       </view>
       <view class="device-info">
         <view class="device-header">
@@ -26,18 +26,18 @@
         <text class="device-type">{{item.type}}</text>
         <view class="device-meta">
           <text class="meta-item">
-            <text class="fa fa-map-marker-alt"></text>
+            <text class="-map-marker-alt">📍</text>
             {{item.location}}
           </text>
           <text class="meta-item">
-            <text class="fa fa-clock"></text>
+            <text class="-clock">●</text>
             {{item.lastTime}}
           </text>
         </view>
       </view>
       <view class="device-action" wx:if="{{!item.isCurrent}}">
         <button class="unbind-btn" bindtap="onUnbindDevice" data-device-id="{{item.id}}">
-          <text class="fa fa-unlink"></text>
+          <text class="-unlink">●</text>
           解绑
         </button>
       </view>
@@ -47,14 +47,14 @@
   <!-- 全部解绑按钮 -->
   <view class="action-section" wx:if="{{devices.length > 1}}">
     <button class="danger-btn" bindtap="onUnbindAll">
-      <text class="fa fa-exclamation-triangle"></text>
+      <text class="-exclamation-triangle">●</text>
       全部解绑
     </button>
   </view>
 
   <!-- 安全提示 -->
   <view class="security-tip">
-    <text class="fa fa-info-circle tip-icon"></text>
+    <text class="-info-circle tip-icon">ℹ</text>
     <view class="tip-content">
       <text class="tip-title">安全提示</text>
       <text class="tip-text">• 建议定期检查登录设备列表</text>

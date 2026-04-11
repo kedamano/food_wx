@@ -13,7 +13,7 @@
       <view class="type-item {{typeIndex === index ? 'selected' : ''}}" 
             wx:for="{{paymentTypes}}" wx:key="id"
             bindtap="onTypeSelect" data-index="{{index}}">
-        <text class="type-icon">{{item.icon}}</text>
+        <text type-icon>{{iconText || "💬"}}</text>
         <text class="type-name">{{item.name}}</text>
         <text class="type-radio">{{typeIndex === index ? '✓' : ''}}</text>
       </view>

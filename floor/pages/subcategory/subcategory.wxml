@@ -25,7 +25,7 @@ NEW_FILE_CODE
             <text class="food-price">¥{{item.price}}</text>
             <text class="food-sales">月售{{item.sales}}</text>
             <view class="rating">
-              <text class="fa fa-star"></text>
+              <text class="-star">⭐</text>
               <text class="rating-text">{{item.rating}}</text>
             </view>
           </view>
@@ -37,7 +37,7 @@ NEW_FILE_CODE
 
   <!-- 空状态 -->
   <view class="empty-state" wx:if="{{foodList.length === 0 && !isLoading}}">
-    <text class="fa fa-utensils empty-icon"></text>
+    <text class="-utensils empty-icon">🍴</text>
     <text class="empty-text">暂无美食</text>
     <text class="empty-subtext">该分类下暂无商品</text>
   </view>
@@ -53,7 +53,7 @@ NEW_FILE_CODE
 <view class="bottom-cart" wx:if="{{cartItems.length > 0}}">
   <view class="cart-left">
     <view class="cart-icon-wrapper">
-      <text class="fa fa-shopping-cart cart-icon"></text>
+      <text class="-shopping-cart cart-icon">🛒</text>
       <text class="cart-count" wx:if="{{cartCount > 0}}">{{cartCount}}</text>
     </view>
     <text class="cart-total">¥{{cartTotal}}</text>

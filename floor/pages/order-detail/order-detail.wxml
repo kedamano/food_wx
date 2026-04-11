@@ -7,14 +7,14 @@
     </view>
     <text class="nav-title">订单详情</text>
     <view class="nav-right" bindtap="onShareOrder">
-      <text class="fa fa-share-alt share-icon"></text>
+      <text class="-share-alt share-icon">↗</text>
     </view>
   </view>
 
   <!-- 订单状态 -->
   <view class="order-status-section">
     <view class="status-header">
-      <text class="status-icon">{{statusIcon}}</text>
+      <text status-icon>{{statusIconText || "⏳"}}</text>
       <text class="status-text">{{orderInfo.statusText}}</text>
       <text class="status-desc">{{statusDesc}}</text>
     </view>
@@ -62,7 +62,7 @@
   <view class="store-section">
     <text class="section-title">商家信息</text>
     <view class="store-info">
-      <text class="fa fa-store store-icon"></text>
+      <text class="-store store-icon">🏪</text>
       <text class="store-name">{{orderInfo.store.name}}</text>
       <text class="store-distance">{{orderInfo.store.distance}}</text>
     </view>
@@ -75,7 +75,7 @@
       <view class="item-row" wx:for="{{orderInfo.items}}" wx:key="foodId">
         <view class="item-image">
           <image class="food-image" src="{{item.image}}" mode="aspectFill"></image>
-          <text class="fa fa-utensils food-icon" wx:if="{{!item.image}}"></text>
+          <text class="-utensils food-icon" wx:if="{{!item.image}}">🍴</text>
         </view>
         <view class="item-details">
           <text class="item-name">{{item.name}}</text>
