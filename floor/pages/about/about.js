@@ -7,10 +7,10 @@ Page({
     buildNumber: '20240115',
     updateTime: '2024-01-15',
     features: [
-      { icon: 'fa-utensils', iconText: 'ð´', title: '海量美食', desc: '汇聚各类美食商家' },
-      { icon: 'fa-rocket', iconText: 'ð', title: '快速配送', desc: '30分钟送达' },
-      { icon: 'fa-credit-card', iconText: 'ð³', title: '便捷支付', desc: '支持多种支付方式' },
-      { icon: 'fa-star', iconText: 'â­', title: '真实评价', desc: '查看其他用户评价' }
+      { icon: 'utensils', iconText: '🍴', title: '海量美食', desc: '汇聚各类美食商家' },
+      { icon: 'rocket', iconText: '🚀', title: '快速配送', desc: '30分钟送达' },
+      { icon: 'credit-card', iconText: '💳', title: '便捷支付', desc: '支持多种支付方式' },
+      { icon: 'star', iconText: '⭐', title: '真实评价', desc: '查看其他用户评价' }
     ],
     contactInfo: {
       servicePhone: '400-888-8888',

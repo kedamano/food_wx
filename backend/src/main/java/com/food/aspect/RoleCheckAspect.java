@@ -75,9 +75,10 @@ public class RoleCheckAspect {
         final String finalUserRole = userRole;
 
         // 验证用户角色是否在允许的角色列表中
+        // ADMIN 拥有最高权限，可绕过所有角色限制
         String[] requiredRoles = requireRole.value();
-        boolean hasPermission = Arrays.stream(requiredRoles)
-                .anyMatch(role -> role.equals(finalUserRole));
+        boolean hasPermission = "ADMIN".equals(finalUserRole)
+                || Arrays.stream(requiredRoles).anyMatch(role -> role.equals(finalUserRole));
 
         if (!hasPermission) {
             return BaseResult.error(403, "无权访问：需要 " + Arrays.toString(requiredRoles) + " 角色");

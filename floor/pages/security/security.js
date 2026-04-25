@@ -6,23 +6,51 @@ var app = getApp();
 Page({
   data: {
     userId: null,
-    phoneBound: true,
+    phoneBound: false,
     emailBound: false,
     passwordSet: true,
     bindWechat: false,
-    lastLoginTime: '2024-01-15 10:30'
+    securityLevel: 'low',
+    securityLevelText: '低',
+    levelPercent: 20,
+    securityTip: '建议绑定手机号和邮箱以提高账号安全'
   },
 
   onLoad: function() {
-    var app = getApp();
     this.setData({
       userId: app.globalData.userId || 1
     });
     this.loadSecurityInfo();
   },
 
+  // 计算安全等级
+  calcSecurityLevel: function() {
+    var score = 0;
+    if (this.data.phoneBound) score += 30;
+    if (this.data.emailBound) score += 30;
+    if (this.data.passwordSet) score += 25;
+    if (this.data.bindWechat) score += 15;
+
+    var level = 'low';
+    var text = '低';
+    var tip = '建议绑定手机号和邮箱以提高账号安全';
+    if (score >= 80) {
+      level = 'high'; text = '高'; tip = '您的账号安全性很好';
+    } else if (score >= 50) {
+      level = 'medium'; text = '中'; tip = '建议绑定更多方式以提高安全';
+    }
+
+    this.setData({
+      securityLevel: level,
+      securityLevelText: text,
+      levelPercent: Math.max(score, 20),
+      securityTip: tip
+    });
+  },
+
   // 加载安全信息
   loadSecurityInfo: function() {
+    var self = this;
     var userId = this.data.userId;
     if (!userId) return;
 
@@ -31,13 +59,15 @@ Page({
       method: 'GET'
     }).then(function(res) {
       if (res && res.code === 200 && res.data) {
-        this.setData({
+        self.setData({
           phoneBound: !!res.data.phone,
           emailBound: !!res.data.email
         });
+        self.calcSecurityLevel();
       }
     }).catch(function(err) {
       console.error('获取安全信息失败', err);
+      self.calcSecurityLevel();
     });
   },
 
@@ -99,13 +129,14 @@ Page({
 
   // 绑定手机号
   bindPhone: function(phone) {
+    var self = this;
     app.authRequest({
       url: '/user/' + this.data.userId,
       method: 'PUT',
       data: { phone: phone }
     }).then(function(res) {
       if (res && res.code === 200) {
-        this.setData({ phoneBound: true });
+        self.setData({ phoneBound: true });
         wx.showToast({ title: '手机号绑定成功', icon: 'success' });
       } else {
         wx.showToast({ title: '绑定失败', icon: 'none' });
@@ -137,13 +168,14 @@ Page({
 
   // 绑定邮箱
   bindEmail: function(email) {
+    var self = this;
     app.authRequest({
       url: '/user/' + this.data.userId,
       method: 'PUT',
       data: { email: email }
     }).then(function(res) {
       if (res && res.code === 200) {
-        this.setData({ emailBound: true });
+        self.setData({ emailBound: true });
         wx.showToast({ title: '邮箱绑定成功', icon: 'success' });
       } else {
         wx.showToast({ title: '绑定失败', icon: 'none' });

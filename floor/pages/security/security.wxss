@@ -1,67 +1,76 @@
-/* 安全设置页面样式 */
+/* 安全设置页面 - 统一设置风格 */
 page {
-  background: #f5f5f7;
+  background: #f5f5f5;
 }
 
-.container {
+.page-sub {
+  padding: 24rpx 0 0;
   min-height: 100vh;
-  padding-top: 20rpx;
 }
 
-/* 安全等级 */
-.security-level {
-  background: #fff;
-  margin: 0 24rpx 20rpx;
-  padding: 30rpx;
-  border-radius: 20rpx;
+/* ---------- 安全等级卡片 ---------- */
+.level-card {
+  margin-bottom: 24rpx;
 }
 
-.level-header {
+.level-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20rpx;
 }
 
-.level-title {
+.level-label {
   font-size: 30rpx;
   color: #333;
-  font-weight: bold;
+  font-weight: 500;
 }
 
-.level-badge {
-  padding: 6rpx 20rpx;
+.level-tag {
+  padding: 6rpx 24rpx;
   border-radius: 20rpx;
+}
+
+.level-tag-text {
   font-size: 24rpx;
 }
 
-.level-badge.high {
-  background: #FFF0EB;
-  color: #FF6633;
+.level-tag.high {
+  background: rgba(34, 197, 94, 0.1);
 }
 
-.level-badge.medium {
-  background: #fff3e0;
-  color: #ff9800;
+.level-tag.high .level-tag-text {
+  color: #16a34a;
 }
 
-.level-badge.low {
-  background: #ffebee;
-  color: #f44336;
+.level-tag.medium {
+  background: rgba(255, 165, 0, 0.1);
 }
 
-.level-bar {
-  height: 16rpx;
-  background: #e0e0e0;
-  border-radius: 8rpx;
+.level-tag.medium .level-tag-text {
+  color: #e68a00;
+}
+
+.level-tag.low {
+  background: rgba(255, 59, 48, 0.1);
+}
+
+.level-tag.low .level-tag-text {
+  color: #FF3B30;
+}
+
+.level-bar-bg {
+  height: 12rpx;
+  background: #f0f0f0;
+  border-radius: 6rpx;
   overflow: hidden;
   margin-bottom: 16rpx;
 }
 
-.level-progress {
+.level-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #f44336, #ff9800, #FF6633);
-  border-radius: 8rpx;
+  border-radius: 6rpx;
+  background: linear-gradient(90deg, #FF6633, #22c55e);
   transition: width 0.3s;
 }
 
@@ -70,83 +79,119 @@ page {
   color: #999;
 }
 
-/* 区块 */
-.section {
-  margin: 0 24rpx 20rpx;
+/* ---------- 分组 ---------- */
+.sub-group {
+  margin-bottom: 24rpx;
 }
 
-.section-title {
-  display: block;
-  font-size: 28rpx;
+.group-title {
+  font-size: 24rpx;
   color: #999;
-  margin-bottom: 16rpx;
-  padding-left: 10rpx;
+  padding: 0 40rpx 12rpx;
+  font-weight: 400;
+  letter-spacing: 1rpx;
 }
 
-.item-list {
+/* ---------- 卡片 ---------- */
+.s-card {
   background: #fff;
-  border-radius: 20rpx;
+  margin: 0 24rpx;
+  border-radius: 16rpx;
   overflow: hidden;
+  box-shadow: 0 1rpx 4rpx rgba(0, 0, 0, 0.04);
 }
 
-.item {
+.s-cell {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 28rpx 30rpx;
-  border-bottom: 1rpx solid #f0f0f0;
+  padding: 26rpx 32rpx;
+  background: #fff;
+  position: relative;
 }
 
-.item:last-child {
-  border-bottom: none;
+.s-cell::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 32rpx;
+  right: 0;
+  height: 1rpx;
+  background: #f0f0f0;
 }
 
-.item-left {
+.s-cell-last::after {
+  display: none;
+}
+
+.s-cell-hover {
+  background: #fafafa;
+}
+
+.s-cell-hd {
   display: flex;
   align-items: center;
+  flex: 1;
+  min-width: 0;
 }
 
-.item-icon {
-  font-size: 40rpx;
-  margin-right: 20rpx;
-}
-
-.item-info {
+.s-cell-ft {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+  flex-shrink: 0;
 }
 
-.item-name {
+/* ---------- 圆形图标 ---------- */
+.s-icon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 24rpx;
+  flex-shrink: 0;
+}
+
+.s-icon text {
+  font-size: 30rpx;
+}
+
+.s-icon-orange { background: rgba(255, 102, 51, 0.1); }
+.s-icon-blue { background: rgba(59, 130, 246, 0.1); }
+.s-icon-green { background: rgba(34, 197, 94, 0.1); }
+.s-icon-purple { background: rgba(139, 92, 246, 0.1); }
+.s-icon-gray { background: rgba(107, 114, 128, 0.1); }
+
+/* ---------- 文字 ---------- */
+.s-title {
   font-size: 30rpx;
   color: #333;
+  font-weight: 400;
 }
 
-.item-desc {
-  font-size: 24rpx;
+.s-desc {
+  font-size: 26rpx;
   color: #999;
-  margin-top: 4rpx;
 }
 
-.item-right {
-  display: flex;
-  align-items: center;
+.s-arrow {
+  font-size: 32rpx;
+  color: #ccc;
+  font-weight: 300;
 }
 
-.bind-status {
+.s-cell-status {
   font-size: 26rpx;
   color: #FF6633;
-  margin-right: 10rpx;
 }
 
-.bind-status.bound {
+.s-cell-status.bound {
   color: #999;
 }
 
-.item-arrow {
-  font-size: 28rpx;
-  color: #ccc;
-}
-
-.safe-area-bottom {
-  height: 40rpx;
+/* ---------- 底部安全区 ---------- */
+.safe-bottom {
+  height: calc(40rpx + env(safe-area-inset-bottom));
 }

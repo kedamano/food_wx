@@ -1,184 +1,169 @@
-<!-- 设置页面 - 精致版 -->
-<scroll-view class="container" scroll-y>
-  <!-- 头部 -->
-  <view class="header-section">
-    <view class="header-content">
-      <text class="header-title">设置</text>
-      <text class="header-subtitle">管理您的偏好设置</text>
-    </view>
-  </view>
-
-  <!-- 账号设置 -->
-  <view class="settings-section">
-    <text class="section-title">账号设置</text>
-    <view class="setting-list">
-      <view class="setting-item" bindtap="onAccountInfo">
-        <view class="item-left">
-          <view class="item-icon account">
-            <text class="-user">👤</text>
-          </view>
-          <text class="item-text">账号信息</text>
+<view class="page-settings">
+  <!-- 账号与安全 -->
+  <view class="settings-group">
+    <view class="group-title">账号与安全</view>
+    <view class="s-card">
+      <view class="s-cell" bindtap="onAccountInfo" hover-class="s-cell-hover">
+        <view class="s-cell-hd">
+          <view class="s-icon s-icon-orange"><text>👤</text></view>
+          <text class="s-title">账号信息</text>
         </view>
-        <text class="item-arrow">→</text>
-      </view>
-      <view class="setting-item" bindtap="onSecurity">
-        <view class="item-left">
-          <view class="item-icon security">
-            <text class="-lock">🔒</text>
-          </view>
-          <text class="item-text">安全设置</text>
-        </view>
-        <text class="item-arrow">→</text>
-      </view>
-      <view class="setting-item" bindtap="onPrivacy">
-        <view class="item-left">
-          <view class="item-icon privacy">
-            <text class="-shield-alt">🛡</text>
-          </view>
-          <text class="item-text">隐私设置</text>
-        </view>
-        <text class="item-arrow">→</text>
-      </view>
-    </view>
-  </view>
-
-  <!-- 通知设置 -->
-  <view class="settings-section">
-    <text class="section-title">通知设置</text>
-    <view class="setting-list">
-      <view class="setting-item switch">
-        <view class="item-left">
-          <view class="item-icon notifications">
-            <text class="-bell">●</text>
-          </view>
-          <text class="item-text">订单通知</text>
-        </view>
-        <switch class="item-switch" checked="{{settings.orderNotifications}}" bind:change="onSwitchChange" data-setting="orderNotifications" />
-      </view>
-      <view class="setting-item switch">
-        <view class="item-left">
-          <view class="item-icon promotions">
-            <text class="-bullhorn">●</text>
-          </view>
-          <text class="item-text">促销通知</text>
-        </view>
-        <switch class="item-switch" checked="{{settings.promoNotifications}}" bind:change="onSwitchChange" data-setting="promoNotifications" />
-      </view>
-      <view class="setting-item switch">
-        <view class="item-left">
-          <view class="item-icon customer">
-            <text class="-comment-dots">●</text>
-          </view>
-          <text class="item-text">客服消息</text>
-        </view>
-        <switch class="item-switch" checked="{{settings.customerServiceNotifications}}" bind:change="onSwitchChange" data-setting="customerServiceNotifications" />
-      </view>
-    </view>
-  </view>
-
-  <!-- 通用设置 -->
-  <view class="settings-section">
-    <text class="section-title">通用设置</text>
-    <view class="setting-list">
-      <view class="setting-item switch">
-        <view class="item-left">
-          <view class="item-icon location">
-            <text class="-globe">●</text>
-          </view>
-          <text class="item-text">自动定位</text>
-        </view>
-        <switch class="item-switch" checked="{{settings.autoLocation}}" bind:change="onSwitchChange" data-setting="autoLocation" />
-      </view>
-      <view class="setting-item switch">
-        <view class="item-left">
-          <view class="item-icon update">
-            <text class="-sync-alt">🔄</text>
-          </view>
-          <text class="item-text">自动更新</text>
-        </view>
-        <switch class="item-switch" checked="{{settings.autoUpdate}}" bind:change="onSwitchChange" data-setting="autoUpdate" />
-      </view>
-      <view class="setting-item" bindtap="onLanguage">
-        <view class="item-left">
-          <view class="item-icon language">
-            <text class="-language">●</text>
-          </view>
-          <text class="item-text">语言设置</text>
-        </view>
-        <view class="item-value">
-          <text class="value-text">{{settings.language}}</text>
-          <text class="item-arrow">→</text>
+        <view class="s-cell-ft">
+          <text class="s-arrow">›</text>
         </view>
       </view>
-      <view class="setting-item" bindtap="onClearCache">
-        <view class="item-left">
-          <view class="item-icon cache">
-            <text class="-broom">●</text>
-          </view>
-          <text class="item-text">清除缓存</text>
+      <view class="s-cell" bindtap="onSecurity" hover-class="s-cell-hover">
+        <view class="s-cell-hd">
+          <view class="s-icon s-icon-blue"><text>🔒</text></view>
+          <text class="s-title">安全设置</text>
         </view>
-        <view class="item-value">
-          <text class="value-text">{{cacheSize}}</text>
-          <text class="item-arrow">→</text>
+        <view class="s-cell-ft">
+          <text class="s-arrow">›</text>
+        </view>
+      </view>
+      <view class="s-cell s-cell-last" bindtap="onPrivacy" hover-class="s-cell-hover">
+        <view class="s-cell-hd">
+          <view class="s-icon s-icon-green"><text>🛡️</text></view>
+          <text class="s-title">隐私设置</text>
+        </view>
+        <view class="s-cell-ft">
+          <text class="s-arrow">›</text>
         </view>
       </view>
     </view>
   </view>
 
-  <!-- 关于我们 -->
-  <view class="settings-section">
-    <text class="section-title">关于我们</text>
-    <view class="setting-list">
-      <view class="setting-item" bindtap="onAbout">
-        <view class="item-left">
-          <view class="item-icon about">
-            <text class="-info-circle">ℹ</text>
-          </view>
-          <text class="item-text">关于小程序</text>
+  <!-- 新消息通知 -->
+  <view class="settings-group">
+    <view class="group-title">新消息通知</view>
+    <view class="s-card">
+      <view class="s-cell">
+        <view class="s-cell-hd">
+          <view class="s-icon s-icon-orange"><text>🔔</text></view>
+          <text class="s-title">订单通知</text>
         </view>
-        <text class="item-arrow">→</text>
+        <view class="s-cell-ft">
+          <switch class="s-switch" checked="{{settings.orderNotifications}}" bindchange="onSwitchChange" data-setting="orderNotifications" color="#FF6633" />
+        </view>
       </view>
-      <view class="setting-item" bindtap="onHelp">
-        <view class="item-left">
-          <view class="item-icon help">
-            <text class="-question-circle">●</text>
-          </view>
-          <text class="item-text">帮助中心</text>
+      <view class="s-cell">
+        <view class="s-cell-hd">
+          <view class="s-icon s-icon-purple"><text>📢</text></view>
+          <text class="s-title">促销通知</text>
         </view>
-        <text class="item-arrow">→</text>
+        <view class="s-cell-ft">
+          <switch class="s-switch" checked="{{settings.promoNotifications}}" bindchange="onSwitchChange" data-setting="promoNotifications" color="#FF6633" />
+        </view>
       </view>
-      <view class="setting-item" bindtap="onFeedback">
-        <view class="item-left">
-          <view class="item-icon feedback">
-            <text class="-comment-alt">●</text>
-          </view>
-          <text class="item-text">意见反馈</text>
+      <view class="s-cell s-cell-last">
+        <view class="s-cell-hd">
+          <view class="s-icon s-icon-blue"><text>💬</text></view>
+          <text class="s-title">客服消息</text>
         </view>
-        <text class="item-arrow">→</text>
+        <view class="s-cell-ft">
+          <switch class="s-switch" checked="{{settings.customerServiceNotifications}}" bindchange="onSwitchChange" data-setting="customerServiceNotifications" color="#FF6633" />
+        </view>
       </view>
-      <view class="setting-item" bindtap="onVersion">
-        <view class="item-left">
-          <view class="item-icon version">
-            <text class="-sync-alt">🔄</text>
-          </view>
-          <text class="item-text">检查更新</text>
+    </view>
+  </view>
+
+  <!-- 通用 -->
+  <view class="settings-group">
+    <view class="group-title">通用</view>
+    <view class="s-card">
+      <view class="s-cell">
+        <view class="s-cell-hd">
+          <view class="s-icon s-icon-orange"><text>📍</text></view>
+          <text class="s-title">自动定位</text>
         </view>
-        <view class="item-value">
-          <text class="value-text">v{{version}}</text>
-          <text class="item-arrow">→</text>
+        <view class="s-cell-ft">
+          <switch class="s-switch" checked="{{settings.autoLocation}}" bindchange="onSwitchChange" data-setting="autoLocation" color="#FF6633" />
+        </view>
+      </view>
+      <view class="s-cell">
+        <view class="s-cell-hd">
+          <view class="s-icon s-icon-green"><text>🔄</text></view>
+          <text class="s-title">自动更新</text>
+        </view>
+        <view class="s-cell-ft">
+          <switch class="s-switch" checked="{{settings.autoUpdate}}" bindchange="onSwitchChange" data-setting="autoUpdate" color="#FF6633" />
+        </view>
+      </view>
+      <view class="s-cell" bindtap="onLanguage" hover-class="s-cell-hover">
+        <view class="s-cell-hd">
+          <view class="s-icon s-icon-blue"><text>🌐</text></view>
+          <text class="s-title">语言</text>
+        </view>
+        <view class="s-cell-ft">
+          <text class="s-desc">{{settings.language}}</text>
+          <text class="s-arrow">›</text>
+        </view>
+      </view>
+      <view class="s-cell s-cell-last" bindtap="onClearCache" hover-class="s-cell-hover">
+        <view class="s-cell-hd">
+          <view class="s-icon s-icon-gray"><text>🧹</text></view>
+          <text class="s-title">清除缓存</text>
+        </view>
+        <view class="s-cell-ft">
+          <text class="s-desc">{{cacheSize}}</text>
+          <text class="s-arrow">›</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 关于 -->
+  <view class="settings-group">
+    <view class="group-title">关于</view>
+    <view class="s-card">
+      <view class="s-cell" bindtap="onAbout" hover-class="s-cell-hover">
+        <view class="s-cell-hd">
+          <view class="s-icon s-icon-orange"><text>ℹ️</text></view>
+          <text class="s-title">关于小程序</text>
+        </view>
+        <view class="s-cell-ft">
+          <text class="s-arrow">›</text>
+        </view>
+      </view>
+      <view class="s-cell" bindtap="onHelp" hover-class="s-cell-hover">
+        <view class="s-cell-hd">
+          <view class="s-icon s-icon-blue"><text>❓</text></view>
+          <text class="s-title">帮助中心</text>
+        </view>
+        <view class="s-cell-ft">
+          <text class="s-arrow">›</text>
+        </view>
+      </view>
+      <view class="s-cell" bindtap="onFeedback" hover-class="s-cell-hover">
+        <view class="s-cell-hd">
+          <view class="s-icon s-icon-orange"><text>✉️</text></view>
+          <text class="s-title">意见反馈</text>
+        </view>
+        <view class="s-cell-ft">
+          <text class="s-arrow">›</text>
+        </view>
+      </view>
+      <view class="s-cell s-cell-last" bindtap="onVersion" hover-class="s-cell-hover">
+        <view class="s-cell-hd">
+          <view class="s-icon s-icon-purple"><text>🔄</text></view>
+          <text class="s-title">检查更新</text>
+        </view>
+        <view class="s-cell-ft">
+          <text class="s-desc">v{{version}}</text>
+          <text class="s-arrow">›</text>
         </view>
       </view>
     </view>
   </view>
 
   <!-- 退出登录 -->
-  <view class="logout-section">
-    <button class="logout-btn" bindtap="onLogout">
-      <text class="-sign-out-alt btn-icon">●</text>
-      <text class="btn-text">退出登录</text>
-    </button>
+  <view class="settings-group group-last">
+    <view class="s-card card-logout">
+      <view class="s-cell s-cell-last" bindtap="onLogout" hover-class="s-cell-hover">
+        <text class="logout-text">退出登录</text>
+      </view>
+    </view>
   </view>
 
-  <!-- 底部安全区域 -->
-  <view class="safe-area-bottom"></view>
-</scroll-view>
+  <view class="safe-bottom"></view>
+</view>

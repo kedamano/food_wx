@@ -28,50 +28,35 @@ Page({
   loadFavoriteStores: function() {
     var self = this;
     var app = getApp();
+    var userId = app.globalData.userId || wx.getStorageSync('userId');
     self.setData({ loading: true });
 
-    // 后端暂无收藏接口，从所有商家中筛选已收藏的
-    // 使用本地存储保存收藏列表
-    var favoriteIds = wx.getStorageSync('favoriteStoreIds') || [];
+    if (!userId) {
+      self.setData({ loading: false, favoriteStores: [], empty: true });
+      return;
+    }
 
     app.authRequest({
-      url: '/store/all',
+      url: '/favorite/user/' + userId,
       method: 'GET'
     }).then(function(res) {
       self.setData({ loading: false });
       if (res && res.code === 200 && res.data) {
-        var allStores = Array.isArray(res.data) ? res.data : [];
-        var stores = [];
-        for (var i = 0; i < allStores.length; i++) {
-          var s = allStores[i];
-          var sid = s.storeId || s.id;
-          var isFound = false;
-          for (var fi = 0; fi < favoriteIds.length; fi++) {
-            if (favoriteIds[fi] === sid) {
-              isFound = true;
-              break;
-            }
-          }
-          if (isFound) {
-            stores.push({
-              storeId: s.storeId || s.id,
-              name: s.storeName || s.name,
-              image: app.resolveImageUrl(s.logo) || app.resolveImageUrl(s.banner) || '/images/stores/default.png',
-              rating: s.rating || 0,
-              monthlySales: s.monthlySales || 0,
-              distance: s.distance || '未知',
-              deliveryTime: s.deliveryTime ? s.deliveryTime + '分钟' : '未知',
-              deliveryFee: s.deliveryFee || 0,
-              minOrder: s.minOrder || 0,
-              tags: s.tags || [],
-              isFavorite: true
-            });
-          }
+        var stores = Array.isArray(res.data) ? res.data : [];
+        var list = [];
+        for (var i = 0; i < stores.length; i++) {
+          var s = stores[i];
+          list.push({
+            storeId: s.storeId,
+            name: s.storeName || s.name,
+            image: app.resolveImageUrl(s.logo) || '/images/stores/default.png',
+            rating: s.rating || 0,
+            deliveryTime: s.deliveryTime || '30分钟',
+            deliveryFee: s.deliveryFee || 0,
+            isFavorite: true
+          });
         }
-        self.setData({
-          favoriteStores: stores,
-          empty: stores.length === 0
-        });
+        self.setData({ favoriteStores: list, empty: list.length === 0 });
       } else {
         self.setData({ favoriteStores: [], empty: true });
       }
@@ -94,6 +79,7 @@ Page({
     var storeId = e.currentTarget.dataset.storeId;
     var storeName = e.currentTarget.dataset.name;
     var self = this;
+    var app = getApp();
     e.stopPropagation();
 
     wx.showModal({
@@ -101,28 +87,23 @@ Page({
       content: '确定取消收藏「' + storeName + '」吗？',
       success: function(res) {
         if (res.confirm) {
-          // 从本地存储中移除收藏ID
-          var favoriteIds = wx.getStorageSync('favoriteStoreIds') || [];
-          var newFavoriteIds = [];
-          for (var i = 0; i < favoriteIds.length; i++) {
-            if (favoriteIds[i] !== storeId) {
-              newFavoriteIds.push(favoriteIds[i]);
+          // 调用后端取消收藏接口
+          app.authRequest({
+            url: '/favorite/' + storeId,
+            method: 'DELETE'
+          }).then(function(delRes) {
+            // 更新列表
+            var updatedStores = [];
+            for (var j = 0; j < self.data.favoriteStores.length; j++) {
+              if (self.data.favoriteStores[j].storeId !== storeId) {
+                updatedStores.push(self.data.favoriteStores[j]);
+              }
             }
-          }
-          wx.setStorageSync('favoriteStoreIds', newFavoriteIds);
-
-          // 更新列表
-          var updatedStores = [];
-          for (var j = 0; j < self.data.favoriteStores.length; j++) {
-            if (self.data.favoriteStores[j].storeId !== storeId) {
-              updatedStores.push(self.data.favoriteStores[j]);
-            }
-          }
-          self.setData({
-            favoriteStores: updatedStores,
-            empty: updatedStores.length === 0
+            self.setData({ favoriteStores: updatedStores, empty: updatedStores.length === 0 });
+            wx.showToast({ title: '已取消收藏', icon: 'success' });
+          }).catch(function(err) {
+            wx.showToast({ title: '操作失败', icon: 'none' });
           });
-          wx.showToast({ title: '已取消收藏', icon: 'success' });
         }
       }
     });

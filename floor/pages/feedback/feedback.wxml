@@ -1,65 +1,80 @@
 <!-- 意见反馈页面 -->
-<view class="container">
+<view class="page-sub">
   <!-- 反馈类型 -->
-  <view class="section">
-    <text class="section-title">反馈类型</text>
-    <view class="type-grid">
-      <view class="type-item {{selectedType === item.id ? 'selected' : ''}}" wx:for="{{feedbackTypes}}" wx:key="id" bindtap="onSelectType" data-id="{{item.id}}">
-        <text type-icon>{{iconText || "💡"}}</text>
-        <text class="type-name">{{item.name}}</text>
+  <view class="sub-group">
+    <view class="group-title">反馈类型</view>
+    <view class="type-row">
+      <view class="type-chip {{selectedType === item.id ? 'active' : ''}}" wx:for="{{feedbackTypes}}" wx:key="id" bindtap="onSelectType" data-id="{{item.id}}">
+        <text class="type-chip-icon">{{item.iconText}}</text>
+        <text class="type-chip-name">{{item.name}}</text>
       </view>
     </view>
   </view>
 
   <!-- 反馈内容 -->
-  <view class="section">
-    <text class="section-title">反馈内容</text>
-    <view class="content-box">
-      <textarea class="content-input" placeholder="请详细描述您遇到的问题或建议（至少10个字）..." value="{{content}}" bindinput="onInputContent" maxlength="500" />
-      <text class="char-count">{{content.length}}/500</text>
+  <view class="sub-group">
+    <view class="group-title">反馈内容</view>
+    <view class="s-card textarea-card">
+      <textarea class="fb-textarea" placeholder="请详细描述您遇到的问题或建议（至少10个字）..." value="{{content}}" bindinput="onInputContent" maxlength="500" />
+      <view class="textarea-footer">
+        <text class="char-count">{{content.length}}/500</text>
+      </view>
     </view>
   </view>
 
   <!-- 上传图片 -->
-  <view class="section">
-    <text class="section-title">上传图片（可选）</text>
-    <view class="images-grid">
-      <view class="image-item" wx:for="{{images}}" wx:key="index">
-        <image class="uploaded-image" src="{{item}}" mode="aspectFill" bindtap="onPreviewImage" data-index="{{index}}"></image>
-        <view class="remove-btn" bindtap="onRemoveImage" data-index="{{index}}">×</view>
+  <view class="sub-group">
+    <view class="group-title">上传图片（可选，最多{{maxImages}}张）</view>
+    <view class="image-row">
+      <view class="image-thumb" wx:for="{{images}}" wx:key="index">
+        <image class="thumb-img" src="{{item}}" mode="aspectFill" bindtap="onPreviewImage" data-index="{{index}}"></image>
+        <view class="thumb-del" bindtap="onRemoveImage" data-index="{{index}}">
+          <text class="del-icon">×</text>
+        </view>
       </view>
-      <view class="add-image-btn" wx:if="{{images.length < maxImages}}" bindtap="onAddImage">
-        <text class="add-icon">+</text>
-        <text class="add-text">添加图片</text>
+      <view class="image-add" wx:if="{{images.length < maxImages}}" bindtap="onAddImage">
+        <text class="add-plus">+</text>
+        <text class="add-label">添加图片</text>
       </view>
     </view>
   </view>
 
   <!-- 联系方式 -->
-  <view class="section">
-    <text class="section-title">联系方式（可选）</text>
-    <input class="contact-input" type="text" placeholder="请输入手机号或邮箱，方便我们联系您" value="{{contactInfo}}" bindinput="onInputContact" />
-  </view>
-
-  <!-- 提交按钮 -->
-  <view class="submit-section">
-    <button class="submit-btn {{submitting ? 'disabled' : ''}}" bindtap="onSubmit" disabled="{{submitting}}">
-      <text wx:if="{{submitting}}">提交中...</text>
-      <text wx:else>提交反馈</text>
-    </button>
-    <view class="history-btn" bindtap="onViewHistory">
-      <text class="-clipboard-list history-icon">📋</text>
-      <text class="history-text">查看反馈历史</text>
+  <view class="sub-group">
+    <view class="group-title">联系方式（可选）</view>
+    <view class="s-card">
+      <view class="input-cell">
+        <input class="fb-input" type="text" placeholder="请输入手机号或邮箱" value="{{contactInfo}}" bindinput="onInputContact" />
+      </view>
     </view>
   </view>
 
-  <!-- 提示 -->
-  <view class="tips">
-    <text class="tip-title">温馨提示</text>
-    <text class="tip-text">请尽量详细描述您的问题，以便我们更好地解决</text>
-    <text class="tip-text">上传问题截图可以加快处理速度</text>
-    <text class="tip-text">我们会在1-3个工作日内处理您的反馈</text>
+  <!-- 提交按钮 -->
+  <view class="btn-area">
+    <button class="submit-btn" bindtap="onSubmit" disabled="{{submitting}}">
+      <text wx:if="{{submitting}}">提交中...</text>
+      <text wx:else>提交反馈</text>
+    </button>
   </view>
 
-  <view class="safe-area-bottom"></view>
+  <!-- 温馨提示 -->
+  <view class="tip-section">
+    <view class="s-card tip-card">
+      <view class="tip-header">
+        <text class="tip-title">温馨提示</text>
+      </view>
+      <view class="tip-list">
+        <view class="tip-row"><text class="tip-dot">·</text><text class="tip-text">请尽量详细描述您的问题，以便我们更好地解决</text></view>
+        <view class="tip-row"><text class="tip-dot">·</text><text class="tip-text">上传问题截图可以加快处理速度</text></view>
+        <view class="tip-row"><text class="tip-dot">·</text><text class="tip-text">我们会在1-3个工作日内处理您的反馈</text></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 查看历史 -->
+  <view class="history-link" bindtap="onViewHistory" hover-class="s-cell-hover">
+    <text class="history-text">📋 查看反馈历史</text>
+  </view>
+
+  <view class="safe-bottom"></view>
 </view>

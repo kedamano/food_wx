@@ -66,8 +66,15 @@ Page({
               quantity: Number(item.quantity) || 0,
               selected: true,
               cartId: item.cartId,
+              storeId: item.storeId,
               itemTotal: Number((Number(item.price) || 0) * (Number(item.quantity) || 0)).toFixed(2)
             });
+          }
+
+          // 从购物车数据中提取 storeId 更新到 storeInfo
+          var firstStoreId = cartData[0].storeId;
+          if (firstStoreId) {
+            self.setData({ 'storeInfo.id': firstStoreId });
           }
 
           self.setData({
@@ -107,6 +114,7 @@ Page({
         image: app.resolveImageUrl(item.image) || self.getDefaultFoodImage(item.name),
         quantity: Number(item.quantity) || 0,
         selected: true,
+        storeId: item.storeId,
         itemTotal: Number((Number(item.price) || 0) * (Number(item.quantity) || 0)).toFixed(2)
       });
     }
@@ -381,21 +389,28 @@ Page({
     var finalAmount = Math.max(0, subtotalNum + deliveryFeeNum - discountNum).toFixed(2);
 
     var orderItems = [];
+    var cartIds = [];
     for (var j = 0; j < selectedItems.length; j++) {
       var si = selectedItems[j];
       orderItems.push({
         foodId: si.id,
+        cartId: si.cartId,
         name: si.name,
         price: si.price,
         image: si.image,
         quantity: si.quantity,
         totalPrice: (si.price * si.quantity).toFixed(2)
       });
+      if (si.cartId) {
+        cartIds.push(si.cartId);
+      }
     }
 
     var orderInfo = {
       orderId: Date.now(),
       items: orderItems,
+      cartIds: cartIds,
+      storeId: self.data.storeInfo.id || (selectedItems[0] && selectedItems[0].storeId) || 1,
       store: self.data.storeInfo,
       subtotal: self.data.subtotal,
       totalAmount: self.data.totalAmount,

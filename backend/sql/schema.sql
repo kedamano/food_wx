@@ -211,3 +211,53 @@ CREATE TABLE payment_records (
     INDEX idx_payment_no (payment_no),
     INDEX idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='支付记录表';
+
+-- 积分变动日志表
+CREATE TABLE IF NOT EXISTS `points_log` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL COMMENT '用户ID',
+  `change` int NOT NULL COMMENT '积分变化量（正为增加，负为减少）',
+  `type` varchar(32) NOT NULL COMMENT 'SIGN_IN/ORDER_COMPLETE/ADMIN/EXCHANGE/REVIEW',
+  `reason` varchar(128) DEFAULT NULL COMMENT '操作原因',
+  `balance` int NOT NULL COMMENT '操作后余额',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_type` (`type`),
+  KEY `idx_create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='积分变动日志表';
+
+-- 用户收藏商家表
+CREATE TABLE IF NOT EXISTS `user_favorites` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL COMMENT '用户ID',
+  `store_id` int NOT NULL COMMENT '商家ID',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '收藏时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_store` (`user_id`, `store_id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_store_id` (`store_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户收藏商家表';
+
+-- stores 表补充字段（经纬度，若不存在则添加）
+ALTER TABLE stores ADD COLUMN IF NOT EXISTS lat DECIMAL(10,6) DEFAULT NULL COMMENT '商家纬度';
+ALTER TABLE stores ADD COLUMN IF NOT EXISTS lng DECIMAL(10,6) DEFAULT NULL COMMENT '商家经度';
+ALTER TABLE stores ADD COLUMN IF NOT EXISTS price_level DECIMAL(10,2) DEFAULT 25 COMMENT '人均价格';
+ALTER TABLE stores ADD COLUMN IF NOT EXISTS name VARCHAR(100) AS (store_name) VIRTUAL COMMENT '商家名称别名（兼容）';
+
+-- users 表补充 role 字段
+ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(20) DEFAULT 'USER' COMMENT '用户角色：USER/ADMIN/MERCHANT';
+
+-- 用户反馈表
+CREATE TABLE IF NOT EXISTS `feedback` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int DEFAULT NULL COMMENT '用户ID（0表示未登录）',
+  `type` int DEFAULT 4 COMMENT '反馈类型：1-功能建议 2-Bug反馈 3-体验问题 4-其他',
+  `content` text NOT NULL COMMENT '反馈内容',
+  `contact` varchar(100) DEFAULT NULL COMMENT '联系方式',
+  `status` varchar(20) DEFAULT 'pending' COMMENT '处理状态：pending/resolved',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户反馈表';

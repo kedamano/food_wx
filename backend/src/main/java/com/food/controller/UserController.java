@@ -3,7 +3,9 @@ package com.food.controller;
 import com.food.annotation.RequireRole;
 import com.food.dto.BaseResult;
 import com.food.dto.UserDTO;
+import com.food.entity.PointsLog;
 import com.food.entity.User;
+import com.food.mapper.PointsLogMapper;
 import com.food.service.UserService;
 import com.food.utils.JwtUtil;
 import com.food.utils.SmsService;
@@ -30,6 +32,9 @@ public class UserController {
 
     @Autowired
     private SmsService smsService;
+
+    @Autowired
+    private PointsLogMapper pointsLogMapper;
 
     /**
      * 从请求中提取Token（去掉Bearer前缀）
@@ -232,7 +237,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    @ApiOperation(value = "用户注册", notes = "用户注册接口")
+    @ApiOperation(value = "用户注册", notes = "用户注册接口（需要先发送并验证手机验证码）")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "username", value = "用户名", required = true, paramType = "body"),
             @ApiImplicitParam(name = "password", value = "密码", required = true, paramType = "body"),
@@ -240,7 +245,35 @@ public class UserController {
             @ApiImplicitParam(name = "verifyCode", value = "验证码", required = true, paramType = "body"),
             @ApiImplicitParam(name = "inviteCode", value = "邀请码", required = false, paramType = "body")
     })
-    public BaseResult register(@RequestBody User user) {
+    public BaseResult register(@RequestBody Map<String, String> requestBody) {
+        String phone = requestBody.get("phone");
+        String verifyCode = requestBody.get("verifyCode");
+
+        // 验证手机号格式
+        if (!isValidPhone(phone)) {
+            return BaseResult.error(400, "手机号格式不正确");
+        }
+
+        // 验证验证码
+        if (verifyCode == null || verifyCode.isEmpty()) {
+            return BaseResult.error(400, "请输入验证码");
+        }
+        if (!com.food.utils.VerifyCodeUtil.verifyCode(phone, verifyCode)) {
+            return BaseResult.error(400, "验证码错误或已过期");
+        }
+        // 验证成功立即清除，防止重放
+        com.food.utils.VerifyCodeUtil.clearVerifyCode(phone);
+
+        // 构建 User 对象
+        User user = new User();
+        user.setUsername(requestBody.get("username"));
+        user.setPassword(requestBody.get("password"));
+        user.setPhone(phone);
+        String inviteCode = requestBody.get("inviteCode");
+        if (inviteCode != null && !inviteCode.isEmpty()) {
+            user.setInviteCode(inviteCode);
+        }
+
         return userService.register(user);
     }
 
@@ -410,15 +443,13 @@ public class UserController {
             }
         }
 
-        // 记录积分变动日志（实际项目中应该写入数据库）
+        // 记录积分变动日志（写入数据库）
         String reason = pointsRequest.getReason();
         if (reason == null || reason.isEmpty()) {
             reason = "管理员操作";
         }
-        System.out.println("[积分变动] 管理员ID: " + adminUserId + ", 目标用户ID: " + targetUserId +
-                ", 变动: " + pointsChange + ", 原因: " + reason);
 
-        return userService.updateUserPoints(targetUserId, pointsChange);
+        return userService.updateUserPoints(targetUserId, pointsChange, "ADMIN", reason);
     }
 
     @GetMapping("/points/{userId}")
@@ -435,9 +466,11 @@ public class UserController {
             result.put("points", user.getPoints());
             result.put("level", user.getLevel());
             
-            // 模拟今日可获积分和本月累计积分
-            result.put("todayPoints", user.getPoints() % 200 + 50);
-            result.put("monthlyPoints", user.getPoints() / 2);
+            // 从数据库查询今日和本月实际积分
+            Integer todayPoints = pointsLogMapper.getTodayPoints(userId);
+            Integer monthlyPoints = pointsLogMapper.getMonthlyPoints(userId);
+            result.put("todayPoints", todayPoints != null ? todayPoints : 0);
+            result.put("monthlyPoints", monthlyPoints != null ? monthlyPoints : 0);
             
             return BaseResult.success(result);
         } catch (Exception e) {
@@ -445,8 +478,48 @@ public class UserController {
         }
     }
 
+    @GetMapping("/points-history/{userId}")
+    @ApiOperation(value = "获取用户积分历史", notes = "获取用户积分变动记录")
+    public BaseResult getPointsHistory(@PathVariable Integer userId, HttpServletRequest request) {
+        try {
+            String token = extractToken(request);
+            if (token == null || token.isEmpty()) {
+                return BaseResult.error(401, "未登录");
+            }
+            Integer currentUserId = jwtUtil.getUserIdFromToken(token);
+            if (currentUserId == null) {
+                return BaseResult.error(401, "Token无效");
+            }
+            // 只能查自己的记录，管理员可以查所有
+            User currentUser = userService.getUserById(currentUserId);
+            boolean isAdmin = currentUser != null && "ADMIN".equals(currentUser.getRole());
+            if (!currentUserId.equals(userId) && !isAdmin) {
+                return BaseResult.error(403, "无权查看他人积分记录");
+            }
+            List<PointsLog> logs = pointsLogMapper.selectByUserId(userId);
+            // 转为前端友好格式
+            List<Map<String, Object>> result = new java.util.ArrayList<>();
+            for (PointsLog log : logs) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("id", log.getId());
+                item.put("change", log.getChange());
+                item.put("type", log.getChange() > 0 ? "收入" : "支出");
+                item.put("points", log.getChange() > 0 ? "+" + log.getChange() : String.valueOf(log.getChange()));
+                item.put("desc", log.getReason());
+                item.put("reason", log.getReason());
+                item.put("balance", log.getBalance());
+                item.put("createTime", log.getCreateTime() != null ? log.getCreateTime().toString() : "");
+                item.put("time", log.getCreateTime() != null ? log.getCreateTime().toString() : "");
+                result.add(item);
+            }
+            return BaseResult.success(result);
+        } catch (Exception e) {
+            return BaseResult.error("获取积分记录失败: " + e.getMessage());
+        }
+    }
+
     @PostMapping("/sign-in/{userId}")
-    @ApiOperation(value = "用户签到", notes = "用户每日签到获取积分（每天只能签到一次）")
+    @ApiOperation(value = "用户签到", notes = "用户每日签到获取积分（每天只能签到一次，基于数据库防重）")
     public BaseResult signIn(@PathVariable Integer userId, HttpServletRequest request) {
         try {
             // 验证登录状态
@@ -465,18 +538,14 @@ public class UserController {
                 return BaseResult.error(403, "无权为他人签到");
             }
 
-            // 检查今天是否已经签到
-            if (com.food.utils.SignInUtil.hasSignedInToday(userId)) {
+            // 通过数据库检查今天是否已经签到（持久化防重）
+            Integer todaySignInCount = pointsLogMapper.countTodayByType(userId, "SIGN_IN");
+            if (todaySignInCount != null && todaySignInCount > 0) {
                 return BaseResult.error(400, "今天已经签到过了，明天再来吧~");
             }
 
-            // 记录签到
-            if (!com.food.utils.SignInUtil.recordSignIn(userId)) {
-                return BaseResult.error(400, "今天已经签到过了");
-            }
-
-            // 计算连续签到天数
-            int consecutiveDays = com.food.utils.SignInUtil.getConsecutiveDays(userId);
+            // 计算连续签到天数（基于数据库历史记录）
+            int consecutiveDays = calculateConsecutiveDays(userId);
 
             // 计算奖励积分（连续签到有额外奖励）
             int basePoints = com.food.utils.SignInUtil.SIGN_IN_POINTS;
@@ -488,8 +557,12 @@ public class UserController {
             }
             int totalPoints = basePoints + bonusPoints;
 
-            // 给用户增加积分
-            BaseResult result = userService.updateUserPoints(userId, totalPoints);
+            String reason = bonusPoints > 0
+                    ? "每日签到（连续" + consecutiveDays + "天，含奖励" + bonusPoints + "分）"
+                    : "每日签到";
+
+            // 给用户增加积分并写日志（type=SIGN_IN）
+            BaseResult result = userService.updateUserPoints(userId, totalPoints, "SIGN_IN", reason);
 
             if (result.getCode() == 200) {
                 Map<String, Object> response = new HashMap<>();
@@ -508,6 +581,25 @@ public class UserController {
         } catch (Exception e) {
             return BaseResult.error("签到失败: " + e.getMessage());
         }
+    }
+
+    /**
+     * 基于数据库积分日志计算连续签到天数
+     */
+    private int calculateConsecutiveDays(Integer userId) {
+        int days = 0;
+        java.time.LocalDate today = java.time.LocalDate.now();
+        for (int i = 0; i <= 30; i++) {
+            java.time.LocalDate checkDate = today.minusDays(i);
+            // 查询该日期是否有签到记录
+            Integer count = pointsLogMapper.countSignInByDate(userId, checkDate.toString());
+            if (count != null && count > 0) {
+                days++;
+            } else if (i > 0) {
+                break; // 不连续则停止
+            }
+        }
+        return days;
     }
 
     @GetMapping("/all")

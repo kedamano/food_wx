@@ -2,13 +2,13 @@
 <view class="container">
   <!-- 快捷操作 -->
   <view class="quick-actions">
-    <view class="action-card" bindtap="onOnlineChat">
+    <button class="action-card contact-btn" open-type="contact">
       <view class="action-icon-wrap chat">
         <text class="-comments action-icon-text">💬</text>
       </view>
       <text class="action-title">在线客服</text>
       <text class="action-desc">平均响应时间 5 分钟</text>
-    </view>
+    </button>
     <view class="action-card" bindtap="onCallService">
       <view class="action-icon-wrap phone">
         <text class="-phone action-icon-text">📞</text>

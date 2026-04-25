@@ -39,15 +39,53 @@ Page({
     this.filterByMonth(month);
   },
 
-  // 按月份筛选
+  // 按月份筛选（真实日期过滤）
   filterByMonth: function(month) {
     var allList = this.data.allList || this.data.spendingList;
     if (month === '全部') {
       this.setData({ spendingList: allList });
+      this.updateTotalSpending(allList);
       return;
     }
-    var filtered = allList.slice();
+
+    var now = new Date();
+    var cutoffTime;
+    if (month === '近1月') {
+      cutoffTime = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()).getTime();
+    } else if (month === '近3月') {
+      cutoffTime = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate()).getTime();
+    } else if (month === '近6月') {
+      cutoffTime = new Date(now.getFullYear(), now.getMonth() - 6, now.getDate()).getTime();
+    } else if (month === '近1年') {
+      cutoffTime = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()).getTime();
+    } else {
+      cutoffTime = 0;
+    }
+
+    var filtered = [];
+    for (var i = 0; i < allList.length; i++) {
+      var item = allList[i];
+      // 还原出订单时间戳进行比较
+      var itemTime = item.rawTime || 0;
+      if (itemTime >= cutoffTime) {
+        filtered.push(item);
+      }
+    }
     this.setData({ spendingList: filtered });
+    this.updateTotalSpending(filtered);
+  },
+
+  // 更新汇总金额
+  updateTotalSpending: function(list) {
+    var total = 0;
+    for (var i = 0; i < list.length; i++) {
+      total += list[i].amount || 0;
+    }
+    this.setData({
+      totalSpending: total,
+      totalSpendingStr: total.toFixed(2),
+      monthSpending: total
+    });
   },
 
   // 加载消费明细（从已完成的订单中获取）
@@ -132,6 +170,7 @@ Page({
         amountStr: amount.toFixed(2),
         date: dateStr,
         time: hours + ':' + minutes,
+        rawTime: date.getTime(),
         status: order.status || '已完成'
       };
     } catch (e) {

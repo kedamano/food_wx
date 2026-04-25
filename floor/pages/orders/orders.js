@@ -141,14 +141,21 @@ Page({
     // 格式化时间
     var orderTime = ''
     if (order.createTime) {
-      var date = new Date(order.createTime)
-      var month = date.getMonth() + 1
-      var day = date.getDate()
-      var hours = date.getHours().toString()
-      if (hours.length < 2) hours = '0' + hours
-      var minutes = date.getMinutes().toString()
-      if (minutes.length < 2) minutes = '0' + minutes
-      orderTime = month + '/' + day + ' ' + hours + ':' + minutes
+      var timeStr = order.createTime.replace('T', ' ').replace(/-/g, '/')
+      var date = new Date(timeStr)
+      if (isNaN(date.getTime())) {
+        // 解析失败，直接截取字符串
+        var parts = order.createTime.substring(0, 16).replace('T', ' ').split(/[-\s:]/)
+        orderTime = parseInt(parts[1]) + '/' + parseInt(parts[2]) + ' ' + parts[3] + ':' + parts[4]
+      } else {
+        var month = date.getMonth() + 1
+        var day = date.getDate()
+        var hours = date.getHours().toString()
+        if (hours.length < 2) hours = '0' + hours
+        var minutes = date.getMinutes().toString()
+        if (minutes.length < 2) minutes = '0' + minutes
+        orderTime = month + '/' + day + ' ' + hours + ':' + minutes
+      }
     }
     
     // 格式化金额

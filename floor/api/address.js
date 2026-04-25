@@ -23,7 +23,7 @@ function getAddressList() {
  * 获取地址详情
  */
 function getAddressDetail(addressId) {
-  return api.get(config.ADDRESS_DETAIL.replace('{id}', addressId)).then(function(res) {
+  return api.get(config.ADDRESS_DETAIL.replace(':id', addressId)).then(function(res) {
     return formatAddressFromBackend(res.data);
   });
 }
@@ -87,7 +87,7 @@ function updateAddress(addressId, data) {
  */
 function deleteAddress(addressId) {
   wx.showLoading({ title: '删除中...' });
-  return api.delete(config.ADDRESS_DELETE.replace('{id}', addressId)).then(function(res) {
+  return api.delete(config.ADDRESS_DELETE.replace(':id', addressId)).then(function(res) {
     wx.hideLoading();
     wx.showToast({ title: '删除成功', icon: 'success' });
     return { success: true };
@@ -103,7 +103,7 @@ function deleteAddress(addressId) {
  */
 function setDefaultAddress(addressId) {
   wx.showLoading({ title: '设置中...' });
-  return api.put(config.ADDRESS_SET_DEFAULT.replace('{id}', addressId)).then(function(res) {
+  return api.put(config.ADDRESS_SET_DEFAULT.replace(':id', addressId)).then(function(res) {
     wx.hideLoading();
     wx.showToast({ title: '设置成功', icon: 'success' });
     return { success: true };

@@ -1,4 +1,6 @@
 // 订单确认页面逻辑
+var app = getApp();
+var orderApi = require('../../api/order');
 
 Page({
   data: {
@@ -67,17 +69,13 @@ Page({
     var self = this;
     console.log('选择地址');
     wx.navigateTo({
-      url: '/pages/address/address',
-      success: function(res) {
-        // 监听地址选择事件
-        if (res.onPageReceive) {
-          res.onPageReceive(function(data) {
-            if (data.selectedAddress) {
-              self.setData({
-                selectedAddress: data.selectedAddress
-              });
-            }
-          });
+      url: '/pages/address/address?selectMode=true',
+      events: {
+        // 监听地址页面回传的 addressSelected 事件
+        addressSelected: function(data) {
+          if (data && data.address) {
+            self.setData({ selectedAddress: data.address });
+          }
         }
       }
     });
@@ -193,18 +191,39 @@ Page({
       });
     }
 
+    // 收集 cartIds
+    var cartIds = [];
+    for (var ci = 0; ci < orderInfo.items.length; ci++) {
+      if (orderInfo.items[ci].cartId) {
+        cartIds.push(orderInfo.items[ci].cartId);
+      }
+    }
+
+    // 获取 storeId（多种来源尝试）
+    var storeId = null;
+    if (orderInfo.store && orderInfo.store.id) {
+      storeId = orderInfo.store.id;
+    } else if (orderInfo.storeId) {
+      storeId = orderInfo.storeId;
+    } else if (orderInfo.items && orderInfo.items.length > 0 && orderInfo.items[0].storeId) {
+      storeId = orderInfo.items[0].storeId;
+    }
+
+    console.log('提交订单 storeId:', storeId, ', orderInfo.store:', JSON.stringify(orderInfo.store));
+
     var orderData = {
-      storeId: orderInfo.store ? orderInfo.store.id : orderInfo.storeId,
-      storeName: orderInfo.store ? orderInfo.store.name : orderInfo.storeName || '美食商家',
+      storeId: storeId,
+      storeName: (orderInfo.store && orderInfo.store.name) ? orderInfo.store.name : (orderInfo.storeName || '美食商家'),
       totalAmount: parseFloat(orderInfo.subtotal) || 0,
       deliveryFee: parseFloat(orderInfo.deliveryFee) || 5,
       discount: parseFloat(orderInfo.discount) || 0,
       payAmount: parseFloat(orderInfo.finalAmount) || 0,
       receiverName: address.name,
-      receiverPhone: address.phone,
+      phone: address.phone,
       address: (address.province || '') + (address.city || '') + (address.district || '') + (address.detail || ''),
       remark: this.data.remark,
-      items: itemsList
+      items: itemsList,
+      cartIds: cartIds.length > 0 ? cartIds : null
     };
 
     app.authRequest({
@@ -270,6 +289,7 @@ Page({
         orderId: currentOrder.orderId,
         items: currentOrder.items,
         store: currentOrder.store,
+        storeId: currentOrder.storeId,
         subtotal: subtotal,
         deliveryFee: deliveryFee,
         discount: discount,
@@ -280,21 +300,36 @@ Page({
     });
   },
 
-  // 加载默认地址（从本地存储读取，后端暂无地址接口）
+  // 加载默认地址（调用后端 AddressController）
   loadDefaultAddress: function() {
     var self = this;
-    var addresses = wx.getStorageSync('user_addresses') || [];
-    if (addresses.length > 0) {
-      var defaultAddr = null;
-      for (var i = 0; i < addresses.length; i++) {
-        if (addresses[i].isDefault) {
-          defaultAddr = addresses[i];
-          break;
-        }
+    var app = getApp();
+    app.authRequest({
+      url: '/address/default',
+      method: 'GET'
+    }).then(function(res) {
+      if (res && res.code === 200 && res.data) {
+        var addr = res.data;
+        self.setData({
+          selectedAddress: {
+            id: addr.addressId,
+            name: addr.receiverName || addr.name,
+            phone: addr.phone,
+            province: addr.province || '',
+            city: addr.city || '',
+            district: addr.district || '',
+            detail: addr.detail || addr.address || '',
+            isDefault: true
+          }
+        });
+      } else {
+        // 无默认地址则不预填
+        self.setData({ selectedAddress: null });
       }
-      if (!defaultAddr) defaultAddr = addresses[0];
-      this.setData({ selectedAddress: defaultAddr });
-    }
+    }).catch(function(err) {
+      console.log('无默认地址或加载失败', err);
+      self.setData({ selectedAddress: null });
+    });
   },
 
   // 加载可用优惠券

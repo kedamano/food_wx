@@ -53,46 +53,18 @@ public class StoreController {
             List<Store> stores = (List<Store>) result.getData();
             List<Map<String, Object>> enrichedStores = new ArrayList<>();
             for (Store store : stores) {
-                enrichedStores.add(enrichStoreData(store));
+                enrichedStores.add(enrichStoreData(store, lat, lng));
             }
             return BaseResult.success(enrichedStores);
         }
         return result;
     }
 
-    /**
-     * 创建并返回一个包含商店信息的Map对象
-     *
-     * @param id 商店ID
-     * @param name 商店名称
-     * @param price 价格等级
-     * @param rating 评分
-     * @param icon 图标URL
-     * @param distance 距离信息
-     * @param deliveryTime 配送时间
-     * @return 包含所有商店信息的Map对象，键包括：
-     *         - id: 商店ID
-     *         - name: 商店名称
-     *         - price: 价格等级
-     *         - rating: 评分
-     *         - icon: 图标URL
-     *         - distance: 距离信息
-     *         - deliveryTime: 配送时间
-     */
-    /**
-     * 从数据库实体创建并返回一个包含商店信息的Map对象
-     *
-     * @param store 商店实体
-     * @return 包含所有商店信息的Map对象，键包括：
-     *         - id: 商店ID
-     *         - name: 商店名称
-     *         - price: 价格等级
-     *         - rating: 评分
-     *         - icon: 图标
-     *         - distance: 距离信息
-     *         - deliveryTime: 配送时间
-     */
     private Map<String, Object> enrichStoreData(Store store) {
+        return enrichStoreData(store, null, null);
+    }
+
+    private Map<String, Object> enrichStoreData(Store store, Double userLat, Double userLng) {
         Map<String, Object> storeMap = new HashMap<>();
         storeMap.put("id", store.getStoreId());
         storeMap.put("storeId", store.getStoreId());
@@ -103,7 +75,12 @@ public class StoreController {
         storeMap.put("icon", getStoreIcon(store.getStoreId()));
         storeMap.put("logo", store.getLogo() != null ? store.getLogo() : "");
         storeMap.put("banner", store.getLogo() != null ? store.getLogo() : "");
-        storeMap.put("distance", calculateDistance(store.getLat(), store.getLng()));
+        // 使用 Haversine 计算真实距离
+        if (userLat != null && userLng != null) {
+            storeMap.put("distance", calculateDistanceFromUser(userLat, userLng, store.getLat(), store.getLng()));
+        } else {
+            storeMap.put("distance", calculateDistance(store.getLat(), store.getLng()));
+        }
         storeMap.put("deliveryTime", estimateDeliveryTime(store.getStoreId()));
         return storeMap;
     }
@@ -121,15 +98,50 @@ public class StoreController {
     }
 
     /**
-     * 计算距离（简化版本）
+     * 计算距离 - 使用 Haversine 公式
+     * @param storeLat 商家纬度
+     * @param storeLng 商家经度
+     * @return 距离字符串
      */
-    private String calculateDistance(Double lat, Double lng) {
-        // 实际项目中应该根据经纬度计算真实距离
-        // 这里返回模拟距离
-        if (lat == null || lng == null) {
-            return "1.0km";
+    private String calculateDistance(Double storeLat, Double storeLng) {
+        if (storeLat == null || storeLng == null) {
+            return "距离未知";
         }
-        return String.format("%.1fkm", Math.random() * 3 + 0.5);
+        // 使用默认用户位置（北京天安门）作为fallback，实际应由前端传入
+        double userLat = 39.90923;
+        double userLng = 116.397428;
+        double distKm = haversineDistance(userLat, userLng, storeLat, storeLng);
+        if (distKm < 1.0) {
+            return String.format("%.0fm", distKm * 1000);
+        }
+        return String.format("%.1fkm", distKm);
+    }
+
+    /**
+     * 根据用户传入坐标计算距离
+     */
+    private String calculateDistanceFromUser(Double userLat, Double userLng, Double storeLat, Double storeLng) {
+        if (storeLat == null || storeLng == null || userLat == null || userLng == null) {
+            return "距离未知";
+        }
+        double distKm = haversineDistance(userLat, userLng, storeLat, storeLng);
+        if (distKm < 1.0) {
+            return String.format("%.0fm", distKm * 1000);
+        }
+        return String.format("%.1fkm", distKm);
+    }
+
+    /**
+     * Haversine 公式计算两点间距离（km）
+     */
+    private double haversineDistance(double lat1, double lng1, double lat2, double lng2) {
+        final int R = 6371;
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLng = Math.toRadians(lng2 - lng1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
 
     /**

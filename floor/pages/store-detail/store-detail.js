@@ -22,20 +22,12 @@ Page({
   onLoad: function(options) {
     var storeId = parseInt(options.storeId) || 1;
     var self = this;
-    // 检查收藏状态
-    var favoriteIds = wx.getStorageSync('favoriteStoreIds') || [];
-    var isCollected = false;
-    for (var i = 0; i < favoriteIds.length; i++) {
-      if (favoriteIds[i] === storeId) {
-        isCollected = true;
-        break;
-      }
-    }
-    this.setData({ isCollected: isCollected });
     this.loadStoreInfo(storeId);
     this.loadCategories();
     this.loadFoods(storeId);
     this.loadCart();
+    // 检查收藏状态（调用后端）
+    this.checkFavoriteStatus(storeId);
   },
 
   goBack: function() { wx.navigateBack({ delta: 1 }); },
@@ -65,27 +57,60 @@ Page({
     });
   },
 
+  // 检查是否已收藏（调用后端）
+  checkFavoriteStatus: function(storeId) {
+    var self = this;
+    var app = getApp();
+    app.authRequest({
+      url: '/favorite/check/' + storeId,
+      method: 'GET'
+    }).then(function(res) {
+      if (res && res.code === 200 && res.data) {
+        self.setData({ isCollected: res.data.isFavorite || false });
+      }
+    }).catch(function() {
+      // 未登录时降级为本地存储
+      var favoriteIds = wx.getStorageSync('favoriteStoreIds') || [];
+      var isCollected = false;
+      for (var i = 0; i < favoriteIds.length; i++) {
+        if (favoriteIds[i] === storeId) { isCollected = true; break; }
+      }
+      self.setData({ isCollected: isCollected });
+    });
+  },
+
   toggleCollect: function() {
+    var self = this;
+    var app = getApp();
     var storeId = this.data.storeInfo.id;
     var isCollected = !this.data.isCollected;
 
-    // 保存到本地存储
-    var favoriteIds = wx.getStorageSync('favoriteStoreIds') || [];
     if (isCollected) {
-      favoriteIds.push(storeId);
-    } else {
-      var newFavoriteIds = [];
-      for (var i = 0; i < favoriteIds.length; i++) {
-        if (favoriteIds[i] !== storeId) {
-          newFavoriteIds.push(favoriteIds[i]);
+      // 收藏
+      app.authRequest({
+        url: '/favorite',
+        method: 'POST',
+        data: { storeId: storeId }
+      }).then(function(res) {
+        if (res && (res.code === 200 || res.code === 400)) {
+          self.setData({ isCollected: true });
+          wx.showToast({ title: '已收藏', icon: 'success' });
         }
-      }
-      favoriteIds = newFavoriteIds;
+      }).catch(function(err) {
+        wx.showToast({ title: '收藏失败，请先登录', icon: 'none' });
+      });
+    } else {
+      // 取消收藏
+      app.authRequest({
+        url: '/favorite/' + storeId,
+        method: 'DELETE'
+      }).then(function(res) {
+        self.setData({ isCollected: false });
+        wx.showToast({ title: '已取消收藏', icon: 'success' });
+      }).catch(function(err) {
+        wx.showToast({ title: '操作失败', icon: 'none' });
+      });
     }
-    wx.setStorageSync('favoriteStoreIds', favoriteIds);
-
-    this.setData({ isCollected: isCollected });
-    wx.showToast({ title: isCollected ? '已收藏' : '已取消收藏', icon: 'none' });
   },
 
   switchTab: function(e) {

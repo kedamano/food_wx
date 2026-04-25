@@ -239,18 +239,24 @@ App({
               if (successCallback) successCallback(res.data || res);
               resolve(res.data || res);
             } else {
-              if (failCallback) failCallback(new Error(res.data.message || '请求失败'));
-              reject(new Error(res.data.message || '请求失败'));
+              if (failCallback) {
+                failCallback(new Error(res.data.message || '请求失败'));
+              } else {
+                reject(new Error(res.data.message || '请求失败'));
+              }
             }
           } else {
-            if (failCallback) failCallback(new Error('请求失败：' + res.statusCode));
-            reject(new Error('请求失败：' + res.statusCode));
+            if (failCallback) {
+              failCallback(new Error('请求失败：' + res.statusCode));
+            } else {
+              reject(new Error('请求失败：' + res.statusCode));
+            }
           }
         };
         extendedOptions.fail = function(err) {
           console.error('请求失败：', err);
           if (failCallback) failCallback(err);
-          reject(err);
+          // 不再 reject，由 failCallback 处理错误
         };
         extendedOptions.complete = function() {
           if (completeCallback) completeCallback();
@@ -258,7 +264,11 @@ App({
         originalRequest(extendedOptions);
       });
 
-      return promise.then(function(result) { return result; }).catch(function(error) { throw error; });
+      // 如果有 fail 回调，错误已被回调处理，不再抛出
+      if (failCallback) {
+        return promise.catch(function() {});
+      }
+      return promise;
     };
   },
 

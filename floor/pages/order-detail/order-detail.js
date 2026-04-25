@@ -1,4 +1,6 @@
 // 订单详情页面逻辑
+var app = getApp();
+var orderApi = require('../../api/order');
 
 Page({
   data: {

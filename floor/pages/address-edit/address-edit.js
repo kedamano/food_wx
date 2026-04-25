@@ -19,12 +19,38 @@ Page({
       isWork: false
     },
     errors: {},
-    // 省市区选项（简化版）
-    regions: {
-      provinces: ['广东省', '浙江省', '江苏省', '上海市', '北京市', '四川省', '湖北省', '湖南省', '山东省', '河南省'],
-      cities: ['深圳市', '广州市', '杭州市', '苏州市', '上海市', '北京市', '成都市', '武汉市', '长沙市', '青岛市'],
-      districts: ['南山区', '福田区', '罗湖区', '宝安区', '西湖区', '工业园区', '浦东新区', '朝阳区', '锦江区', '江汉区']
-    },
+    // 省市区数据（三级联动）
+    regionData: [
+      {
+        name: '广东省',
+        cities: [
+          { name: '深圳市', districts: ['南山区', '福田区', '罗湖区', '宝安区', '龙岗区', '盐田区'] },
+          { name: '广州市', districts: ['天河区', '越秀区', '海珠区', '荔湾区', '白云区', '番禺区'] }
+        ]
+      },
+      {
+        name: '浙江省',
+        cities: [
+          { name: '杭州市', districts: ['西湖区', '拱墅区', '上城区', '滨江区', '萧山区', '余杭区'] },
+          { name: '宁波市', districts: ['海曙区', '江北区', '鄞州区', '镇海区', '北仑区'] }
+        ]
+      },
+      {
+        name: '北京市',
+        cities: [
+          { name: '北京市', districts: ['朝阳区', '海淀区', '东城区', '西城区', '丰台区', '通州区'] }
+        ]
+      },
+      {
+        name: '上海市',
+        cities: [
+          { name: '上海市', districts: ['浦东新区', '黄浦区', '徐汇区', '长宁区', '静安区', '普陀区'] }
+        ]
+      }
+    ],
+    provinces: ['广东省', '浙江省', '北京市', '上海市'],
+    cities: ['深圳市', '广州市', '杭州市', '宁波市', '北京市', '上海市'],
+    districts: ['南山区', '福田区', '罗湖区', '宝安区', '西湖区', '拱墅区', '朝阳区', '海淀区', '浦东新区', '黄浦区'],
     regionIndex: [0, 0, 0]
   },
 
@@ -88,14 +114,50 @@ Page({
     this.setData(obj);
   },
 
-  // 省市区选择改变
+  // 省市区列变化
+  onRegionColumnChange: function(e) {
+    var column = e.detail.column;
+    var value = e.detail.value;
+    var regionIndex = this.data.regionIndex.slice();
+    regionIndex[column] = value;
+
+    if (column === 0) {
+      // 选省 → 更新市和区
+      var province = this.data.regionData[value];
+      var cityNames = [];
+      for (var i = 0; i < province.cities.length; i++) {
+        cityNames.push(province.cities[i].name);
+      }
+      var districtNames = province.cities[0].districts;
+      regionIndex[1] = 0;
+      regionIndex[2] = 0;
+      this.setData({
+        regionIndex: regionIndex,
+        cities: cityNames,
+        districts: districtNames
+      });
+    } else if (column === 1) {
+      // 选市 → 更新区
+      var provinceData = this.data.regionData[regionIndex[0]];
+      var cityData = provinceData.cities[value];
+      regionIndex[2] = 0;
+      this.setData({
+        regionIndex: regionIndex,
+        districts: cityData.districts
+      });
+    } else {
+      this.setData({ regionIndex: regionIndex });
+    }
+  },
+
+  // 省市区选择确认
   onRegionChange: function(e) {
     var value = e.detail.value;
     this.setData({
       regionIndex: value,
-      'formData.province': this.data.regions.provinces[value[0]] || '',
-      'formData.city': this.data.regions.cities[value[1]] || '',
-      'formData.district': this.data.regions.districts[value[2]] || ''
+      'formData.province': this.data.provinces[value[0]] || '',
+      'formData.city': this.data.cities[value[1]] || '',
+      'formData.district': this.data.districts[value[2]] || ''
     });
   },
 

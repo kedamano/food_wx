@@ -6,10 +6,10 @@ var app = getApp();
 Page({
   data: {
     feedbackTypes: [
-      { id: 1, name: '功能建议', icon: 'fa-lightbulb', iconText: 'ð¡' },
-      { id: 2, name: 'Bug反馈', icon: 'fa-bug', iconText: 'ð' },
-      { id: 3, name: '体验问题', icon: 'fa-mobile-alt', iconText: 'ð±' },
-      { id: 4, name: '其他', icon: 'fa-pen', iconText: 'â' }
+      { id: 1, name: '功能建议', iconText: '💡' },
+      { id: 2, name: 'Bug反馈', iconText: '🐛' },
+      { id: 3, name: '体验问题', iconText: '📱' },
+      { id: 4, name: '其他', iconText: '✏️' }
     ],
     selectedType: null,
     content: '',
@@ -92,41 +92,58 @@ Page({
     if (this.data.submitting) return;
     this.setData({ submitting: true });
 
-    var userId = app.globalData.userId || 1;
+    var app = getApp();
+    var userId = app.globalData.userId || 0;
 
     var feedbackData = {
       userId: userId,
       type: selectedType,
       content: content.trim(),
-      contact: contactInfo.trim(),
-      images: images
+      contact: contactInfo.trim()
     };
 
-    setTimeout(function() {
+    wx.showLoading({ title: '提交中...' });
+
+    app.authRequest({
+      url: '/feedback',
+      method: 'POST',
+      data: feedbackData
+    }).then(function(res) {
+      wx.hideLoading();
+      self.setData({ submitting: false });
+      if (res && res.code === 200) {
+        wx.showModal({
+          title: '提交成功',
+          content: '感谢您的反馈，我们会尽快处理！',
+          showCancel: false,
+          success: function() { wx.navigateBack(); }
+        });
+      } else {
+        wx.showToast({ title: res.message || '提交失败', icon: 'none' });
+      }
+    }).catch(function(err) {
+      wx.hideLoading();
+      self.setData({ submitting: false });
+      console.error('提交反馈失败', err);
+      // 降级：本地存储兜底
       var feedbackList = wx.getStorageSync('feedbackList') || [];
       feedbackList.unshift({
         userId: feedbackData.userId,
         type: feedbackData.type,
         content: feedbackData.content,
         contact: feedbackData.contact,
-        images: feedbackData.images,
         createTime: new Date().toISOString(),
         status: 'pending',
         id: Date.now()
       });
       wx.setStorageSync('feedbackList', feedbackList);
-
-      self.setData({ submitting: false });
-
       wx.showModal({
         title: '提交成功',
-        content: '感谢您的反馈，我们会尽快处理！',
+        content: '感谢您的反馈！（已暂存本地）',
         showCancel: false,
-        success: function() {
-          wx.navigateBack();
-        }
+        success: function() { wx.navigateBack(); }
       });
-    }, 1500);
+    });
   },
 
   // 查看反馈历史
@@ -140,15 +157,17 @@ Page({
 
     var message = '';
     var types = this.data.feedbackTypes;
-    feedbackList.slice(0, 5).forEach(function(item, index) {
+    var list = feedbackList.slice(0, 5);
+    for (var fi = 0; fi < list.length; fi++) {
+      var item = list[fi];
       var typeName = '其他';
       for (var i = 0; i < types.length; i++) {
         if (types[i].id === item.type) { typeName = types[i].name; break; }
       }
       var statusText = item.status === 'pending' ? '处理中' : '已处理';
       var time = new Date(item.createTime).toLocaleDateString();
-      message += (index + 1) + '. [' + typeName + '] ' + statusText + ' - ' + time + '\n';
-    });
+      message += (fi + 1) + '. [' + typeName + '] ' + statusText + ' - ' + time + '\n';
+    }
 
     wx.showModal({
       title: '反馈历史',

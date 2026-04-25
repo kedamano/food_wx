@@ -44,8 +44,7 @@
       </view>
       <picker class="item-picker {{errors.location ? 'error' : ''}}" 
               mode="multiSelector" 
-              range="{{[regions.provinces, regions.cities, regions.districts]}}"
-              range-key="name"
+              range="{{[provinces, cities, districts]}}"
               value="{{regionIndex}}"
               bindchange="onRegionChange"
               bindcolumnchange="onRegionColumnChange">

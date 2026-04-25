@@ -63,13 +63,18 @@ Page({
   formatDate: function(dateStr) {
     if (!dateStr) return '';
     var date;
-    // 处理带T的ISO格式、带-的格式、时间戳等
-    if (typeof dateStr === 'number') {
+    // 兼容 LocalDateTime 序列化后的数组格式 [2026,4,11,10,30,0]
+    if (Array.isArray(dateStr) && dateStr.length >= 3) {
+      date = new Date(dateStr[0], dateStr[1] - 1, dateStr[2]);
+    } else if (typeof dateStr === 'number') {
       date = new Date(dateStr);
-    } else {
-      // 替换多种分隔符
+    } else if (typeof dateStr === 'string') {
       var str = dateStr.replace(/-/g, '/');
       date = new Date(str);
+    } else if (dateStr instanceof Date) {
+      date = dateStr;
+    } else {
+      return '未知';
     }
     if (isNaN(date.getTime())) return '未知';
     var year = date.getFullYear();
@@ -200,10 +205,7 @@ Page({
     }).catch(function(err) {
       wx.hideLoading();
       console.error('更新失败', err);
-      if (data.username) self.setData({ 'userInfo.username': data.username });
-      if (data.phone) self.setData({ 'userInfo.phone': self.maskPhone(data.phone) });
-      if (data.email) self.setData({ 'userInfo.email': data.email });
-      wx.showToast({ title: '修改成功（模拟）', icon: 'success' });
+      wx.showToast({ title: '修改失败，请重试', icon: 'none' });
     });
   }
 });

@@ -11,6 +11,7 @@
     "pages/profile/profile",
     "pages/reviews/reviews",
     "pages/address/address",
+    "pages/address-edit/address-edit",
     "pages/orders/orders",
     "pages/order-confirm/order-confirm",
     "pages/payment/payment",

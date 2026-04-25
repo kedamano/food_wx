@@ -1,12 +1,6 @@
 /**
  * 设置页面逻辑
  */
-var requestUtils = require('../../api/request');
-var showLoading = requestUtils.showLoading;
-var hideLoading = requestUtils.hideLoading;
-var showError = requestUtils.showError;
-var showSuccess = requestUtils.showSuccess;
-
 Page({
   data: {
     // 设置选项
@@ -19,7 +13,7 @@ Page({
       language: '中文'
     },
     // 缓存大小
-    cacheSize: '12.5MB',
+    cacheSize: '计算中...',
     // 版本信息
     version: '1.0.0'
   },
@@ -46,17 +40,8 @@ Page({
   // 保存设置
   onSaveSettings: function() {
     console.log('保存设置');
-    var self = this;
-    
-    showLoading('保存中...');
-    
-    // 保存设置到本地存储
-    self.saveSettings();
-    
-    hideLoading();
-    showSuccess('设置已保存');
-
-    // 返回上一页
+    this.saveSettings();
+    wx.showToast({ title: '设置已保存', icon: 'success' });
     setTimeout(function() {
       wx.navigateBack();
     }, 1500);
@@ -99,6 +84,9 @@ Page({
       settings: settings
     });
 
+    // 自动保存到本地
+    this.saveSettings();
+
     // 特殊处理：自动定位
     if (setting === 'autoLocation' && value) {
       this.requestLocationPermission();
@@ -140,6 +128,8 @@ Page({
         self.setData({
           settings: settings
         });
+        // 自动保存
+        self.saveSettings();
       }
     });
   },
@@ -164,20 +154,18 @@ Page({
   clearCache: function() {
     console.log('执行清除缓存');
     var self = this;
-    
-    showLoading('清除中...');
 
-    // 清除本地存储
+    // 清除本地存储（保留 token 和用户设置）
+    var token = wx.getStorageSync('token');
+    var userSettings = wx.getStorageSync('userSettings');
+    var privacySettings = wx.getStorageSync('privacySettings');
     wx.clearStorageSync();
+    if (token) wx.setStorageSync('token', token);
+    if (userSettings) wx.setStorageSync('userSettings', userSettings);
+    if (privacySettings) wx.setStorageSync('privacySettings', privacySettings);
 
-    // 模拟清除缓存
-    setTimeout(function() {
-      self.setData({
-        cacheSize: '0MB'
-      });
-      showSuccess('缓存已清除');
-      hideLoading();
-    }, 1000);
+    self.setData({ cacheSize: '0KB' });
+    wx.showToast({ title: '缓存已清除', icon: 'success' });
   },
 
   // 关于小程序
@@ -233,13 +221,14 @@ Page({
       content: '确定要退出登录吗？',
       success: function(res) {
         if (res.confirm) {
-          showLoading('退出中...');
-
           // 清除登录状态
           var app = getApp();
           app.globalData.userInfo = null;
+          app.globalData.userId = null;
+          wx.removeStorageSync('token');
+          wx.removeStorageSync('userInfo');
 
-          showSuccess('已退出登录');
+          wx.showToast({ title: '已退出登录', icon: 'success' });
 
           // 返回首页
           setTimeout(function() {
@@ -248,9 +237,6 @@ Page({
             });
           }, 1500);
         }
-      },
-      fail: function() {
-        hideLoading();
       }
     });
   },

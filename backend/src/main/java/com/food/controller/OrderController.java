@@ -64,7 +64,7 @@ public class OrderController {
         order.setPhone(orderRequest.getPhone());
         order.setRemark(orderRequest.getRemark());
 
-        return orderService.createOrder(order, orderRequest.getCartIds());
+        return orderService.createOrder(order, orderRequest.getCartIds(), orderRequest.getItems());
     }
 
     @PutMapping
@@ -462,19 +462,32 @@ public class OrderController {
     }
 
     // 内部类用于订单创建请求
-    private static class OrderRequest {
+    public static class OrderRequest {
         private Integer storeId;
+        private String storeName;
+        private BigDecimal totalAmount;
         private BigDecimal deliveryFee;
+        private BigDecimal discountAmount;
+        private BigDecimal payAmount;
         private String address;
         private String phone;
         private String remark;
         private List<Integer> cartIds;
+        private List<OrderItemRequest> items;
 
         // getters and setters
         public Integer getStoreId() { return storeId; }
         public void setStoreId(Integer storeId) { this.storeId = storeId; }
+        public String getStoreName() { return storeName; }
+        public void setStoreName(String storeName) { this.storeName = storeName; }
+        public BigDecimal getTotalAmount() { return totalAmount; }
+        public void setTotalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount; }
         public BigDecimal getDeliveryFee() { return deliveryFee; }
         public void setDeliveryFee(BigDecimal deliveryFee) { this.deliveryFee = deliveryFee; }
+        public BigDecimal getDiscountAmount() { return discountAmount; }
+        public void setDiscountAmount(BigDecimal discountAmount) { this.discountAmount = discountAmount; }
+        public BigDecimal getPayAmount() { return payAmount; }
+        public void setPayAmount(BigDecimal payAmount) { this.payAmount = payAmount; }
         public String getAddress() { return address; }
         public void setAddress(String address) { this.address = address; }
         public String getPhone() { return phone; }
@@ -483,6 +496,28 @@ public class OrderController {
         public void setRemark(String remark) { this.remark = remark; }
         public List<Integer> getCartIds() { return cartIds; }
         public void setCartIds(List<Integer> cartIds) { this.cartIds = cartIds; }
+        public List<OrderItemRequest> getItems() { return items; }
+        public void setItems(List<OrderItemRequest> items) { this.items = items; }
+    }
+
+    // 内部类用于订单项请求
+    public static class OrderItemRequest {
+        private Integer foodId;
+        private String name;
+        private BigDecimal price;
+        private Integer quantity;
+        private BigDecimal totalPrice;
+
+        public Integer getFoodId() { return foodId; }
+        public void setFoodId(Integer foodId) { this.foodId = foodId; }
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+        public BigDecimal getPrice() { return price; }
+        public void setPrice(BigDecimal price) { this.price = price; }
+        public Integer getQuantity() { return quantity; }
+        public void setQuantity(Integer quantity) { this.quantity = quantity; }
+        public BigDecimal getTotalPrice() { return totalPrice; }
+        public void setTotalPrice(BigDecimal totalPrice) { this.totalPrice = totalPrice; }
     }
 
     // 内部类用于状态更新请求

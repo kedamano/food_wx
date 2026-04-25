@@ -1,5 +1,6 @@
 package com.food.controller;
 
+import com.food.annotation.RequireRole;
 import com.food.dto.BaseResult;
 import com.food.entity.Banner;
 import com.food.entity.Category;
@@ -32,19 +33,22 @@ public class FoodController {
     private CategoryMapper categoryMapper;
 
     @PostMapping
-    @ApiOperation(value = "添加菜品", notes = "添加新菜品")
+    @ApiOperation(value = "添加菜品", notes = "添加新菜品（仅商家/管理员）")
+    @RequireRole("MERCHANT")
     public BaseResult addFood(@RequestBody Food food) {
         return foodService.addFood(food);
     }
 
     @PutMapping
-    @ApiOperation(value = "更新菜品", notes = "更新菜品信息")
+    @ApiOperation(value = "更新菜品", notes = "更新菜品信息（仅商家/管理员）")
+    @RequireRole("MERCHANT")
     public BaseResult updateFood(@RequestBody Food food) {
         return foodService.updateFood(food);
     }
 
     @DeleteMapping("/{foodId}")
-    @ApiOperation(value = "删除菜品", notes = "删除指定菜品")
+    @ApiOperation(value = "删除菜品", notes = "删除指定菜品（仅商家/管理员）")
+    @RequireRole("MERCHANT")
     public BaseResult deleteFood(@PathVariable Integer foodId) {
         return foodService.deleteFood(foodId);
     }

@@ -70,9 +70,11 @@ Page({
     }).then(function(res) {
       self.setData({ loading: false });
       if (res && res.code === 200 && res.data && res.data.length > 0) {
-        var list = res.data.map(function(item) {
-          return self.formatRecord(item);
-        });
+        var rawList = res.data;
+        var list = [];
+        for (var i = 0; i < rawList.length; i++) {
+          list.push(self.formatRecord(rawList[i]));
+        }
         wx.setStorageSync('pointsHistory', list);
         self.applyFilter(list);
       } else {
@@ -182,12 +184,17 @@ Page({
   // 应用筛选
   applyFilter: function(allList) {
     var filterType = this.data.filterType;
-    var filtered = allList;
+    var filtered;
 
     if (filterType !== 'all') {
-      filtered = allList.filter(function(item) {
-        return item.type === filterType;
-      });
+      filtered = [];
+      for (var i = 0; i < allList.length; i++) {
+        if (allList[i].type === filterType) {
+          filtered.push(allList[i]);
+        }
+      }
+    } else {
+      filtered = allList;
     }
 
     this.setData({

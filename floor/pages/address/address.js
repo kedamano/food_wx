@@ -43,10 +43,18 @@ Page({
   // 点击地址（选择模式返回，普通模式编辑）
   onAddressSelect: function(e) {
     var address = e.currentTarget.dataset.address;
-    var pages = getCurrentPages();
-    var prevPage = pages[pages.length - 2];
-    if (prevPage && prevPage.route === 'pages/order-confirm/order-confirm') {
-      prevPage.setData({ selectedAddress: address });
+    if (this.data.isSelectMode) {
+      // 选择模式：通过 EventChannel 回传数据，再返回上一页
+      var pages = getCurrentPages();
+      var prevPage = pages[pages.length - 2];
+      // 优先使用 EventChannel（order-confirm 页面通过 events 监听）
+      var eventChannel = this.getOpenerEventChannel();
+      if (eventChannel && typeof eventChannel.emit === 'function') {
+        eventChannel.emit('addressSelected', { address: address });
+      } else if (prevPage) {
+        // 兜底：直接 setData 到上一页
+        prevPage.setData({ selectedAddress: address });
+      }
       wx.navigateBack();
       return;
     }
