@@ -16,7 +16,6 @@
     "pages/order-confirm/order-confirm",
     "pages/order-review/order-review",
     "pages/delivery-track/delivery-track",
-    "pages/payment/payment",
     "pages/coupons/coupons",
     "pages/points/points",
     "pages/points-history/points-history",

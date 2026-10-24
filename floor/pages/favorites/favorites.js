@@ -49,7 +49,7 @@ Page({
           list.push({
             storeId: s.storeId,
             name: s.storeName || s.name,
-            image: app.resolveImageUrl(s.logo) || '/images/stores/default.png',
+            image: app.resolveImageUrl(s.logo) || '/images/stores/store1.png',
             rating: s.rating || 0,
             deliveryTime: s.deliveryTime || '30分钟',
             deliveryFee: s.deliveryFee || 0,

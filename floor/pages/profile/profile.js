@@ -411,7 +411,7 @@ Page({
     var menu = e.currentTarget.dataset.menu;
     var isLoggedIn = self.data.userInfo.isLoggedIn;
 
-    var requiresLoginMenus = ['address', 'payment', 'coupons', 'reviews', 'points'];
+    var requiresLoginMenus = ['address', 'coupons', 'reviews', 'points'];
     // 手动检查数组包含
     var needsLogin = false;
     for (var i = 0; i < requiresLoginMenus.length; i++) {

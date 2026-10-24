@@ -33,31 +33,28 @@ Page({
     var self = this;
     wx.showLoading({ title: '加载中...' });
 
-    var token = wx.getStorageSync('token');
-    wx.request({
-      url: 'http://localhost:8080/api/order/' + orderId,
-      method: 'GET',
-      header: { 'Authorization': token || '' },
-      success: function(res) {
-        wx.hideLoading();
-        if (res.statusCode === 200 && res.data.code === 200) {
-          var order = res.data.data;
-          self.setData({
-            orderInfo: {
-              storeName: order.storeName || '未知商家',
-              foodItems: self.formatFoodItems(order.orderDetails || []),
-              orderTime: self.formatOrderTime(order.createTime)
-            }
-          });
-        } else {
-          wx.showModal({ title: '提示', content: res.data.message || '获取订单信息失败', showCancel: false });
-        }
-      },
-      fail: function(err) {
-        wx.hideLoading();
-        console.error('订单信息请求失败：', err);
-        wx.showModal({ title: '提示', content: '网络连接失败', showCancel: false });
+    var app = getApp();
+    app.authRequest({
+      url: '/order/' + orderId,
+      method: 'GET'
+    }).then(function(res) {
+      wx.hideLoading();
+      if (res && res.code === 200 && res.data) {
+        var order = res.data;
+        self.setData({
+          orderInfo: {
+            storeName: order.storeName || '未知商家',
+            foodItems: self.formatFoodItems(order.orderDetails || []),
+            orderTime: self.formatOrderTime(order.createTime)
+          }
+        });
+      } else {
+        wx.showModal({ title: '提示', content: (res && res.message) || '获取订单信息失败', showCancel: false });
       }
+    }).catch(function(err) {
+      wx.hideLoading();
+      console.error('订单信息请求失败：', err);
+      wx.showModal({ title: '提示', content: '网络连接失败', showCancel: false });
     });
   },
 
@@ -66,7 +63,7 @@ Page({
     var list = [];
     for (var i = 0; i < details.length; i++) {
       var detail = details[i];
-      list.push({ name: detail.foodName, quantity: detail.quantity, price: detail.price });
+      list.push({ foodId: detail.foodId, name: detail.foodName, quantity: detail.quantity, price: detail.price });
     }
     return list;
   },
@@ -148,33 +145,38 @@ Page({
 
     var reviewData = {
       orderId: parseInt(orderId),
+      // 评价表要求关联菜品，取订单第一个菜品
+      foodId: this.data.orderInfo.foodItems && this.data.orderInfo.foodItems.length > 0
+        ? this.data.orderInfo.foodItems[0].foodId : null,
       rating: rating,
       content: reviewContent.trim(),
       images: images
     };
 
-    var token = wx.getStorageSync('token');
-    wx.request({
-      url: 'http://localhost:8080/api/review/order/' + orderId,
+    if (!reviewData.foodId) {
+      wx.showToast({ title: '订单缺少菜品信息，无法评价', icon: 'none' });
+      return;
+    }
+
+    var app = getApp();
+    app.authRequest({
+      url: '/review/order/' + orderId,
       method: 'POST',
-      header: { 'Authorization': token || '', 'Content-Type': 'application/json' },
-      data: reviewData,
-      success: function(res) {
-        wx.hideLoading();
+      data: reviewData
+    }).then(function(res) {
+      wx.hideLoading();
+      if (res && res.code === 200) {
+        wx.showToast({ title: '评价成功', icon: 'success' });
+        setTimeout(function() { wx.navigateBack(); }, 1500);
+      } else {
         self.setData({ isLoading: false });
-        if (res.statusCode === 200 && res.data.code === 200) {
-          wx.showToast({ title: '评价成功', icon: 'success' });
-          setTimeout(function() { wx.navigateBack(); }, 1500);
-        } else {
-          wx.showModal({ title: '提示', content: res.data.message || '评价提交失败', showCancel: false });
-        }
-      },
-      fail: function(err) {
-        wx.hideLoading();
-        self.setData({ isLoading: false });
-        console.error('评价提交请求失败：', err);
-        wx.showModal({ title: '提示', content: '网络连接失败', showCancel: false });
+        wx.showModal({ title: '提示', content: (res && res.message) || '评价提交失败', showCancel: false });
       }
+    }).catch(function(err) {
+      wx.hideLoading();
+      self.setData({ isLoading: false });
+      console.error('评价提交请求失败：', err);
+      wx.showModal({ title: '提示', content: '网络连接失败', showCancel: false });
     });
   },
 

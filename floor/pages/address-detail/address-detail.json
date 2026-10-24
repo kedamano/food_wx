@@ -1,8 +1,0 @@
-{
-  "navigationBarTitleText": "地址详情",
-  "navigationBarBackgroundColor": "#4CAF50",
-  "navigationBarTextStyle": "white",
-  "backgroundColor": "#F8F9FA",
-  "enablePullDownRefresh": false,
-  "usingComponents": {}
-}

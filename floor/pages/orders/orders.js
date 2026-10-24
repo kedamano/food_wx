@@ -1,7 +1,12 @@
 // pages/orders/orders.js
 
 Page({
+  // 触底分页：每页条数
+  PAGE_SIZE: 10,
+
   data: {
+    orders: [],
+    hasMore: false,
     // 状态标签配置
     statusTabs: [
       { status: 'all', name: '全部', count: 0 },
@@ -11,7 +16,6 @@ Page({
       { status: '已完成', name: '已完成', count: 0 }
     ],
     activeTab: 'all',
-    orders: [],
     loading: false,
     empty: false
   },
@@ -72,19 +76,24 @@ Page({
   loadOrders: function() {
     var app = getApp()
     var self = this
-    var userId = app.globalData.userId || wx.getStorageSync('userId') || 1
-    
+
+    // 未登录不请求，展示空态
+    if (!app.isLoggedIn()) {
+      self.setData({ orders: [], empty: true })
+      return
+    }
+
     self.setData({ loading: true })
-    
+
     app.authRequest({
-      url: '/order/user/' + userId,
+      url: '/order/user/' + app.getCurrentUserId(),
       method: 'GET'
     }).then(function(res) {
       self.setData({ loading: false })
-      
+
       if (res && res.code === 200 && res.data) {
         var orders = res.data
-        
+
         // 根据当前标签筛选订单
         if (self.data.activeTab !== 'all') {
           var filtered = []
@@ -95,31 +104,50 @@ Page({
           }
           orders = filtered
         }
-        
+
         // 格式化订单数据
         var formatted = []
         for (var i = 0; i < orders.length; i++) {
           formatted.push(self.formatOrder(orders[i]))
         }
         orders = formatted
-        
+
+        // 全量缓存在页面实例上，按页渲染，触底加载更多
+        self._allOrders = orders
         self.setData({
-          orders: orders,
-          empty: orders.length === 0
+          orders: orders.slice(0, self.PAGE_SIZE),
+          empty: orders.length === 0,
+          hasMore: orders.length > self.PAGE_SIZE
         })
       } else {
+        self._allOrders = []
         self.setData({
           orders: [],
-          empty: true
+          empty: true,
+          hasMore: false
         })
       }
     }).catch(function(err) {
       self.setData({ loading: false })
       console.error('加载订单失败', err)
+      self._allOrders = []
       self.setData({
         orders: [],
-        empty: true
+        empty: true,
+        hasMore: false
       })
+    })
+  },
+
+  // 触底加载更多（本地分页）
+  onReachBottom: function() {
+    if (!this._allOrders || !this.data.hasMore) return
+    var next = this.data.orders.concat(
+      this._allOrders.slice(this.data.orders.length, this.data.orders.length + this.PAGE_SIZE)
+    )
+    this.setData({
+      orders: next,
+      hasMore: this._allOrders.length > next.length
     })
   },
 

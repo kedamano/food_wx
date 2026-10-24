@@ -1,12 +1,17 @@
 // 搜索页
 
 Page({
+  // 触底分页：每页条数
+  PAGE_SIZE: 10,
+
   data: {
     keyword: '',
     hasSearched: false,
     activeTab: 'food',
     foodResults: [],
     storeResults: [],
+    hasMoreFoods: false,
+    hasMoreStores: false,
     searchHistory: [],
     hotSearches: ['牛肉面', '披萨', '烤肉', '奶茶', '麻辣香锅', '寿司']
   },
@@ -59,7 +64,15 @@ Page({
 
     function checkDone() {
       if (pending === 0) {
-        self.setData({ foodResults: foodsResult || [], storeResults: storesResult || [] });
+        // 全量缓存在页面实例上，按页渲染，触底加载更多
+        self._allFoods = foodsResult || [];
+        self._allStores = storesResult || [];
+        self.setData({
+          foodResults: self._allFoods.slice(0, self.PAGE_SIZE),
+          storeResults: self._allStores.slice(0, self.PAGE_SIZE),
+          hasMoreFoods: self._allFoods.length > self.PAGE_SIZE,
+          hasMoreStores: self._allStores.length > self.PAGE_SIZE
+        });
         wx.hideLoading();
       }
     }
@@ -219,5 +232,18 @@ Page({
   onStoreTap: function(e) {
     var id = e.currentTarget.dataset.id;
     wx.navigateTo({ url: '/pages/store-detail/store-detail?storeId=' + id });
+  },
+
+  // 触底加载更多（本地分页，按当前 Tab 追加）
+  onReachBottom: function() {
+    if (this.data.activeTab === 'food') {
+      if (!this.data.hasMoreFoods) return;
+      var next = this.data.foodResults.concat(this._allFoods.slice(this.data.foodResults.length, this.data.foodResults.length + this.PAGE_SIZE));
+      this.setData({ foodResults: next, hasMoreFoods: this._allFoods.length > next.length });
+    } else {
+      if (!this.data.hasMoreStores) return;
+      var nextStores = this.data.storeResults.concat(this._allStores.slice(this.data.storeResults.length, this.data.storeResults.length + this.PAGE_SIZE));
+      this.setData({ storeResults: nextStores, hasMoreStores: this._allStores.length > nextStores.length });
+    }
   }
 });

@@ -96,10 +96,6 @@
         <image class="tool-icon" src="/images/icons/location.png" mode="aspectFit"></image>
         <text class="tool-text">收货地址</text>
       </view>
-      <view class="tool-item" bindtap="onMenuClick" data-menu="payment">
-        <image class="tool-icon" src="/images/icons/wallet.png" mode="aspectFit"></image>
-        <text class="tool-text">支付管理</text>
-      </view>
       <view class="tool-item" bindtap="onMenuClick" data-menu="coupons">
         <view class="coupon-tool-icon">
           <image class="tool-icon" src="/images/icons/ticket.png" mode="aspectFit"></image>

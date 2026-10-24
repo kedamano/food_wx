@@ -6,7 +6,7 @@
             indicator-active-color="#fff" autoplay="{{true}}" interval="{{4000}}" circular="{{true}}"
             style="height: 480rpx;" wx:if="{{storeImages.length > 0}}">
       <swiper-item wx:for="{{storeImages}}" wx:key="index">
-        <image class="hero-img" src="{{item}}" mode="aspectFill"></image>
+        <image lazy-load class="hero-img" src="{{item}}" mode="aspectFill"></image>
       </swiper-item>
     </swiper>
     <view class="hero-placeholder" wx:else>
@@ -134,7 +134,7 @@
         <view class="food-list">
           <view class="menu-food-item" wx:for="{{foodList}}" wx:key="id">
             <view class="menu-food-img">
-              <image class="menu-img" src="{{item.image}}" mode="aspectFill" wx:if="{{item.image}}"></image>
+              <image lazy-load class="menu-img" src="{{item.image}}" mode="aspectFill" wx:if="{{item.image}}"></image>
               <view class="menu-img-placeholder" wx:else>
                 <text class="-utensils">🍴</text>
               </view>
@@ -191,7 +191,7 @@
         </view>
         <text class="review-content">{{item.content}}</text>
         <view class="review-imgs" wx:if="{{item.images && item.images.length > 0}}">
-          <image class="review-thumb" wx:for="{{item.images}}" wx:for-item="img" wx:key="*this" 
+          <image lazy-load class="review-thumb" wx:for="{{item.images}}" wx:for-item="img" wx:key="*this" 
                  src="{{img}}" mode="aspectFill"></image>
         </view>
       </view>
@@ -258,7 +258,7 @@
       <text class="cart-empty-text">购物车是空的</text>
     </view>
     <view class="cart-popup-item" wx:for="{{cartPopupItems}}" wx:key="foodId">
-      <image class="cart-item-img" src="{{item.image}}" mode="aspectFill"></image>
+      <image lazy-load class="cart-item-img" src="{{item.image}}" mode="aspectFill"></image>
       <view class="cart-item-info">
         <text class="cart-item-name">{{item.name}}</text>
         <text class="cart-item-price">¥{{item.price}}</text>

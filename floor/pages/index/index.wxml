@@ -35,7 +35,7 @@
               style="height: 320rpx;">
         <swiper-item wx:for="{{banners}}" wx:key="id">
           <view class="banner-item">
-            <image class="banner-img" src="{{item.image}}" mode="aspectFill" wx:if="{{item.image}}"></image>
+            <image lazy-load class="banner-img" src="{{item.image}}" mode="aspectFill" wx:if="{{item.image}}"></image>
             <view class="banner-mask" wx:if="{{item.title}}">
               <text class="banner-title">{{item.title}}</text>
               <text class="banner-subtitle" wx:if="{{item.subtitle}}">{{item.subtitle}}</text>
@@ -79,7 +79,7 @@
         <view class="promo-list">
           <view class="promo-item" wx:for="{{promoList}}" wx:key="id" bindtap="onFoodTap" data-food-id="{{item.id}}">
             <view class="promo-img-wrap">
-              <image class="promo-img" src="{{item.image}}" mode="aspectFill" wx:if="{{item.image}}"></image>
+              <image lazy-load class="promo-img" src="{{item.image}}" mode="aspectFill" wx:if="{{item.image}}"></image>
               <view class="promo-badge" wx:if="{{item.discount}}">
                 <text>{{item.discount}}</text>
               </view>
@@ -113,7 +113,7 @@
         <view class="store-card card" wx:for="{{nearbyStores}}" wx:key="id" bindtap="onStoreTap" data-store-id="{{item.id}}">
           <!-- 商家图片 -->
           <view class="store-card-img">
-            <image class="store-img" src="{{item.banner}}" mode="aspectFill" wx:if="{{item.banner}}"></image>
+            <image lazy-load class="store-img" src="{{item.banner}}" mode="aspectFill" wx:if="{{item.banner}}"></image>
             <view class="store-img-placeholder" wx:else>
               <text>🏪</text>
             </view>

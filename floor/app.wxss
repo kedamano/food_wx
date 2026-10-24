@@ -253,10 +253,3 @@ page {
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom);
 }
-
-@font-face {
-  font-family: 'FontAwesome';
-  src: url('./fonts/fa-solid-900.woff2') format('woff2');
-  font-weight: normal;
-  font-style: normal;
-}
