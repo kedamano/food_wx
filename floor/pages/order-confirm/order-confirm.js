@@ -1,6 +1,5 @@
 // 订单确认页面逻辑
 var app = getApp();
-var orderApi = require('../../api/order');
 
 Page({
   data: {
@@ -36,7 +35,6 @@ Page({
   // 页面加载
   onLoad: function(options) {
     var self = this;
-    console.log('订单确认页面加载');
 
     // 获取订单信息
     this.loadOrderInfo();
@@ -50,7 +48,6 @@ Page({
 
   // 返回按钮点击
   onBackClick: function() {
-    console.log('返回按钮点击');
     wx.navigateBack({
       delta: 1
     });
@@ -58,7 +55,6 @@ Page({
 
   // 首页按钮点击
   onHomeClick: function() {
-    console.log('首页按钮点击');
     wx.switchTab({
       url: '/pages/index/index'
     });
@@ -67,7 +63,6 @@ Page({
   // 选择地址
   onSelectAddress: function() {
     var self = this;
-    console.log('选择地址');
     wx.navigateTo({
       url: '/pages/address/address?selectMode=true',
       events: {
@@ -132,7 +127,6 @@ Page({
   // 选择支付方式
   onSelectPayment: function(e) {
     var paymentMethod = e.currentTarget.dataset.method;
-    console.log('选择支付方式：', paymentMethod);
 
     this.setData({
       paymentMethod: paymentMethod
@@ -142,7 +136,6 @@ Page({
   // 备注输入
   onRemarkInput: function(e) {
     var remark = e.detail.value;
-    console.log('备注输入：', remark);
 
     this.setData({
       remark: remark
@@ -151,7 +144,6 @@ Page({
 
   // 取消订单
   onCancelOrder: function() {
-    console.log('取消订单');
     wx.navigateBack({
       delta: 1
     });
@@ -160,7 +152,6 @@ Page({
   // 确认订单
   onConfirmOrder: function() {
     var self = this;
-    console.log('确认订单');
 
     // 验证地址
     if (!this.data.selectedAddress) {
@@ -209,7 +200,6 @@ Page({
       storeId = orderInfo.items[0].storeId;
     }
 
-    console.log('提交订单 storeId:', storeId, ', orderInfo.store:', JSON.stringify(orderInfo.store));
 
     var orderData = {
       storeId: storeId,
@@ -328,7 +318,6 @@ Page({
         self.setData({ selectedAddress: null });
       }
     }).catch(function(err) {
-      console.log('无默认地址或加载失败', err);
       self.setData({ selectedAddress: null });
     });
   },

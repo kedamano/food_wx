@@ -91,60 +91,10 @@ Page({
   // 使用本地历史
   useLocalHistory: function() {
     var history = wx.getStorageSync('pointsHistory') || [];
-    if (history.length === 0) {
-      // 如果没有本地数据，使用示例数据
-      history = this.getMockHistory();
-      wx.setStorageSync('pointsHistory', history);
-    }
+    // 无数据时展示空态，不再使用假记录兜底
     this.applyFilter(history);
   },
 
-  // 示例数据
-  getMockHistory: function() {
-    var now = new Date();
-    return [
-      {
-        id: 1, type: '收入', desc: '每日签到', points: '+20',
-        icon: 'fa-check', iconText: '\u2713', time: this.formatDate(new Date(now.getTime() - 0))
-      },
-      {
-        id: 2, type: '收入', desc: '完成订单奖励', points: '+50',
-        icon: 'fa-utensils', iconText: '\uD83C\uDF74', time: this.formatDate(new Date(now.getTime() - 86400000))
-      },
-      {
-        id: 3, type: '收入', desc: '评价订单奖励', points: '+30',
-        icon: 'fa-star', iconText: '\u2B50', time: this.formatDate(new Date(now.getTime() - 2 * 86400000))
-      },
-      {
-        id: 4, type: '支出', desc: '兑换5元通用券', points: '-500',
-        icon: 'fa-ticket-alt', iconText: '\uD83C\uDFAB', time: this.formatDate(new Date(now.getTime() - 3 * 86400000))
-      },
-      {
-        id: 5, type: '收入', desc: '每日签到', points: '+20',
-        icon: 'fa-check', iconText: '\u2713', time: this.formatDate(new Date(now.getTime() - 4 * 86400000))
-      },
-      {
-        id: 6, type: '收入', desc: '分享小程序', points: '+20',
-        icon: 'fa-share-alt', iconText: '\uD83D\uDD17', time: this.formatDate(new Date(now.getTime() - 5 * 86400000))
-      },
-      {
-        id: 7, type: '支出', desc: '兑换定制餐具套装', points: '-1280',
-        icon: 'fa-gift', iconText: '\uD83C\uDF81', time: this.formatDate(new Date(now.getTime() - 6 * 86400000))
-      },
-      {
-        id: 8, type: '收入', desc: '每日签到', points: '+20',
-        icon: 'fa-check', iconText: '\u2713', time: this.formatDate(new Date(now.getTime() - 7 * 86400000))
-      },
-      {
-        id: 9, type: '收入', desc: '完成订单奖励', points: '+50',
-        icon: 'fa-utensils', iconText: '\uD83C\uDF74', time: this.formatDate(new Date(now.getTime() - 8 * 86400000))
-      },
-      {
-        id: 10, type: '收入', desc: '每日签到', points: '+20',
-        icon: 'fa-check', iconText: '\u2713', time: this.formatDate(new Date(now.getTime() - 9 * 86400000))
-      }
-    ];
-  },
 
   // 格式化日期
   formatDate: function(date) {

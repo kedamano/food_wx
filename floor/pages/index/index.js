@@ -96,7 +96,6 @@ Page({
     wx.scanCode({
       onlyFromCamera: false,
       success: function (res) {
-        console.log('扫码结果：', res);
         wx.showToast({ title: '扫码成功', icon: 'success' });
       },
       fail: function () {}
@@ -106,7 +105,6 @@ Page({
   // 功能入口 - 携带分类参数跳转到分类页
   onChannelTap: function (e) {
     var channel = e.currentTarget.dataset.channel;
-    console.log('点击功能入口：', channel.name);
     if (channel.name === '全部分类') {
       wx.setStorageSync('categoryTabParam', '');
       wx.switchTab({ url: '/pages/category/category' });

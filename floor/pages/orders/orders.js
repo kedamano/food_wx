@@ -16,6 +16,7 @@ Page({
       { status: '已完成', name: '已完成', count: 0 }
     ],
     activeTab: 'all',
+    searchKeyword: '',
     loading: false,
     empty: false
   },
@@ -196,7 +197,7 @@ Page({
   // 切换标签
   onTabChange: function(e) {
     var status = e.currentTarget.dataset.status
-    this.setData({ activeTab: status })
+    this.setData({ activeTab: status, searchKeyword: '' })
     this.loadOrders(true)
   },
 
@@ -208,12 +209,46 @@ Page({
     })
   },
 
-  // 搜索订单
+  // 搜索订单：对当前列表按订单号/商家名/状态本地过滤
   onSearchOrders: function() {
-    wx.showToast({
-      title: '搜索功能开发中',
-      icon: 'none'
-    })
+    var self = this;
+    wx.showModal({
+      title: '搜索订单',
+      editable: true,
+      placeholderText: '输入订单号、商家名或状态',
+      success: function(res) {
+        if (!res.confirm) return;
+        var keyword = (res.content || '').trim();
+        if (!keyword) {
+          // 清空关键词：恢复完整列表
+          self.setData({ searchKeyword: '' });
+          self.loadOrders(true);
+          return;
+        }
+        self.setData({ searchKeyword: keyword });
+        self.filterOrders(keyword);
+      }
+    });
+  },
+
+  // 本地过滤已加载的订单
+  filterOrders: function(keyword) {
+    var kw = keyword.toLowerCase();
+    var filtered = [];
+    for (var i = 0; i < this.data.orders.length; i++) {
+      var o = this.data.orders[i];
+      var storeName = (o.storeName || (o.store && o.store.name) || '').toLowerCase();
+      var orderNo = String(o.orderNo || o.orderId || '').toLowerCase();
+      var statusText = o.statusText || o.status || '';
+      if (orderNo.indexOf(kw) !== -1 || storeName.indexOf(kw) !== -1 || statusText.indexOf(keyword) !== -1) {
+        filtered.push(o);
+      }
+    }
+    this.setData({
+      orders: filtered,
+      empty: filtered.length === 0,
+      hasMore: false
+    });
   },
 
   // 取消订单

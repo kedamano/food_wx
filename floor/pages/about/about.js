@@ -13,7 +13,7 @@ Page({
       { icon: 'star', iconText: '⭐', title: '真实评价', desc: '查看其他用户评价' }
     ],
     contactInfo: {
-      servicePhone: '400-888-8888',
+      servicePhone: '400-123-4567',
       email: 'service@foodapp.com',
       workTime: '周一至周日 9:00-21:00'
     }

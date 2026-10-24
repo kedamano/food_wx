@@ -24,7 +24,6 @@ Page({
 
   // 页面加载
   onLoad: function(options) {
-    console.log('注册页面加载，参数：', options);
 
     // 清除之前的定时器
     if (this.data.countdownTimer) {
@@ -122,14 +121,10 @@ Page({
   // 获取验证码
   onGetVerifyCode: function() {
     var self = this;
-    console.log('点击获取验证码按钮');
     var phone = this.data.phone;
-    console.log('当前手机号：', phone);
-    console.log('当前isGettingCode状态：', this.data.isGettingCode);
 
     // 验证手机号
     if (!phone || phone.length !== 11) {
-      console.log('手机号验证失败：长度不正确');
       this.showError('请输入正确的手机号');
       return;
     }
@@ -137,18 +132,15 @@ Page({
     // 验证手机号格式
     var phoneRegex = /^1[3-9]\d{9}$/;
     if (!phoneRegex.test(phone)) {
-      console.log('手机号验证失败：格式不正确');
       this.showError('手机号格式不正确');
       return;
     }
 
     // 防止重复点击
     if (this.data.isGettingCode) {
-      console.log('正在发送验证码，阻止重复点击');
       return;
     }
 
-    console.log('准备发送验证码请求');
     // 发送验证码到后端
     this.sendVerifyCode(phone);
   },
@@ -156,7 +148,6 @@ Page({
   // 发送验证码到后端
   sendVerifyCode: function(phone) {
     var self = this;
-    console.log('发送验证码请求，手机号：', phone);
 
     this.setData({
       isGettingCode: true
@@ -176,12 +167,7 @@ Page({
         phone: phone
       },
       success: function(res) {
-        console.log('发送验证码响应：', res);
-        console.log('响应状态码：', res.statusCode);
-        console.log('响应数据：', res.data);
         if (res.data) {
-          console.log('响应code：', res.data.code);
-          console.log('响应message：', res.data.message);
         }
 
         if (res.statusCode === 200 && res.data && res.data.code === 200) {
@@ -191,10 +177,8 @@ Page({
             title: '验证码已发送',
             icon: 'success'
           });
-          console.log('验证码发送成功');
         } else {
           var errorMessage = res.data && res.data.message ? res.data.message : '发送验证码失败';
-          console.log('验证码发送失败：', errorMessage);
           self.showError(errorMessage);
         }
       },
@@ -203,7 +187,6 @@ Page({
         self.showError('网络连接失败');
       },
       complete: function() {
-        console.log('发送验证码请求完成');
         wx.hideLoading();
         self.setData({
           isGettingCode: false
@@ -289,7 +272,6 @@ Page({
     // 调用微信登录API
     wx.login({
       success: function(res) {
-        console.log('微信登录成功：', res);
 
         if (res.code) {
           // 发送到后端进行微信注册
@@ -457,7 +439,6 @@ Page({
         inviteCode: inviteCode || ''
       },
       success: function(res) {
-        console.log('注册响应：', res);
 
         if (res.statusCode === 200) {
           if (res.data.code === 200) {

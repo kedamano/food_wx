@@ -1,4 +1,18 @@
 // API 接口配置文件
+// 环境自适应：微信开发者工具/开发版走 localhost，体验版/正式版走线上域名
+// 上线前把 PRODUCTION_BASEURL 替换为真实域名，并在小程序后台配置 request 合法域名
+var PRODUCTION_BASEURL = 'https://your-api-domain.com/api';
+
+function detectEnv() {
+  try {
+    var envVersion = wx.getAccountInfoSync().miniProgram.envVersion;
+    // develop: 开发者工具与开发版；trial: 体验版；release: 正式版
+    return (envVersion === 'trial' || envVersion === 'release') ? 'production' : 'development';
+  } catch (e) {
+    return 'development';
+  }
+}
+
 module.exports = {
   environments: {
     development: {
@@ -6,12 +20,12 @@ module.exports = {
       timeout: 10000
     },
     production: {
-      baseURL: 'https://your-api-domain.com/api',
+      baseURL: PRODUCTION_BASEURL,
       timeout: 15000
     }
   },
 
-  currentEnv: 'development',
+  currentEnv: detectEnv(),
 
   endpoints: {
     food: {

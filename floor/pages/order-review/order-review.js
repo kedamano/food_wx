@@ -14,7 +14,6 @@ Page({
   },
 
   onLoad: function(options) {
-    console.log('订单评价页面加载，参数：', options);
     var orderId = options.orderId;
     if (!orderId) {
       wx.showModal({

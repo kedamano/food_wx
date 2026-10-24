@@ -5,12 +5,6 @@ App({
     logs.unshift(Date.now());
     wx.setStorageSync('logs', logs);
 
-    wx.login({
-      success: function(res) {
-        // 发送 res.code 到后台换取 openId
-      }
-    });
-
     this.initGlobalData();
     this.initAuthRequest();
     this.loadUserInfo();
@@ -60,7 +54,6 @@ App({
     if (!this.globalData.lastRequest) {
       this.globalData.lastRequest = null;
     }
-    console.log('全局数据初始化完成');
   },
 
   globalData: {
@@ -85,7 +78,6 @@ App({
   },
 
   handleNetworkError: function(error) {
-    console.log('网络错误：', error);
     var self = this;
     wx.showModal({
       title: '网络连接失败',
@@ -100,13 +92,11 @@ App({
   },
 
   handleAuthError: function(error) {
-    console.log('认证错误：', error);
     this.userLogout();
     wx.navigateTo({ url: '/pages/login/login' });
   },
 
   handleBusinessError: function(error) {
-    console.log('业务错误：', error);
     if (error.data && error.data.details) {
       wx.showModal({
         title: '操作提示',
@@ -117,7 +107,6 @@ App({
   },
 
   handleUnknownError: function(error) {
-    console.log('未知错误：', error);
     wx.setStorageSync('errorLog', {
       timestamp: new Date().toISOString(),
       error: error.toString(),
@@ -145,7 +134,6 @@ App({
         self.globalData.lastRequest = function() { return requestFn.apply(null, args); };
         var result = requestFn.apply(null, args);
         var duration = Date.now() - startTime;
-        console.log('请求完成：' + (requestFn.name || 'anonymous') + '，耗时：' + duration + 'ms');
         return result;
       } catch (error) {
         self.globalErrorHandle(error, options.showToast);
@@ -155,6 +143,13 @@ App({
   },
 
   apiConfig: require('./api/config'),
+
+  /**
+   * 当前环境 API 基础地址（来自 api/config.js，随开发/正式环境自适应）
+   */
+  apiBase: function() {
+    return this.apiConfig.environments[this.apiConfig.currentEnv].baseURL;
+  },
 
   getAuthHeaderConfig: function() {
     var token = this.globalData.token || wx.getStorageSync('token');
@@ -170,7 +165,7 @@ App({
 
   resolveApiUrl: function(url) {
     if (url && url.indexOf('http') === 0) return url;
-    if (url && url.indexOf('/') === 0) return 'http://localhost:8080/api' + url;
+    if (url && url.indexOf('/') === 0) return this.apiBase() + url;
     if (url) {
       var parts = url.split('/');
       if (parts.length >= 2) {
@@ -187,15 +182,15 @@ App({
         }
       }
     }
-    return 'http://localhost:8080/api' + (url || '');
+    return this.apiBase() + (url || '');
   },
 
   resolveImageUrl: function(url) {
     if (!url) return '';
     if (url.indexOf('http://') === 0 || url.indexOf('https://') === 0) return url;
     // 使用完整 URL（微信小程序需要）
-    if (url.indexOf('/images/') === 0) return 'http://localhost:8080/api' + url;
-    if (url.indexOf('/') === 0) return 'http://localhost:8080/api' + url;
+    if (url.indexOf('/images/') === 0) return this.apiBase() + url;
+    if (url.indexOf('/') === 0) return this.apiBase() + url;
     return url;
   },
 
@@ -205,7 +200,6 @@ App({
       if (!options.header) options.header = {};
       options.url = self.resolveApiUrl(options.url);
       var authHeaders = self.getAuthHeaderConfig();
-      console.log('请求：' + (options.method || 'GET') + ' ' + options.url);
 
       var successCallback = options.success;
       var failCallback = options.fail;
@@ -226,9 +220,7 @@ App({
       extendedOptions.timeout = self.apiConfig.getTimeout();
 
       var promise = new Promise(function(resolve, reject) {
-        console.log('开始发送请求...');
         extendedOptions.success = function(res) {
-          console.log('响应：' + res.statusCode + ' ' + options.url);
           if (res.statusCode === 401) {
             // HTTP 401 统一走重新登录
             self.handleAuthError({ message: '登录已过期', code: 'AUTH_ERROR' });
@@ -289,7 +281,6 @@ App({
       this.globalData.token = token;
       this.globalData.userInfo = userInfo;
       if (userId) this.globalData.userId = userId;
-      console.log('用户信息加载成功：', userInfo);
       // 登录态下以后端购物车为准
       this.syncCartFromServer();
     }
@@ -328,7 +319,7 @@ App({
       });
     }
     wx.request({
-      url: 'http://localhost:8080/api/cart/user/' + userId + '/merge',
+      url: this.apiBase() + '/cart/user/' + userId + '/merge',
       method: 'POST',
       header: this.getAuthHeaderConfig(),
       data: items,
@@ -354,7 +345,7 @@ App({
     if (!this.isLoggedIn()) return;
     var userId = this.getCurrentUserId();
     wx.request({
-      url: 'http://localhost:8080/api/cart/user/' + userId,
+      url: this.apiBase() + '/cart/user/' + userId,
       method: 'GET',
       header: this.getAuthHeaderConfig(),
       success: function(res) {
@@ -422,7 +413,7 @@ App({
 
     if (this.isLoggedIn()) {
       wx.request({
-        url: 'http://localhost:8080/api/cart',
+        url: this.apiBase() + '/cart',
         method: 'POST',
         header: this.getAuthHeaderConfig(),
         data: {
@@ -462,8 +453,8 @@ App({
     if (this.isLoggedIn()) {
       var userId = this.getCurrentUserId();
       var url = cartId
-        ? 'http://localhost:8080/api/cart/' + cartId
-        : 'http://localhost:8080/api/cart/user/' + userId + '/food/' + foodId;
+        ? this.apiBase() + '/cart/' + cartId
+        : this.apiBase() + '/cart/user/' + userId + '/food/' + foodId;
       wx.request({
         url: url,
         method: 'DELETE',
@@ -492,7 +483,7 @@ App({
 
     if (this.isLoggedIn() && cartId) {
       wx.request({
-        url: 'http://localhost:8080/api/cart/' + cartId,
+        url: this.apiBase() + '/cart/' + cartId,
         method: 'PUT',
         header: this.getAuthHeaderConfig(),
         data: { quantity: quantity },
@@ -515,7 +506,7 @@ App({
     if (syncServer && this.isLoggedIn()) {
       var userId = this.getCurrentUserId();
       wx.request({
-        url: 'http://localhost:8080/api/cart/user/' + userId + '/clear',
+        url: this.apiBase() + '/cart/user/' + userId + '/clear',
         method: 'DELETE',
         header: this.getAuthHeaderConfig(),
         success: function(res) {
@@ -533,7 +524,6 @@ App({
     merged.isLoggedIn = true;
     this.globalData.userInfo = merged;
     wx.setStorageSync('userInfo', this.globalData.userInfo);
-    console.log('用户登录成功：', this.globalData.userInfo);
   },
 
   userLogout: function() {
@@ -548,7 +538,6 @@ App({
     };
     wx.removeStorageSync('userInfo');
     this.clearCart();
-    console.log('用户退出登录');
   },
 
   updateUserInfo: function(userInfo) {
@@ -558,7 +547,6 @@ App({
     for (var k in userInfo) merged[k] = userInfo[k];
     this.globalData.userInfo = merged;
     wx.setStorageSync('userInfo', this.globalData.userInfo);
-    console.log('用户信息更新：', this.globalData.userInfo);
   },
 
   addSearchHistory: function(keyword) {

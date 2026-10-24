@@ -81,7 +81,6 @@ Page({
     wx.getLocation({
       type: 'gcj02',
       success: function(res) {
-        console.log('位置获取成功', res);
       },
       fail: function(err) {
         wx.showToast({ title: '位置权限获取失败', icon: 'none' });

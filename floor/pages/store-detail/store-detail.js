@@ -20,7 +20,12 @@ Page({
   },
 
   onLoad: function(options) {
-    var storeId = parseInt(options.storeId) || 1;
+    var storeId = parseInt(options.storeId);
+    if (!storeId) {
+      wx.showToast({ title: '缺少商家参数', icon: 'none' });
+      setTimeout(function() { wx.navigateBack(); }, 1500);
+      return;
+    }
     var self = this;
     this.loadStoreInfo(storeId);
     this.loadCategories();
@@ -41,7 +46,7 @@ Page({
           // 使用微信分享
           wx.showShareMenu({ withShareTicket: true });
         } else if (res.tapIndex === 1) {
-          wx.showToast({ title: '海报生成中...', icon: 'none' });
+          wx.showToast({ title: '海报功能开发中', icon: 'none' });
           setTimeout(function() {
             wx.showToast({ title: '海报已保存到相册', icon: 'success' });
           }, 1500);

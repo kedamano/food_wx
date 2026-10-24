@@ -1,4 +1,5 @@
 {
   "navigationBarTitleText": "配送跟踪",
-  "usingComponents": {}
+  "usingComponents": {},
+  "enablePullDownRefresh": false
 }

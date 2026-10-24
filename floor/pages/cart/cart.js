@@ -7,24 +7,15 @@ Page({
     cartCount: 0,
     isEditMode: false,
     storeInfo: {
-      name: '川味人家',
-      distance: '1.2km',
-      deliveryTime: '30分钟'
+      name: '',
+      distance: '',
+      deliveryTime: ''
     },
     cartItems: [],
-    coupons: [
-      { id: 1, name: '新人专享券', discount: 15, condition: '满50可用', minAmount: 50 },
-      { id: 2, name: '会员专享券', discount: 10, condition: '满30可用', minAmount: 30 },
-      { id: 3, name: '周末特惠券', discount: 20, condition: '满80可用', minAmount: 80 }
-    ],
+    coupons: [],
     selectedCoupon: null,
     showCouponModal: false,
-    recommendItems: [
-      { id: 201, name: '香辣鸡翅', price: 18.00, image: '/images/foods/chicken_wings.png' },
-      { id: 202, name: '冰爽可乐', price: 5.00, image: '/images/foods/cola.png' },
-      { id: 203, name: '水果沙拉', price: 22.00, image: '/images/foods/fruit_salad.png' },
-      { id: 204, name: '经典冰淇淋', price: 8.00, image: '/images/foods/ice_cream.png' }
-    ],
+    recommendItems: [],
     subtotal: '0.00',
     deliveryFee: '5.00',
     discount: '0.00',
@@ -34,7 +25,6 @@ Page({
   },
 
   onLoad: function () {
-    console.log('购物车页面加载');
     this.setData({
       subtotal: '0.00',
       deliveryFee: '5.00',
@@ -42,7 +32,57 @@ Page({
       totalAmount: '0.00'
     });
     this.loadCartData();
+    this.loadCoupons();
     this.calculateCosts();
+  },
+
+  // 从后端加载本人可用优惠券（替换原写死的 3 张假券）
+  loadCoupons: function () {
+    var self = this;
+    var app = getApp();
+    if (!app.isLoggedIn()) {
+      self.setData({ coupons: [] });
+      return;
+    }
+    app.authRequest({
+      url: '/coupon/user/' + app.getCurrentUserId(),
+      method: 'GET'
+    }).then(function (res) {
+      if (res && res.code === 200 && Array.isArray(res.data)) {
+        var list = [];
+        for (var i = 0; i < res.data.length; i++) {
+          var item = res.data[i];
+          if (item.status !== 'available') continue;
+          list.push({
+            id: item.id, // 用户优惠券ID
+            name: item.name || '优惠券',
+            discount: Number(item.discount) || 0,
+            condition: item.condition || '无门槛',
+            minAmount: Number(item.minAmount) || 0
+          });
+        }
+        self.setData({ coupons: list });
+      }
+    }).catch(function () {
+      self.setData({ coupons: [] });
+    });
+  },
+
+  // 按店铺 id 拉取店铺名，替换写死的"川味人家"
+  loadStoreInfo: function (storeId) {
+    var self = this;
+    if (!storeId) return;
+    app.authRequest({
+      url: '/store/' + storeId,
+      method: 'GET'
+    }).then(function (res) {
+      if (res && res.code === 200 && res.data) {
+        self.setData({
+          'storeInfo.name': res.data.storeName || res.data.name || '',
+          'storeInfo.deliveryTime': (res.data.deliveryTime || '') + (res.data.deliveryTime ? '分钟' : '')
+        });
+      }
+    }).catch(function () {});
   },
 
   loadCartData: function () {
@@ -81,6 +121,7 @@ Page({
           var firstStoreId = cartData[0].storeId;
           if (firstStoreId) {
             self.setData({ 'storeInfo.id': firstStoreId });
+            self.loadStoreInfo(firstStoreId);
           }
 
           self.setData({
@@ -140,14 +181,12 @@ Page({
   },
 
   onBackClick: function () {
-    console.log('返回按钮点击');
     wx.navigateBack({ delta: 1 });
   },
 
   onEditClick: function () {
     var isEditMode = this.data.isEditMode;
     this.setData({ isEditMode: !isEditMode });
-    console.log('切换编辑模式：', !isEditMode);
   },
 
   onItemSelect: function (e) {
@@ -443,7 +482,6 @@ Page({
     wx.navigateTo({
       url: '/pages/order-confirm/order-confirm',
       success: function (res) {
-        console.log('跳转到订单确认页成功');
       },
       fail: function (err) {
         console.error('跳转失败：', err);
@@ -453,7 +491,6 @@ Page({
   },
 
   onGoShopping: function () {
-    console.log('去选购');
     wx.switchTab({ url: '/pages/index/index' });
   },
 
@@ -505,6 +542,9 @@ Page({
 
   calculateDeliveryFee: function () {
     var distance = parseFloat(this.data.storeInfo.distance);
+    if (isNaN(distance)) {
+      return 5; // 距离未知时的默认配送费
+    }
     if (distance <= 1) {
       return 3;
     } else if (distance <= 2) {
@@ -550,7 +590,6 @@ Page({
   },
 
   onShow: function () {
-    console.log('购物车页面显示');
     // 登录态以服务端购物车为准，未登录使用本地
     if (app.isLoggedIn()) {
       this.loadCartData();

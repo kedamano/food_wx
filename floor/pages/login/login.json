@@ -1,4 +1,5 @@
 {
   "navigationBarTitleText": "用户登录",
-  "usingComponents": {}
+  "usingComponents": {},
+  "enablePullDownRefresh": false
 }

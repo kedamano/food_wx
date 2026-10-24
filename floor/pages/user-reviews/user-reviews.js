@@ -16,7 +16,6 @@ Page({
   },
 
   onLoad: function(options) {
-    console.log('用户评价页面加载');
     this.loadUserReviews();
   },
 
@@ -156,70 +155,15 @@ Page({
         statistics: statistics
       });
     } else {
-      // 使用 mock 数据
-      this.useMockData();
+      // 加载失败/无数据：展示空态，不使用假数据
+      this.setData({ isLoading: false, reviews: [] });
     }
   },
 
-  // 使用 Mock 数据
-  useMockData: function() {
-    var mockReviews = [
-      {
-        reviewId: 1,
-        orderId: 1,
-        foodId: 1,
-        foodName: '牛肉拉面',
-        foodImage: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200&h=200&fit=crop',
-        rating: 5,
-        content: '牛肉面非常好吃，汤很浓郁，牛肉也很嫩，强烈推荐！',
-        images: [],
-        createTime: '04/06 12:30',
-        likeCount: 12,
-        isLiked: false
-      },
-      {
-        reviewId: 2,
-        orderId: 2,
-        foodId: 2,
-        foodName: '宫保鸡丁',
-        foodImage: 'https://images.unsplash.com/photo-1525755662778-989d0524087e?w=200&h=200&fit=crop',
-        rating: 4,
-        content: '宫保鸡丁很正宗，味道很棒！',
-        images: [],
-        createTime: '04/05 18:20',
-        likeCount: 8,
-        isLiked: true
-      },
-      {
-        reviewId: 3,
-        orderId: 3,
-        foodId: 3,
-        foodName: '麻辣香锅',
-        foodImage: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200&h=200&fit=crop',
-        rating: 5,
-        content: '麻辣香锅太棒了！麻辣鲜香，配菜丰富，推荐！',
-        images: [],
-        createTime: '04/04 19:00',
-        likeCount: 15,
-        isLiked: false
-      }
-    ];
-
-    var statistics = this.calculateStatistics(mockReviews);
-
-    this.setData({
-      reviews: mockReviews,
-      statistics: statistics
-    });
-
-    // 缓存数据
-    wx.setStorageSync('cachedUserReviews', mockReviews);
-  },
 
   // 查看评价详情
   onReviewDetail: function(e) {
     var review = e.currentTarget.dataset.review;
-    console.log('查看评价详情：', review);
 
     wx.showModal({
       title: review.foodName,
@@ -231,8 +175,12 @@ Page({
 
   // 点赞评价
   onLikeReview: function(e) {
+    // 评价点赞暂无后端支持
+    wx.showToast({ title: '点赞功能即将上线', icon: 'none' });
+    return;
+  },
+  onLikeReviewOld: function(e) {
     var review = e.currentTarget.dataset.review;
-    console.log('点赞评价：', review.reviewId);
 
     var self = this;
     // 用 for 循环替换 map
@@ -269,6 +217,11 @@ Page({
 
   // 回复评价
   onReplyReview: function(e) {
+    // 商家回复暂无后端支持
+    wx.showToast({ title: '回复功能即将上线', icon: 'none' });
+    return;
+  },
+  onReplyReviewOld: function(e) {
     var review = e.currentTarget.dataset.review;
     var self = this;
     wx.showModal({

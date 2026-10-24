@@ -45,7 +45,6 @@ Page({
   // 页面加载
   onLoad: function(options) {
     var self = this;
-    console.log('个人中心页面加载');
     self.initPageData();
   },
 
@@ -565,7 +564,6 @@ Page({
 
   // 页面显示
   onShow: function() {
-    console.log('个人中心页面显示');
     // 页面显示时刷新数据
     this.refreshData();
   },

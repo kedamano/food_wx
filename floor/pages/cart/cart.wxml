@@ -123,7 +123,7 @@
   </view>
 
   <!-- 推荐商品 -->
-  <view class="recommend-section" wx:if="{{cartItems.length > 0}}">
+  <view class="recommend-section" wx:if="{{recommendItems.length > 0}}">
     <text class="section-title">推荐商品</text>
     <view class="recommend-list">
       <view class="recommend-item" wx:for="{{recommendItems}}" wx:key="id" wx:for-index="index" bindtap="onAddRecommend" data-item="{{item}}">

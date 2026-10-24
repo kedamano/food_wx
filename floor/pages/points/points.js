@@ -124,7 +124,6 @@ Page({
 
   // 页面加载
   onLoad: function(options) {
-    console.log('积分商城页面加载');
     this.loadUserPointsInfo();
     this.checkDailyTasks();
     this.loadRecentHistory();

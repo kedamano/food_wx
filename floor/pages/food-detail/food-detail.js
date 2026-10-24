@@ -1,6 +1,7 @@
 // 美食详情页逻辑
 Page({
   data: {
+    totalPrice: '0.00',
     // 当前显示的图片索引
     currentImageIndex: 0,
     // 美食信息
@@ -59,10 +60,14 @@ Page({
 
   // 页面加载
   onLoad: function(options) {
-    console.log('美食详情页加载，参数：', options);
 
     // 获取美食ID
-    var foodId = options.foodId || 1;
+    var foodId = options.foodId;
+    if (!foodId) {
+      wx.showToast({ title: '缺少商品参数', icon: 'none' });
+      setTimeout(function() { wx.navigateBack(); }, 1500);
+      return;
+    }
 
     // 加载美食数据
     this.loadFoodData(foodId);
@@ -88,7 +93,6 @@ Page({
     this.setData({
       currentImageIndex: currentIndex
     });
-    console.log('切换到图片：', currentIndex + 1);
   },
 
   // 加载美食数据
@@ -104,7 +108,6 @@ Page({
         url: '/food/' + foodId, // 使用新的API系统
         method: 'GET',
         success: function(res) {
-          console.log('美食详情响应数据:', res);
           
           // app.authRequest 返回的是 {code, message, data} 格式
           if (res && res.code === 200 && res.data) {
@@ -126,7 +129,6 @@ Page({
               tags: self.processTags(foodData.tags)
             };
             
-            console.log('处理后的美食数据:', processedData);
 
             self.setData({
               food: processedData,
@@ -137,7 +139,6 @@ Page({
             resolve(processedData);
           } else {
             // API 返回错误，使用默认空数据
-            console.log('美食详情加载失败，foodId:', foodId);
             var emptyFoodData = {
               id: foodId,
               name: '暂无数据',
@@ -369,14 +370,14 @@ Page({
   updateTotalPrice: function() {
     var food = this.data.food;
     var quantity = this.data.quantity;
-    var totalPrice = (food.price * quantity).toFixed(2);
-    console.log('总价更新：', totalPrice);
-    // 这里可以更新UI显示总价
+    if (!food || food.price == null) return;
+    this.setData({
+      totalPrice: (food.price * quantity).toFixed(2)
+    });
   },
 
   // 返回按钮点击
   onBackClick: function() {
-    console.log('返回按钮点击');
     wx.navigateBack({
       delta: 1
     });
@@ -403,7 +404,6 @@ Page({
   // 更新收藏状态
   updateFavoriteStatus: function(isFavorite) {
     // 实际项目中应该调用API更新收藏状态
-    console.log('更新收藏状态：', isFavorite);
   },
 
   // 购物车按钮点击 - 弹出购物车详情弹窗
@@ -548,7 +548,6 @@ Page({
     // 更新购物车数量显示
     this.updateCartCount();
 
-    console.log('添加到购物车：', cartItem);
   },
 
   // 立即购买
@@ -611,7 +610,6 @@ Page({
     wx.navigateTo({
       url: '/pages/order-confirm/order-confirm',
       success: function() {
-        console.log('跳转到订单确认页成功');
       },
       fail: function(err) {
         console.error('跳转失败：', err);
@@ -628,13 +626,11 @@ Page({
   // 查看商家信息
   onStoreInfoClick: function() {
     var storeId = this.data.store.id;
-    console.log('查看商家信息：', storeId);
     
     // 直接尝试跳转，商家详情页已存在
     wx.navigateTo({
       url: '/pages/store-detail/store-detail?storeId=' + storeId,
       success: function(res) {
-        console.log('跳转到商家详情页成功');
       },
       fail: function(err) {
         console.error('跳转失败：', err);
@@ -658,7 +654,6 @@ Page({
 
   // 查看全部评价
   onViewAllReviews: function() {
-    console.log('查看全部评价');
     wx.navigateTo({
       url: '/pages/reviews/reviews?foodId=' + this.data.food.id
     });

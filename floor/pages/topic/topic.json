@@ -1,5 +1,6 @@
 {
   "navigationBarTitleText": "话题",
   "navigationBarBackgroundColor": "#4CAF50",
-  "backgroundColor": "#F8F9FA"
+  "backgroundColor": "#F8F9FA",
+  "enablePullDownRefresh": false
 }

@@ -32,13 +32,6 @@ Page({
     });
   },
 
-  // 在线聊天
-  onOnlineChat: function() {
-    wx.showToast({
-      title: '在线客服暂未开放',
-      icon: 'none'
-    });
-  },
 
   // 意见反馈
   onFeedback: function() {

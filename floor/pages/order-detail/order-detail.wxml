@@ -6,7 +6,7 @@
       <text class="back-icon">←</text>
     </view>
     <text class="nav-title">订单详情</text>
-    <view class="nav-right" bindtap="onShareOrder">
+    <button class="nav-right share-btn" open-type="share">
       <text class="-share-alt share-icon">↗</text>
     </view>
   </view>

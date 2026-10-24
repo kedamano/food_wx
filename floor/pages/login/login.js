@@ -17,7 +17,6 @@ Page({
 
   // 页面加载
   onLoad: function(options) {
-    console.log('登录页面加载，参数：', options);
 
     // 检查是否已经登录
     this.checkLoginStatus();
@@ -110,7 +109,6 @@ Page({
     // 调用微信登录API
     wx.login({
       success: function(res) {
-        console.log('微信登录成功：', res);
 
         if (res.code) {
           // 发送到后端验证
@@ -229,7 +227,6 @@ Page({
 
     // 使用新的 API 系统
     var app = getApp();
-    console.log('准备调用登录 API，用户名:', username);
 
     app.authRequest({
       url: '/user/login',
@@ -242,21 +239,15 @@ Page({
         password: password
       },
       success: function(res) {
-        console.log('=== 进入 success 回调 ===');
-        console.log('登录响应：', res);
-        console.log('res.code:', res && res.code);
 
         // 响应拦截器已经处理过，直接检查 res
         if (res && res.code === 200) {
-          console.log('code === 200，准备调用 handleLoginSuccess');
           // 标准格式：res 就是 data.data
           self.handleLoginSuccess(res);
         } else if (res && res.token && res.user) {
-          console.log('兼容格式，直接返回 token 和 user');
           // 兼容格式：直接返回 token 和 user
           self.handleLoginSuccess(res);
         } else {
-          console.log('错误响应，显示错误信息');
           // 错误响应
           self.showError(res.message || '登录失败');
         }
@@ -272,14 +263,11 @@ Page({
   // 处理登录成功
   handleLoginSuccess: function(data) {
     var self = this;
-    console.log('handleLoginSuccess 接收到的数据：', data);
 
     // 处理数据结构：后端返回的是 {code: 200, message: '...', data: {token: '...', user: {...}}}
     var token = data.data ? data.data.token : data.token;
     var user = data.data ? data.data.user : data.user;
 
-    console.log('提取的 token:', token);
-    console.log('提取的 user:', user);
 
     if (!token || !user) {
       this.showError('登录数据异常');
@@ -325,7 +313,6 @@ Page({
       wx.reLaunch({
         url: '/pages/index/index',
         success: function() {
-          console.log('跳转到首页成功');
         },
         fail: function(err) {
           console.error('跳转到首页失败：', err);

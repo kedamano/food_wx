@@ -20,7 +20,6 @@ Page({
 
   // 页面加载
   onLoad: function(options) {
-    console.log('设置页面加载');
 
     var self = this;
     // 加载设置
@@ -31,7 +30,6 @@ Page({
 
   // 返回按钮点击
   onBackClick: function() {
-    console.log('返回按钮点击');
     wx.navigateBack({
       delta: 1
     });
@@ -39,7 +37,6 @@ Page({
 
   // 保存设置
   onSaveSettings: function() {
-    console.log('保存设置');
     this.saveSettings();
     wx.showToast({ title: '设置已保存', icon: 'success' });
     setTimeout(function() {
@@ -49,7 +46,6 @@ Page({
 
   // 账号信息
   onAccountInfo: function() {
-    console.log('账号信息');
     wx.navigateTo({
       url: '/pages/account-info/account-info'
     });
@@ -57,7 +53,6 @@ Page({
 
   // 安全设置
   onSecurity: function() {
-    console.log('安全设置');
     wx.navigateTo({
       url: '/pages/security/security'
     });
@@ -65,7 +60,6 @@ Page({
 
   // 隐私设置
   onPrivacy: function() {
-    console.log('隐私设置');
     wx.navigateTo({
       url: '/pages/privacy/privacy'
     });
@@ -75,7 +69,6 @@ Page({
   onSwitchChange: function(e) {
     var setting = e.currentTarget.dataset.setting;
     var value = e.detail.value;
-    console.log('开关变化：', setting, value);
 
     // 更新设置
     var settings = this.data.settings;
@@ -95,7 +88,6 @@ Page({
 
   // 请求定位权限
   requestLocationPermission: function() {
-    console.log('请求定位权限');
     var self = this;
     
     // 模拟请求定位权限
@@ -117,7 +109,6 @@ Page({
 
   // 语言设置
   onLanguage: function() {
-    console.log('语言设置');
     var self = this;
     wx.showActionSheet({
       itemList: ['中文', 'English'],
@@ -136,7 +127,6 @@ Page({
 
   // 清除缓存
   onClearCache: function() {
-    console.log('清除缓存');
     var self = this;
     
     wx.showModal({
@@ -152,7 +142,6 @@ Page({
 
   // 清除缓存操作
   clearCache: function() {
-    console.log('执行清除缓存');
     var self = this;
 
     // 清除本地存储（保留 token 和用户设置）
@@ -170,7 +159,6 @@ Page({
 
   // 关于小程序
   onAbout: function() {
-    console.log('关于小程序');
     wx.navigateTo({
       url: '/pages/about/about'
     });
@@ -178,7 +166,6 @@ Page({
 
   // 帮助中心
   onHelp: function() {
-    console.log('帮助中心');
     wx.navigateTo({
       url: '/pages/help/help'
     });
@@ -186,31 +173,42 @@ Page({
 
   // 意见反馈
   onFeedback: function() {
-    console.log('意见反馈');
     wx.navigateTo({
       url: '/pages/feedback/feedback'
     });
   },
 
-  // 检查更新
+  // 检查更新：wx.getUpdateManager 真实现
   onVersion: function() {
-    console.log('检查更新');
     var self = this;
-    
-    wx.showLoading({
-      title: '检查更新...'
+    var updateManager = wx.getUpdateManager();
+
+    updateManager.onCheckForUpdate(function(res) {
+      if (!res.hasUpdate) {
+        wx.showModal({
+          title: '检查更新',
+          content: '当前版本：' + self.data.version + '\n已是最新版本',
+          showCancel: false,
+          confirmText: '知道了'
+        });
+      }
     });
 
-    // 模拟检查更新
-    setTimeout(function() {
-      wx.hideLoading();
+    updateManager.onUpdateReady(function() {
       wx.showModal({
-        title: '检查更新',
-        content: '当前版本：' + self.data.version + '\n已是最新版本',
-        showCancel: false,
-        confirmText: '知道了'
+        title: '更新提示',
+        content: '新版本已经准备好，是否重启应用？',
+        success: function(res) {
+          if (res.confirm) {
+            updateManager.applyUpdate();
+          }
+        }
       });
-    }, 1000);
+    });
+
+    updateManager.onUpdateFailed(function() {
+      wx.showToast({ title: '新版本下载失败', icon: 'none' });
+    });
   },
 
   // 退出登录
@@ -274,7 +272,6 @@ Page({
 
   // 下拉刷新
   onPullDownRefresh: function() {
-    console.log('下拉刷新');
     
     this.loadSettings();
     this.calculateCacheSize();

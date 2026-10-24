@@ -30,7 +30,6 @@ Page({
 
   onTopicTap: function(e) {
     var topic = e.currentTarget.dataset.topic;
-    console.log('点击话题：', topic);
     wx.showToast({
       title: '进入' + topic + '话题',
       icon: 'none'
@@ -38,6 +37,5 @@ Page({
   },
 
   onLoad: function() {
-    console.log('话题页面加载');
   }
 });

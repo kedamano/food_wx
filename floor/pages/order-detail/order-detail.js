@@ -1,6 +1,5 @@
 // 订单详情页面逻辑
 var app = getApp();
-var orderApi = require('../../api/order');
 
 Page({
   data: {
@@ -46,10 +45,14 @@ Page({
   // 页面加载
   onLoad: function(options) {
     var self = this;
-    console.log('订单详情页面加载，参数：', options);
 
     // 获取订单ID
-    var orderId = options.orderId || '202401150001';
+    var orderId = options.orderId;
+    if (!orderId) {
+      wx.showToast({ title: '缺少订单参数', icon: 'none' });
+      setTimeout(function() { wx.navigateBack(); }, 1500);
+      return;
+    }
 
     // 加载订单详情
     this.loadOrderDetail(orderId);
@@ -57,19 +60,19 @@ Page({
 
   // 返回按钮点击
   onBackClick: function() {
-    console.log('返回按钮点击');
     wx.navigateBack({
       delta: 1
     });
   },
 
-  // 分享订单
-  onShareOrder: function() {
-    console.log('分享订单');
-    wx.showToast({
-      title: '分享功能开发中',
-      icon: 'none'
-    });
+  // 分享订单（wxml 用 open-type="share" 触发）
+  onShareAppMessage: function() {
+    var orderInfo = this.data.orderInfo || {};
+    var storeName = (orderInfo.store && orderInfo.store.name) || '美食订单';
+    return {
+      title: '我在' + storeName + '点了一份外卖，快来看看',
+      path: '/pages/index/index'
+    };
   },
 
   // 联系骑手
@@ -109,7 +112,6 @@ Page({
   // 复制订单号
   onCopyOrderId: function() {
     var self = this;
-    console.log('复制订单号');
     wx.setClipboardData({
       data: this.data.orderInfo.orderId,
       success: function() {
@@ -347,7 +349,6 @@ Page({
   // 评价订单
   onReviewOrder: function() {
     var self = this;
-    console.log('评价订单');
     var orderId = this.data.orderInfo.orderId;
 
     // 检查订单是否已完成
@@ -370,7 +371,6 @@ Page({
       method: 'GET',
       success: function(res) {
         wx.hideLoading();
-        console.log('检查订单评价状态响应：', res);
 
         if (res && res.code === 200 && res.data) {
           // 已经评价过
@@ -426,7 +426,6 @@ Page({
 
   // 联系客服
   onHelp: function() {
-    console.log('联系客服');
     wx.showModal({
       title: '联系客服',
       content: '客服电话：400-123-4567\n在线时间：9:00-21:00',
@@ -438,7 +437,6 @@ Page({
   // 加载订单详情
   loadOrderDetail: function(orderId) {
     var self = this;
-    console.log('加载订单详情：', orderId);
 
     app.authRequest({
       url: '/order/' + orderId,
@@ -586,9 +584,10 @@ Page({
 
   // 获取状态步骤
   getStatusSteps: function(status) {
+    var orderInfo = this.data.orderInfo || {};
     var steps = [
-      { name: '已下单', time: '2024-01-15 12:30', completed: true },
-      { name: '已支付', time: '2024-01-15 12:35', completed: true },
+      { name: '已下单', time: (orderInfo.orderTime || '').slice(0, 16), completed: true },
+      { name: '已支付', time: (orderInfo.payTime || '').slice(0, 16), completed: true },
       { name: '制作中', time: '', completed: status === 'preparing' || status === 'delivering' || status === 'completed' },
       { name: '配送中', time: '', completed: status === 'delivering' || status === 'completed', active: status === 'delivering' },
       { name: '已完成', time: '', completed: status === 'completed', active: status === 'completed' }

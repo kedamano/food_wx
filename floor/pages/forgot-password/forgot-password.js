@@ -20,7 +20,6 @@ Page({
 
   // 页面加载
   onLoad: function(options) {
-    console.log('忘记密码页面加载');
   },
 
   // 手机号输入
