@@ -276,7 +276,7 @@ while rv < 500:
     rating = random.choice([5, 5, 5, 5, 4, 4, 4, 3])
     content = random.choice(REVIEW_5 if rating == 5 else (REVIEW_4 if rating == 4 else REVIEW_3))
     food = random.choice(picks)
-    imgs = random.choice(['[]', '[]', '["/images/foods/review_1.png"]', '["/images/foods/review_2.png","/images/foods/review_3.png"]'])
+    imgs = random.choice(['[]', '[]', '["/images/foods/dish_31.jpg"]', '["/images/foods/dish_45.jpg","/images/foods/dish_12.jpg"]'])
     sql.append("INSERT INTO reviews (order_id, user_id, food_id, rating, content, images, status, create_time, update_time) "
                "VALUES (%d, %d, %d, %d, '%s', '%s', 1, '%s', '%s');"
                % (oid, owner, food['id'], rating, esc(content), imgs, created, created))
