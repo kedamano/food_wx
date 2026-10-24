@@ -31,8 +31,8 @@ application-prod.properties
 
 # WeChat Mini Program
 miniprogram_npm/
-service/
-components/
+floor/service/
+floor/components/
 pages/*/sitemap.json
 pages/*/module.wxml
 pages.*.js
