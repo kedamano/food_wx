@@ -85,15 +85,21 @@ Page({
 
       if (isLoggedIn) {
         userApi.getUserInfo()
-          .then(function(userInfo) {
-            // 手动合并对象
+          .then(function(res) {
+            // api.get resolve 的是整个响应体，真实用户数据在 res.data
+            var info = (res && res.code === 200 && res.data) ? res.data : {};
             var newUserInfo = {};
             var key;
             for (key in self.data.userInfo) {
               newUserInfo[key] = self.data.userInfo[key];
             }
-            for (key in userInfo) {
-              newUserInfo[key] = userInfo[key];
+            if (info.userId) {
+              newUserInfo.userId = info.userId;
+              newUserInfo.name = info.username || newUserInfo.name;
+              newUserInfo.level = info.level || newUserInfo.level;
+              if (info.avatar) {
+                newUserInfo.avatar = app.resolveImageUrl(info.avatar);
+              }
             }
             newUserInfo.isLoggedIn = true;
             self.setData({

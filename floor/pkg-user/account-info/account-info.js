@@ -42,7 +42,7 @@ Page({
             username: data.username || '',
             phone: data.phone ? self.maskPhone(data.phone) : '未绑定',
             email: data.email || '未绑定',
-            avatar: app.resolveImageUrl(data.avatar) || '/images/avatars/default.png',
+            avatar: data.avatar ? app.resolveImageUrl(data.avatar) : (self.data.userInfo.avatar || ''),
             createTime: data.createTime ? self.formatDate(data.createTime) : ''
           }
         });
@@ -81,6 +81,12 @@ Page({
     var month = ('0' + (date.getMonth() + 1)).slice(-2);
     var day = ('0' + date.getDate()).slice(-2);
     return year + '-' + month + '-' + day;
+  },
+
+  // 头像图片加载失败：回退默认占位（便于发现 URL 问题）
+  onAvatarLoadError: function(e) {
+    console.error('头像加载失败', this.data.userInfo.avatar);
+    this.setData({ tempAvatar: '', 'userInfo.avatar': '' });
   },
 
   // 微信原生头像选择（open-type=chooseAvatar）
@@ -142,7 +148,7 @@ Page({
           wx.showToast({ title: '头像上传成功', icon: 'success', duration: 1500 });
           // 展示完整 URL 并持久化到用户资料
           var fullUrl = app.resolveImageUrl(url);
-          self.setData({ 'userInfo.avatar': fullUrl, tempAvatar: '' });
+          self.setData({ 'userInfo.avatar': fullUrl });
           self.updateUserInfo({ avatar: url });
           app.updateUserInfo({ avatar: fullUrl });
         } else {

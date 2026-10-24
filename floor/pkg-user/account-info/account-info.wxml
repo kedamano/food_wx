@@ -4,7 +4,7 @@
   <view class="s-card avatar-card">
     <button class="avatar-row avatar-row-btn" open-type="chooseAvatar" bind:chooseavatar="onWechatAvatar" hover-class="s-cell-hover">
       <view class="avatar-wrap">
-        <image class="avatar-img" src="{{userInfo.avatar || '/images/avatars/default.png'}}" mode="aspectFill"></image>
+        <image class="avatar-img" src="{{tempAvatar || userInfo.avatar || '/images/avatars/default.png'}}" mode="aspectFill" binderror="onAvatarLoadError"></image>
         <view class="i avatar-badge i-camera"></view>
       </view>
       <view class="avatar-info">
