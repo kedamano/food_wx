@@ -1,6 +1,7 @@
 /**
  * 个人中心页面逻辑
  */
+var app = getApp();
 var userApi = require('../../api/user');
 var orderApi = require('../../api/order');
 var requestModule = require('../../api/request');

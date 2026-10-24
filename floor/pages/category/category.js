@@ -78,7 +78,16 @@ Page({
       }
       self.setData({ mainCategories: cats });
       if (typeof done === 'function') done();
-    }).catch(function () {
+    }).catch(function (err) {
+      console.error('[category] 分类加载失败', err);
+      // 自动重试一次，避免瞬时网络/热重载问题导致侧栏空白
+      if (!self._catRetried) {
+        self._catRetried = true;
+        setTimeout(function () {
+          self.loadCategoriesFromServer(done);
+        }, 1500);
+        return;
+      }
       self.setData({ mainCategories: [] });
       if (typeof done === 'function') done();
     });

@@ -269,8 +269,8 @@ Page({
             });
           }
 
-          // 全量商家放页面实例（非渲染数据不进 data）
-          this._allStores = processedStores;
+          // 全量商家放页面实例（非渲染数据不进 data）；checkAllDone 是普通函数，用闭包里的 self
+          self._allStores = processedStores;
           self.setData({
             banners: bannersData,
             promoList: promoList,
