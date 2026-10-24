@@ -303,12 +303,9 @@ page {
   display: inline-block;
   width: 32rpx;
   height: 32rpx;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  mask-position: center;
-  -webkit-mask-size: contain;
-  mask-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
   flex-shrink: 0;
   vertical-align: middle;
 }
