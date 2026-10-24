@@ -317,7 +317,18 @@ Page({
       method: 'GET',
       success: function (res) {
         if (res && res.code === 200 && res.data) {
-          onSuccess(res.data);
+          // 后端 Banner 字段是 imageUrl，映射为 wxml 使用的 image 并解析为包内路径
+          var mapped = [];
+          for (var i = 0; i < res.data.length; i++) {
+            var b = res.data[i];
+            mapped.push({
+              id: b.id,
+              title: b.title,
+              subtitle: b.subtitle,
+              image: app.resolveImageUrl(b.imageUrl || b.image) || ''
+            });
+          }
+          onSuccess(mapped);
         } else {
           onSuccess(defaultBanners);
         }

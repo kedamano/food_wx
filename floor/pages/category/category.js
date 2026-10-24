@@ -9,18 +9,8 @@ Page({
     cartCount: 0,
     isLoading: false,
 
-    mainCategories: [
-      { id: 1, name: '面食', icon: 'fa-cookie-bite', color: 'linear-gradient(135deg, #FF9A9E, #FAD0C4)' },
-      { id: 2, name: '披萨', icon: 'fa-pizza-slice', color: 'linear-gradient(135deg, #A1C4FD, #C2E9FB)' },
-      { id: 3, name: '汉堡', icon: 'fa-hamburger', color: 'linear-gradient(135deg, #FFD93D, #F6B93B)' },
-      { id: 4, name: '甜品', icon: 'fa-birthday-cake', color: 'linear-gradient(135deg, #E0C3FC, #8EC5FC)' },
-      { id: 5, name: '饮料', icon: 'fa-coffee', color: 'linear-gradient(135deg, #4ECDC4, #44A08D)' },
-      { id: 6, name: '沙拉', icon: 'fa-leaf', color: 'linear-gradient(135deg, #95E1D3, #F38181)' },
-      { id: 7, name: '火锅', icon: 'fa-fire', color: 'linear-gradient(135deg, #FF6B6B, #ee5a5a)' },
-      { id: 8, name: '烧烤', icon: 'fa-drumstick-bite', color: 'linear-gradient(135deg, #f093fb, #f5576c)' },
-      { id: 9, name: '日料', icon: 'fa-fish', color: 'linear-gradient(135deg, #89f7fe, #66a6ff)' },
-      { id: 10, name: '快餐', icon: 'fa-bolt', color: 'linear-gradient(135deg, #ffecd2, #fcb69f)' }
-    ],
+    // 分类从后端 /food/categories 加载（真实数据），渐变色按序号取池
+    mainCategories: [],
 
     subCategories: [],
     categoryFoods: []
@@ -37,17 +27,68 @@ Page({
 
   onShow: function () {
     this.updateCartCount();
+    var self = this;
     var tabParam = wx.getStorageSync('categoryTabParam');
-    if (tabParam) {
-      wx.removeStorageSync('categoryTabParam');
+    if (!tabParam) return;
+    wx.removeStorageSync('categoryTabParam');
+    var handle = function () {
       if (tabParam === 'promo') {
-        this.loadAllPromoFoods();
+        self.loadAllPromoFoods();
       } else {
-        var idx = this.findCategoryIndex(tabParam);
-        if (idx >= 0) {
-          this.onCategoryTap({ currentTarget: { dataset: { index: idx, category: this.data.mainCategories[idx] } } });
+        self.selectByName(tabParam);
+      }
+    };
+    if (this.data.mainCategories.length === 0) {
+      this.loadCategoriesFromServer(handle);
+    } else {
+      handle();
+    }
+  },
+
+  // 从后端加载真实分类
+  loadCategoriesFromServer: function (done) {
+    var self = this;
+    var app = getApp();
+    var colorPool = [
+      'linear-gradient(135deg, #FF9A9E, #FAD0C4)',
+      'linear-gradient(135deg, #A1C4FD, #C2E9FB)',
+      'linear-gradient(135deg, #FFD93D, #F6B93B)',
+      'linear-gradient(135deg, #E0C3FC, #8EC5FC)',
+      'linear-gradient(135deg, #FF8855, #FF6633)',
+      'linear-gradient(135deg, #95E1D3, #F38181)',
+      'linear-gradient(135deg, #FF6B6B, #ee5a5a)',
+      'linear-gradient(135deg, #f093fb, #f5576c)',
+      'linear-gradient(135deg, #89f7fe, #66a6ff)',
+      'linear-gradient(135deg, #ffecd2, #fcb69f)'
+    ];
+    app.authRequest({
+      url: '/food/categories',
+      method: 'GET'
+    }).then(function (res) {
+      var cats = [];
+      if (res && res.code === 200 && Array.isArray(res.data)) {
+        for (var i = 0; i < res.data.length; i++) {
+          var c = res.data[i];
+          cats.push({
+            id: c.id || c.categoryId,
+            name: c.name || c.categoryName,
+            color: colorPool[i % colorPool.length]
+          });
         }
       }
+      self.setData({ mainCategories: cats });
+      if (typeof done === 'function') done();
+    }).catch(function () {
+      self.setData({ mainCategories: [] });
+      if (typeof done === 'function') done();
+    });
+  },
+
+  // 按名称选中分类
+  selectByName: function (name) {
+    var idx = this.findCategoryIndex(name);
+    if (idx >= 0) {
+      this.onCategoryTap({ currentTarget: { dataset: { index: idx, category: this.data.mainCategories[idx] } } });
     }
   },
 

@@ -157,7 +157,7 @@ Page({
 
       // 使用计数器处理 Promise.all
       var completedCount = 0;
-      var totalCount = 2;
+      var totalCount = 4;
       var userStatsResult = null;
       var orderStatsResult = null;
 
@@ -177,14 +177,15 @@ Page({
             self.setData({ userStats: newUserStats });
           }
           if (orderStatsResult) {
-            var newOrderStats = {};
-            for (key in self.data.orderStats) {
-              newOrderStats[key] = self.data.orderStats[key];
-            }
-            for (key in orderStatsResult) {
-              newOrderStats[key] = orderStatsResult[key];
-            }
-            self.setData({ orderStats: newOrderStats });
+            // /order/statistics 返回 xxxOrders 命名，映射到页面字段
+            self.setData({
+              orderStats: {
+                pending: orderStatsResult.pendingOrders || 0,
+                preparing: orderStatsResult.preparingOrders || 0,
+                delivering: orderStatsResult.deliveringOrders || 0,
+                completed: orderStatsResult.completedOrders || 0
+              }
+            });
           }
           resolve();
         }
@@ -198,12 +199,40 @@ Page({
         .catch(function(error) {
           console.error('获取用户统计失败:', error);
           userStatsResult = {
-            orders: 0,
-            favorites: 0,
-            spending: 0,
+            totalOrders: 0,
+            totalSpending: 0,
           };
           checkAllComplete();
         });
+
+      // 收藏商家数
+      var userId = app.globalData.userId || wx.getStorageSync('userId');
+      app.authRequest({
+        url: '/favorite/user/' + userId,
+        method: 'GET'
+      }).then(function(res) {
+        userStatsResult = userStatsResult || {};
+        userStatsResult.favoriteStores = (res && res.code === 200 && Array.isArray(res.data)) ? res.data.length : 0;
+        checkAllComplete();
+      }).catch(function() {
+        userStatsResult = userStatsResult || {};
+        userStatsResult.favoriteStores = 0;
+        checkAllComplete();
+      });
+
+      // 优惠券数
+      app.authRequest({
+        url: '/coupon/statistics/' + userId,
+        method: 'GET'
+      }).then(function(res) {
+        userStatsResult = userStatsResult || {};
+        userStatsResult.couponCount = (res && res.code === 200 && res.data) ? (res.data.total || 0) : 0;
+        checkAllComplete();
+      }).catch(function() {
+        userStatsResult = userStatsResult || {};
+        userStatsResult.couponCount = 0;
+        checkAllComplete();
+      });
 
       orderApi.getOrderStats()
         .then(function(data) {
