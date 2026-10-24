@@ -50,7 +50,7 @@
       <view class="grid-row">
         <view class="grid-item" wx:for="{{channelList}}" wx:key="id" bindtap="onChannelTap" data-channel="{{item}}">
           <view class="grid-icon" style="background: {{item.bgColor}}">
-            <text class="grid-icon-emoji" style="color: {{item.iconColor}}">{{item.icon}}</text>
+            <text class="grid-icon-emoji i i-{{item.icon}}" style="color: {{item.iconColor}}"></text>
           </view>
           <text class="grid-text">{{item.name}}</text>
         </view>

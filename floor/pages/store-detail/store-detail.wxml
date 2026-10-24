@@ -34,7 +34,7 @@
     <view class="info-top">
       <text class="store-name">{{storeInfo.name}}</text>
       <view class="collect-btn {{isCollected ? 'collected' : ''}}" bindtap="toggleCollect">
-        <text>{{isCollected ? '<text class="i i-heart-fill"></text>' : '<text class="i i-heart-fill"></text>'}}</text>
+        <text class="i {{isCollected ? 'i-heart-fill' : 'i-heart'}}"></text>
         <text>{{isCollected ? '已收藏' : '收藏'}}</text>
       </view>
     </view>

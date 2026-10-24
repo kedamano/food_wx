@@ -40,7 +40,7 @@
           value="{{password}}"
           bindinput="onPasswordInput"
         />
-        <text class="password-toggle" bindtap="onTogglePassword">{{showPassword ? '<text class="i i-eye-off"></text>' : '<text class="i i-eye"></text>'}}</text>
+        <text class="password-toggle i" bindtap="onTogglePassword">i {{showPassword ? 'i-eye-off' : 'i-eye'}}</text>
       </view>
 
       <!-- 记住我 & 忘记密码 -->

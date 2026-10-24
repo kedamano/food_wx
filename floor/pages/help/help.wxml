@@ -14,7 +14,7 @@
       <!-- 分类头部 -->
       <view class="faq-header" bindtap="onToggleCategory" data-id="{{item.id}}" hover-class="s-cell-hover">
         <view class="s-cell-hd">
-          <view class="s-icon s-icon-orange"><text>{{item.iconText}}</text></view>
+          <view class="s-icon s-icon-orange"><text class="i i-{{item.icon}}"></text></view>
           <text class="s-title faq-name">{{item.name}}</text>
         </view>
         <view class="s-cell-ft">

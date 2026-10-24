@@ -34,16 +34,16 @@ Page({
 
     // 功能入口
     channelList: [
-      { id: 1, name: '美食', icon: '🍜', bgColor: '#FFF2E8', iconColor: '#FF6633' },
-      { id: 2, name: '甜品饮品', icon: '🍰', bgColor: '#FDE8F0', iconColor: '#FF6699' },
-      { id: 3, name: '快餐简餐', icon: '🍔', bgColor: '#FFF2E8', iconColor: '#FF8855' },
-      { id: 4, name: '火锅烤肉', icon: '🔥', bgColor: '#FFF3E0', iconColor: '#FF9800' },
-      { id: 5, name: '面条米粉', icon: '🍝', bgColor: '#E3F2FD', iconColor: '#2196F3' },
-      { id: 6, name: '烧烤撸串', icon: '🍗', bgColor: '#FBE9E7', iconColor: '#E64A19' },
-      { id: 7, name: '自助餐', icon: '🍽️', bgColor: '#F3E5F5', iconColor: '#9C27B0' },
-      { id: 8, name: '生鲜超市', icon: '🥕', bgColor: '#E8F5E9', iconColor: '#009688' },
-      { id: 9, name: '排行榜', icon: '🏆', bgColor: '#FFF8E1', iconColor: '#FFB300' },
-      { id: 10, name: '全部分类', icon: '☰', bgColor: '#F5F5F5', iconColor: '#757575' }
+      { id: 1, name: '美食', icon: 'store', bgColor: '#FFF2E8', iconColor: '#FF6633' },
+      { id: 2, name: '甜品饮品', icon: 'gift', bgColor: '#FDE8F0', iconColor: '#FF6699' },
+      { id: 3, name: '快餐简餐', icon: 'bag', bgColor: '#FFF2E8', iconColor: '#FF8855' },
+      { id: 4, name: '火锅烤肉', icon: 'hot', bgColor: '#FFF3E0', iconColor: '#FF9800' },
+      { id: 5, name: '面条米粉', icon: 'store', bgColor: '#E3F2FD', iconColor: '#2196F3' },
+      { id: 6, name: '烧烤撸串', icon: 'hot', bgColor: '#FBE9E7', iconColor: '#E64A19' },
+      { id: 7, name: '自助餐', icon: 'store', bgColor: '#F3E5F5', iconColor: '#9C27B0' },
+      { id: 8, name: '生鲜超市', icon: 'list', bgColor: '#E8F5E9', iconColor: '#009688' },
+      { id: 9, name: '排行榜', icon: 'star-fill', bgColor: '#FFF8E1', iconColor: '#FFB300' },
+      { id: 10, name: '全部分类', icon: 'grid', bgColor: '#F5F5F5', iconColor: '#757575' }
     ],
 
     // 限时特惠

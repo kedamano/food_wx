@@ -5,7 +5,7 @@
     <view class="group-title">反馈类型</view>
     <view class="type-row">
       <view class="type-chip {{selectedType === item.id ? 'active' : ''}}" wx:for="{{feedbackTypes}}" wx:key="id" bindtap="onSelectType" data-id="{{item.id}}">
-        <text class="type-chip-icon">{{item.iconText}}</text>
+        <text class="type-chip-icon i i-{{item.icon}}"></text>
         <text class="type-chip-name">{{item.name}}</text>
       </view>
     </view>

@@ -6,10 +6,10 @@ var app = getApp();
 Page({
   data: {
     feedbackTypes: [
-      { id: 1, name: '功能建议', iconText: '💡' },
-      { id: 2, name: 'Bug反馈', iconText: '🐛' },
-      { id: 3, name: '体验问题', iconText: '📱' },
-      { id: 4, name: '其他', iconText: '✏️' }
+      { id: 1, name: '功能建议', icon: 'edit' },
+      { id: 2, name: 'Bug反馈', icon: 'help' },
+      { id: 3, name: '体验问题', icon: 'phone' },
+      { id: 4, name: '其他', icon: 'edit' }
     ],
     selectedType: null,
     content: '',

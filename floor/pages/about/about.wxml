@@ -22,7 +22,7 @@
     <view class="group-title">功能特点</view>
     <view class="feature-grid">
       <view class="feature-card" wx:for="{{features}}" wx:key="index">
-        <text class="feature-emoji">{{item.iconText}}</text>
+        <text class="feature-emoji i i-{{item.icon}}"></text>
         <text class="feature-name">{{item.title}}</text>
         <text class="feature-desc">{{item.desc}}</text>
       </view>

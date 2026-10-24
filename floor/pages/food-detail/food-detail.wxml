@@ -17,7 +17,7 @@
     <!-- 分享/收藏 -->
     <view class="nav-actions">
       <view class="nav-action-btn" bindtap="onFavoriteClick">
-        <text class="action-icon" style="font-size:36rpx;">{{isFavorite ? '<text class="i i-heart-fill"></text>' : '<text class="i i-heart-fill"></text>'}}</text>
+        <text class="action-icon i {{isFavorite ? 'i-heart-fill' : 'i-heart'}}"></text>
       </view>
       <button class="nav-action-btn share-btn" open-type="share">
         <text class="action-icon -share-alt" style="font-size:36rpx;">↗</text>
@@ -143,7 +143,7 @@
 <view class="bottom-bar">
   <view class="bar-icons">
     <view class="bar-icon-item" bindtap="onFavoriteClick">
-      <text class="bar-icon" style="font-size:40rpx;">{{isFavorite ? '<text class="i i-heart-fill"></text>' : '<text class="i i-heart-fill"></text>'}}</text>
+      <text class="bar-icon i {{isFavorite ? 'i-heart-fill' : 'i-heart'}}"></text>
       <text class="bar-label">{{isFavorite ? '已收藏' : '收藏'}}</text>
     </view>
     <view class="bar-icon-item" bindtap="onCartClick">

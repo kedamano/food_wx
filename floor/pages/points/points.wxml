@@ -70,7 +70,7 @@
       <view class="product-card" wx:for="{{products}}" wx:key="id" bindtap="onProductClick" data-product="{{item}}">
         <view class="product-image">
           <image class="product-img" src="{{item.image}}" mode="aspectFill" lazy-load></image>
-          <text class="product-icon" wx:if="{{!item.image}}" style="font-size:64rpx;">{{item.iconText || '\uD83C\uDFAB'}}</text>
+          <text class="product-icon i i-ticket" wx:if="{{!item.image}}"></text>
           <view class="stock-badge" wx:if="{{item.stock <= 10}}">
             <text class="stock-text">仅剩{{item.stock}}件</text>
           </view>

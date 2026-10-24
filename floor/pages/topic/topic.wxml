@@ -7,7 +7,7 @@
   <view class="topic-list">
     <view class="topic-item" wx:for="{{topics}}" wx:key="id" bindtap="onTopicTap" data-topic="{{item.title}}">
       <view class="topic-icon">
-        <text>{{iconText || "<text class="i i-star-fill"></text>"}}</text>
+        <text class="i i-{{item.icon || 'star-fill'}}"></text>
       </view>
       <view class="topic-content">
         <text class="topic-title">{{item.title}}</text>
