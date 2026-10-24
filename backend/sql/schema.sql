@@ -290,3 +290,56 @@ CREATE TABLE IF NOT EXISTS `feedback` (
   KEY `idx_user_id` (`user_id`),
   KEY `idx_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户反馈表';
+-- ===== 产品能力扩展表（积分商城/评价互动/菜品收藏/设备/话题） =====
+CREATE TABLE IF NOT EXISTS points_products (
+  product_id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(100) NOT NULL COMMENT '商品名',
+  points_cost INT NOT NULL COMMENT '兑换所需积分',
+  stock INT DEFAULT 0 COMMENT '库存',
+  image VARCHAR(255) COMMENT '图片',
+  coupon_template_id INT NULL COMMENT '兑换后发放的优惠券模板ID',
+  description VARCHAR(255) COMMENT '描述',
+  status TINYINT DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='积分商城商品';
+
+CREATE TABLE IF NOT EXISTS review_likes (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  review_id INT NOT NULL,
+  user_id INT NOT NULL,
+  create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_review_user (review_id, user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='评价点赞';
+
+CREATE TABLE IF NOT EXISTS review_replies (
+  reply_id INT PRIMARY KEY AUTO_INCREMENT,
+  review_id INT NOT NULL,
+  user_id INT NOT NULL,
+  content VARCHAR(500) NOT NULL,
+  create_time DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='评价回复';
+
+CREATE TABLE IF NOT EXISTS food_favorites (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  food_id INT NOT NULL,
+  create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_user_food (user_id, food_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='菜品收藏';
+
+CREATE TABLE IF NOT EXISTS user_devices (
+  device_id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  device_name VARCHAR(100),
+  device_model VARCHAR(100),
+  platform VARCHAR(50),
+  login_time DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='登录设备';
+
+CREATE TABLE IF NOT EXISTS topics (
+  topic_id INT PRIMARY KEY AUTO_INCREMENT,
+  title VARCHAR(100) NOT NULL,
+  description VARCHAR(500),
+  cover VARCHAR(255),
+  store_ids VARCHAR(500),
+  participant_count INT DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='话题';

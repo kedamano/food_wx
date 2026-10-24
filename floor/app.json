@@ -36,7 +36,8 @@
     "pages/search/search",
     "pages/favorites/favorites",
     "pages/spending/spending",
-    "pages/customer/customer"
+    "pages/customer/customer",
+    "pages/topic-detail/topic-detail"
   ],
   "window": {
     "backgroundTextStyle": "dark",

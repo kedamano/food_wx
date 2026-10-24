@@ -97,7 +97,7 @@ Page({
         method: 'POST',
         data: { storeId: storeId }
       }).then(function(res) {
-        if (res && (res.code === 200 || res.code === 400)) {
+        if (res && res.code === 200) {
           self.setData({ isCollected: true });
           wx.showToast({ title: '已收藏', icon: 'success' });
         }
@@ -127,9 +127,9 @@ Page({
   },
 
   onCategoryTap: function(e) {
-    var id = e.currentTarget.dataset.id;
-    this.setData({ currentCategory: id });
-    this.loadFoods(this.data.storeInfo.id, id);
+    var id = parseInt(e.currentTarget.dataset.id) || 0;
+    this.setData({ currentCategory: id, activeCategoryId: id });
+    this.applyCategoryFilter(id);
   },
 
   onAddToCart: function(e) {
@@ -339,21 +339,13 @@ Page({
   },
 
   loadCategories: function() {
-    this.setData({
-      categories: [
-        { id: 1, name: '招牌推荐' },
-        { id: 2, name: '热销榜' },
-        { id: 3, name: '主食' },
-        { id: 4, name: '小吃' },
-        { id: 5, name: '饮品' },
-        { id: 6, name: '套餐' }
-      ]
-    });
+    // 分类 tab 改由 loadFoods 根据本店商品的真实分类动态生成
   },
 
   loadFoods: function(storeId, categoryId) {
     var self = this;
     var app = getApp();
+    this.ensureCategoryNames();
     var url = '/food/store/' + storeId;
     app.authRequest({
       url: url,
@@ -369,18 +361,68 @@ Page({
               price: f.price,
               description: f.description || '',
               sales: f.sales || f.monthlySales || 0,
+              categoryId: f.categoryId || 0,
               image: app.resolveImageUrl(f.image) || app.resolveImageUrl(f.cover) || ''
             });
           }
-          self.setData({ foodList: list });
+          self.setData({ foodList: list, _allFoods: list });
+          // 由本店菜品的真实分类构建分类 tab
+          self.buildCategoryTabs(list, categoryId);
         } else {
-          self.setData({ foodList: [] });
+          self.setData({ foodList: [], _allFoods: [] });
         }
       },
       fail: function() {
-        self.setData({ foodList: [] });
+        self.setData({ foodList: [], _allFoods: [] });
       }
     });
+  },
+
+  // 拉取全局分类名映射（tab 显示用）
+  ensureCategoryNames: function() {
+    var app = getApp();
+    if (app.globalData.categoryNames && Object.keys(app.globalData.categoryNames).length > 0) return;
+    app.authRequest({
+      url: '/food/categories',
+      method: 'GET'
+    }).then(function(res) {
+      if (!(res && res.code === 200 && Array.isArray(res.data))) return;
+      var map = {};
+      for (var i = 0; i < res.data.length; i++) {
+        map[res.data[i].id] = res.data[i].name;
+      }
+      app.globalData.categoryNames = map;
+    }).catch(function() {});
+  },
+
+  // 依据商品所属分类生成筛选 tab（全部 + 实际存在的分类）
+  buildCategoryTabs: function(list, activeId) {
+    var app = getApp();
+    var seen = {};
+    var cats = [{ id: 0, name: '全部' }];
+    for (var i = 0; i < list.length; i++) {
+      var cid = list[i].categoryId;
+      if (cid && !seen[cid]) {
+        seen[cid] = true;
+        cats.push({ id: cid, name: app.globalData.categoryNames[cid] || ('分类' + cid) });
+      }
+    }
+    this.setData({ categories: cats, currentCategory: activeId || 0 });
+    this.applyCategoryFilter(activeId || 0);
+  },
+
+  // 本地按分类过滤
+  applyCategoryFilter: function(catId) {
+    var all = this.data._allFoods || [];
+    if (!catId) {
+      this.setData({ foodList: all });
+      return;
+    }
+    var filtered = [];
+    for (var i = 0; i < all.length; i++) {
+      if (all[i].categoryId === catId) filtered.push(all[i]);
+    }
+    this.setData({ foodList: filtered });
   },
 
   loadReviews: function() {

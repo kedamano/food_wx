@@ -28,6 +28,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         String uri = request.getRequestURI();
         if (uri.contains("/user/register") || uri.contains("/user/login") ||
             uri.contains("/user/wechat-login") || uri.contains("/user/wechat-register") ||
+            uri.contains("/user/refresh-token") ||
             uri.contains("/order/pay-notify") ||
             uri.contains("/food/all") || uri.contains("/food/popular") ||
             uri.contains("/food/recommend") || uri.contains("/food/*/rating") ||

@@ -26,96 +26,9 @@ Page({
     // 本月累计积分
     monthlyPoints: 0,
     // 每日任务
-    dailyTasks: [
-      {
-        id: 1,
-        name: '签到',
-        points: 20,
-        icon: 'fa-check',
-        iconText: '\u2713',
-        completed: false
-      },
-      {
-        id: 2,
-        name: '完成订单',
-        points: 50,
-        icon: 'fa-utensils',
-        iconText: '\uD83C\uDF74',
-        completed: false
-      },
-      {
-        id: 3,
-        name: '评价订单',
-        points: 30,
-        icon: 'fa-star',
-        iconText: '\u2B50',
-        completed: false
-      },
-      {
-        id: 4,
-        name: '分享小程序',
-        points: 20,
-        icon: 'fa-share-alt',
-        iconText: '\uD83D\uDD17',
-        completed: false
-      }
-    ],
-    // 积分商品
-    products: [
-      {
-        id: 1,
-        name: '5元通用券',
-        points: 500,
-        originalPrice: 5,
-        stock: 999,
-        icon: 'fa-ticket-alt',
-        iconText: '\uD83C\uDFAB'
-      },
-      {
-        id: 2,
-        name: '10元满减券',
-        points: 980,
-        originalPrice: 10,
-        stock: 256,
-        icon: 'fa-ticket-alt',
-        iconText: '\uD83C\uDFAB'
-      },
-      {
-        id: 3,
-        name: '20元无门槛券',
-        points: 1980,
-        originalPrice: 20,
-        stock: 89,
-        icon: 'fa-ticket-alt',
-        iconText: '\uD83C\uDFAB'
-      },
-      {
-        id: 4,
-        name: '50元大额券',
-        points: 4880,
-        originalPrice: 50,
-        stock: 32,
-        icon: 'fa-ticket-alt',
-        iconText: '\uD83C\uDFAB'
-      },
-      {
-        id: 5,
-        name: '100元超值券',
-        points: 9880,
-        originalPrice: 100,
-        stock: 12,
-        icon: 'fa-gem',
-        iconText: '\uD83D\uDC8E'
-      },
-      {
-        id: 6,
-        name: '定制餐具套装',
-        points: 1280,
-        stock: 45,
-        icon: 'fa-utensils',
-        iconText: '\uD83C\uDF74'
-      }
-    ],
+    dailyTasks: [],
+    // 积分商品（后端加载）
+    products: [],
     // 排序文本
     sortText: '积分从低到高',
     // 积分记录
@@ -125,15 +38,59 @@ Page({
   // 页面加载
   onLoad: function(options) {
     this.loadUserPointsInfo();
-    this.checkDailyTasks();
+    this.loadShopData();
     this.loadRecentHistory();
   },
 
   // 页面显示时刷新
   onShow: function() {
     this.loadUserPointsInfo();
-    this.checkDailyTasks();
+    this.loadShopData();
     this.loadRecentHistory();
+  },
+
+  // 积分商城商品 + 每日任务（后端真实数据）
+  loadShopData: function() {
+    var self = this;
+    app.authRequest({
+      url: '/points-shop/products',
+      method: 'GET'
+    }).then(function(res) {
+      if (res && res.code === 200 && Array.isArray(res.data)) {
+        var products = [];
+        for (var i = 0; i < res.data.length; i++) {
+          var it = res.data[i];
+          products.push({
+            id: it.productId,
+            name: it.name,
+            points: it.pointsCost,
+            stock: it.stock,
+            image: app.resolveImageUrl(it.image) || '',
+            description: it.description || ''
+          });
+        }
+        self.setData({ products: products });
+      }
+    }).catch(function() {});
+
+    app.authRequest({
+      url: '/points-shop/tasks',
+      method: 'GET'
+    }).then(function(res) {
+      if (res && res.code === 200 && Array.isArray(res.data)) {
+        var tasks = [];
+        for (var j = 0; j < res.data.length; j++) {
+          var t = res.data[j];
+          tasks.push({
+            id: j + 1,
+            name: t.name,
+            points: t.points,
+            completed: !!t.completed
+          });
+        }
+        self.setData({ dailyTasks: tasks });
+      }
+    }).catch(function() {});
   },
 
   // 加载用户积分信息
@@ -348,24 +305,23 @@ Page({
     });
   },
 
-  // 兑换商品
+  // 兑换商品（后端事务：校验积分/库存、扣减、券类自动发放）
   exchangeProduct: function(product) {
     var self = this;
-    var userId = app.globalData.userId || wx.getStorageSync('userId') || 1;
 
     wx.showLoading({ title: '兑换中...' });
 
     app.authRequest({
-      url: '/user/points',
-      method: 'PUT',
+      url: '/points-shop/exchange',
+      method: 'POST',
       data: {
-        points: product.points,
-        type: 'subtract'
+        productId: product.id
       }
     }).then(function(res) {
       wx.hideLoading();
 
       if (res && res.code === 200) {
+        wx.hideLoading();
         var newUserPoints = self.data.userPoints - product.points;
         var updatedProducts = [];
         for (var pi = 0; pi < self.data.products.length; pi++) {

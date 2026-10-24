@@ -222,11 +222,26 @@ App({
 
       var promise = new Promise(function(resolve, reject) {
         extendedOptions.success = function(res) {
-          if (res.statusCode === 401) {
-            // HTTP 401 统一走重新登录
-            self.handleAuthError({ message: '登录已过期', code: 'AUTH_ERROR' });
-            reject(new Error('登录已过期'));
-          } else if (res.statusCode === 200) {
+          if (res.statusCode === 401 || (res.statusCode === 200 && res.data && res.data.code === 401)) {
+            // 先尝试刷新 Token 换发，成功则重试原请求；失败才走重新登录
+            self.tryRefreshToken(function(refreshed) {
+              if (refreshed && !options._retried) {
+                var retryOptions = {};
+                for (var rk in options) retryOptions[rk] = options[rk];
+                retryOptions._retried = true;
+                retryOptions.header = {};
+                for (var hk in options.header) retryOptions.header[hk] = options.header[hk];
+                var ah = self.getAuthHeaderConfig();
+                for (var ak in ah) retryOptions.header[ak] = ah[ak];
+                self.authRequest(retryOptions).then(resolve, reject);
+              } else {
+                self.handleAuthError({ message: '登录已过期', code: 'AUTH_ERROR' });
+                reject(new Error('登录已过期'));
+              }
+            });
+            return;
+          }
+          if (res.statusCode === 200) {
             if (res.data && (res.data.code === 401 || res.data.message === '未登录')) {
               self.handleAuthError({ message: '未登录', code: 'AUTH_ERROR' });
               reject(new Error('未登录'));

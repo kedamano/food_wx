@@ -2,10 +2,10 @@
 <view class="page-sub">
   <!-- 头像区域 -->
   <view class="s-card avatar-card">
-    <view class="avatar-row" bindtap="onChooseAvatar" hover-class="s-cell-hover">
+    <button class="avatar-row avatar-row-btn" open-type="chooseAvatar" bind:chooseavatar="onWechatAvatar" hover-class="s-cell-hover">
       <view class="avatar-wrap">
         <image class="avatar-img" src="{{userInfo.avatar || '/images/avatars/default.png'}}" mode="aspectFill"></image>
-        <view class="i avatar-badge i-camera"></view>
+        <view class="i avatar-badge i-camera"></button>
       </view>
       <view class="avatar-info">
         <text class="avatar-name">{{userInfo.username || '未设置用户名'}}</text>

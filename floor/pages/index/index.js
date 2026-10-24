@@ -16,19 +16,19 @@ Page({
         id: 1,
         title: '周末美食大放送',
         subtitle: '精选好店，限时5折',
-        image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&h=400&fit=crop'
+        image: '/images/banners/banner_1.jpg'
       },
       {
         id: 2,
         title: '新店开业 特惠尝鲜',
         subtitle: '全场满减，惊喜不断',
-        image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&h=400&fit=crop'
+        image: '/images/banners/banner_2.jpg'
       },
       {
         id: 3,
         title: '人气美食榜单',
         subtitle: '百万吃货都在吃',
-        image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=400&fit=crop'
+        image: '/images/banners/banner_3.jpg'
       }
     ],
 
@@ -126,10 +126,17 @@ Page({
 
   // 倒计时
   startCountdown: function () {
-    var totalSeconds = 2 * 3600 + 30 * 60 + 45;
     var self = this;
+    // 真实倒计时：到当天 24:00 的剩余秒数（每日特惠自然日结束）
+    var computeRemain = function () {
+      var now = new Date();
+      var end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
+      return Math.max(0, Math.floor((end - now) / 1000));
+    };
+    var totalSeconds = computeRemain();
     var timer = setInterval(function () {
       totalSeconds--;
+      if (totalSeconds <= 0) { totalSeconds = computeRemain(); }
       if (totalSeconds <= 0) { clearInterval(timer); return; }
       var h = String(Math.floor(totalSeconds / 3600));
       if (h.length < 2) h = '0' + h;
@@ -148,7 +155,7 @@ Page({
 
   // 筛选商家
   filterStores: function (filter) {
-    var allStores = this.data._allStores || [];
+    var allStores = this._allStores || [];
     // 用 slice 复制数组，避免直接修改
     var stores = allStores.slice();
     if (filter === 'rating') {
@@ -230,13 +237,17 @@ Page({
               sales: f.sales,
               reviews: f.reviews,
               originalPrice: (Number(f.price) * 1.5).toFixed(0),
-              discount: Math.floor(Math.random() * 3 + 5) + '折'
+              discount: Math.max(5, Math.round(Number(f.price) / Math.max(1, Number(f.price) * 1.5) * 10)) + '折'
             });
           }
 
           // 处理商家数据
           var tagPool = ['必吃榜', '人气旺', '品质优选', '回头客多', '环境优雅', '味道赞'];
           var dealPool = ['满100减20', '新客立减15', '满50减8', '招牌菜8折', '双人套餐特惠'];
+          // 按 storeId 稳定取样，避免每次进入页面随机变化
+          var pickStable = function (pool, seed) {
+            return pool[seed % pool.length];
+          };
           var reviewKeywords = ['口味绝佳', '环境很好', '性价比高', '分量十足', '服务热情', '食材新鲜'];
 
           var processedStores = [];
@@ -258,11 +269,12 @@ Page({
             });
           }
 
+          // 全量商家放页面实例（非渲染数据不进 data）
+          this._allStores = processedStores;
           self.setData({
             banners: bannersData,
             promoList: promoList,
-            nearbyStores: processedStores,
-            _allStores: processedStores
+            nearbyStores: processedStores
           });
 
           wx.hideLoading();
@@ -308,9 +320,9 @@ Page({
   // 获取轮播图
   getBanners: function (onSuccess, onFail) {
     var defaultBanners = [
-      { id: 1, title: '周末美食大放送', subtitle: '精选好店，限时5折', image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&h=400&fit=crop' },
-      { id: 2, title: '新店开业 特惠尝鲜', subtitle: '全场满减，惊喜不断', image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&h=400&fit=crop' },
-      { id: 3, title: '人气美食榜单', subtitle: '百万吃货都在吃', image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=400&fit=crop' }
+      { id: 1, title: '周末美食大放送', subtitle: '精选好店，限时5折', image: '/images/banners/banner_1.jpg' },
+      { id: 2, title: '新店开业 特惠尝鲜', subtitle: '全场满减，惊喜不断', image: '/images/banners/banner_2.jpg' },
+      { id: 3, title: '人气美食榜单', subtitle: '百万吃货都在吃', image: '/images/banners/banner_3.jpg' }
     ];
     app.authRequest({
       url: '/food/banners',
@@ -387,7 +399,7 @@ Page({
               rating: Number(store.rating) || 4.5,
               distance: store.distance || '1.5km',
               deliveryTime: store.deliveryTime || '30 分钟',
-              reviews: store.reviews || Math.floor(Math.random() * 200) + 50,
+              reviews: store.reviews || store.sales || 0,
               banner: app.resolveImageUrl(store.logo) || store.banner || ''
             });
           }

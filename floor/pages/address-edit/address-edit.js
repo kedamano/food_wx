@@ -55,10 +55,43 @@ Page({
   },
 
   onLoad: function(options) {
+    this.loadRegionData();
     if (options.id) {
       this.setData({ isEditMode: true, addressId: parseInt(options.id) });
       this.loadAddressDetail(parseInt(options.id));
     }
+  },
+
+  // 从后端加载完整省市区数据（省→市→区），失败时保留内置数据
+  loadRegionData: function() {
+    var self = this;
+    var app = getApp();
+    app.authRequest({
+      url: '/region/tree',
+      method: 'GET'
+    }).then(function(res) {
+      if (!(res && res.code === 200 && Array.isArray(res.data) && res.data.length > 0)) return;
+      var regionData = [];
+      for (var i = 0; i < res.data.length; i++) {
+        var prov = res.data[i];
+        var cities = [];
+        for (var j = 0; j < (prov.children || []).length; j++) {
+          var city = prov.children[j];
+          cities.push({ name: city.name, districts: city.children || [] });
+        }
+        if (cities.length === 0) cities.push({ name: prov.name, districts: [prov.name] });
+        regionData.push({ name: prov.name, cities: cities });
+      }
+      var provinces = [];
+      for (var k = 0; k < regionData.length; k++) provinces.push(regionData[k].name);
+      self.setData({
+        regionData: regionData,
+        provinces: provinces,
+        cities: regionData[0].cities.map(function(c) { return c.name; }),
+        districts: regionData[0].cities[0].districts,
+        regionIndex: [0, 0, 0]
+      });
+    }).catch(function() {});
   },
 
   // 加载地址详情（编辑时）

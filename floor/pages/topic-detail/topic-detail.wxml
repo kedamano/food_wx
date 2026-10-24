@@ -1,0 +1,24 @@
+<view class="page-topic-detail">
+  <view class="td-hero" wx:if="{{topic}}">
+    <image class="td-cover" src="{{topic.cover}}" mode="aspectFill" />
+    <view class="td-info">
+      <text class="td-title">{{topic.title}}</text>
+      <text class="td-desc">{{topic.description}}</text>
+      <text class="td-count">{{topic.followers}} 人参与</text>
+    </view>
+    <view class="td-join" bindtap="onJoinTap" hover-class="press-hover">参与</view>
+  </view>
+
+  <view class="td-section">
+    <view class="td-section-title">参与商家</view>
+    <view class="td-store" wx:for="{{stores}}" wx:key="id" bindtap="onStoreTap" data-id="{{item.id}}" hover-class="press-hover">
+      <image class="td-store-logo" src="{{item.logo}}" mode="aspectFill" lazy-load />
+      <view class="td-store-info">
+        <text class="td-store-name">{{item.name}}</text>
+        <text class="td-store-addr">{{item.address}}</text>
+      </view>
+      <view class="td-store-rating">{{item.rating}}分</view>
+    </view>
+    <view class="td-empty" wx:if="{{stores.length === 0 && !isLoading}}">暂无参与商家</view>
+  </view>
+</view>

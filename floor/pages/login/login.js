@@ -291,6 +291,20 @@ Page({
     // 登录成功后：合并本地购物车到服务端，并拉取服务端购物车
     app.mergeLocalCartToServer();
 
+    // 上报本次登录设备（设备管理用）
+    try {
+      var sysInfo = wx.getSystemInfoSync();
+      app.authRequest({
+        url: '/user/devices/report',
+        method: 'POST',
+        data: {
+          deviceName: sysInfo.model || '未知设备',
+          deviceModel: sysInfo.system || '',
+          platform: sysInfo.platform || 'mp-weixin'
+        }
+      }).then(function() {}, function() {});
+    } catch (e) { /* 忽略设备信息获取失败 */ }
+
     // 处理记住我
     if (this.data.rememberMe) {
       wx.setStorageSync('rememberedUser', {

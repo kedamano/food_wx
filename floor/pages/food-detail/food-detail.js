@@ -383,27 +383,39 @@ Page({
     });
   },
 
-  // 收藏按钮点击
+  // 收藏按钮点击（后端切换，返回最新状态）
   onFavoriteClick: function() {
-    var isFavorite = this.data.isFavorite;
-    var newFavoriteStatus = !isFavorite;
+    var self = this;
+    var foodId = this.data.food && this.data.food.id;
+    if (!foodId) return;
 
-    this.setData({
-      isFavorite: newFavoriteStatus
+    app.authRequest({
+      url: '/food/' + foodId + '/favorite',
+      method: 'POST'
+    }).then(function(res) {
+      if (res && res.code === 200 && res.data) {
+        var favored = !!res.data.favored;
+        self.setData({ isFavorite: favored });
+        wx.showToast({ title: favored ? '已收藏' : '已取消收藏', icon: 'success' });
+      } else {
+        wx.showToast({ title: (res && res.message) || '操作失败', icon: 'none' });
+      }
+    }).catch(function() {
+      wx.showToast({ title: '网络异常', icon: 'none' });
     });
-
-    wx.showToast({
-      title: newFavoriteStatus ? '已收藏' : '已取消收藏',
-      icon: 'success'
-    });
-
-    // 更新收藏状态到服务器
-    this.updateFavoriteStatus(newFavoriteStatus);
   },
 
-  // 更新收藏状态
-  updateFavoriteStatus: function(isFavorite) {
-    // 实际项目中应该调用API更新收藏状态
+  // 加载收藏状态
+  loadFavoriteStatus: function(foodId) {
+    var self = this;
+    app.authRequest({
+      url: '/food/' + foodId + '/favorite/status',
+      method: 'GET'
+    }).then(function(res) {
+      if (res && res.code === 200 && res.data) {
+        self.setData({ isFavorite: !!res.data.favored });
+      }
+    }).catch(function() {});
   },
 
   // 购物车按钮点击 - 弹出购物车详情弹窗

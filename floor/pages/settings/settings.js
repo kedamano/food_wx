@@ -86,25 +86,52 @@ Page({
     }
   },
 
-  // 请求定位权限
+  // 请求定位权限：真实读取/申请/引导系统设置
   requestLocationPermission: function() {
     var self = this;
-    
-    // 模拟请求定位权限
-    wx.showModal({
-      title: '位置权限',
-      content: '允许小程序使用您的位置信息，以便为您提供更精准的商家推荐和配送服务',
+    wx.getSetting({
       success: function(res) {
-        if (!res.confirm) {
-          // 用户拒绝，恢复开关状态
-          var settings = self.data.settings;
-          settings.autoLocation = false;
-          self.setData({
-            settings: settings
+        var granted = res.authSetting['scope.userLocation'];
+        if (granted) {
+          wx.showToast({ title: '定位权限已开启', icon: 'success' });
+        } else if (granted === false) {
+          wx.showModal({
+            title: '定位权限未开启',
+            content: '是否前往设置开启定位权限？',
+            success: function(r) {
+              if (r.confirm) {
+                wx.openSetting({
+                  success: function(setting) {
+                    if (setting.authSetting['scope.userLocation']) {
+                      wx.showToast({ title: '已开启', icon: 'success' });
+                    }
+                  }
+                });
+              } else {
+                self.revertAutoLocation();
+              }
+            }
+          });
+        } else {
+          wx.authorize({
+            scope: 'scope.userLocation',
+            success: function() {
+              wx.showToast({ title: '授权成功', icon: 'success' });
+            },
+            fail: function() {
+              self.revertAutoLocation();
+            }
           });
         }
       }
     });
+  },
+
+  // 用户拒绝授权时回退开关
+  revertAutoLocation: function() {
+    var settings = this.data.settings;
+    settings.autoLocation = false;
+    this.setData({ settings: settings });
   },
 
   // 语言设置

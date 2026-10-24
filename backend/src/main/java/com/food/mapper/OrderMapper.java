@@ -3,6 +3,7 @@ package com.food.mapper;
 import com.food.entity.Order;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 @Mapper
@@ -45,5 +46,8 @@ public interface OrderMapper {
                        @Param("status") String status);
 
     int deleteById(Integer orderId);
+
+    @Select("SELECT COUNT(*) FROM orders WHERE user_id = #{userId} AND DATE(create_time) = CURDATE()")
+    int countTodayByUser(@Param("userId") Integer userId);
 
 }

@@ -195,3 +195,17 @@ page {
 .safe-bottom {
   height: calc(40rpx + env(safe-area-inset-bottom));
 }
+
+/* 原生头像按钮重置 */
+.avatar-row-btn {
+  width: 100%;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  border: none;
+  line-height: inherit;
+  font-size: inherit;
+  text-align: left;
+  display: flex;
+}
+.avatar-row-btn::after { border: none; }

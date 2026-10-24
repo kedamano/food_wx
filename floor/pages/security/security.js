@@ -186,11 +186,24 @@ Page({
     });
   },
 
-  // 绑定微信
+  // 绑定微信：按账号实际 openid 状态展示
   onBindWechat: function() {
-    // 微信小程序中，微信绑定通常由微信自动处理
-    wx.showToast({ title: '微信已自动绑定', icon: 'success' });
-    this.setData({ bindWechat: true });
+    var info = wx.getStorageSync('userInfo') || {};
+    var openid = info.openid || app.globalData.userInfo && app.globalData.userInfo.openid;
+    if (openid) {
+      this.setData({ bindWechat: true });
+      wx.showToast({ title: '当前账号已绑定微信', icon: 'success' });
+    } else {
+      wx.showModal({
+        title: '尚未绑定微信',
+        content: '使用微信登录即可自动完成绑定，是否前往登录页？',
+        success: function(res) {
+          if (res.confirm) {
+            wx.navigateTo({ url: '/pages/login/login' });
+          }
+        }
+      });
+    }
   },
 
   // 登录设备管理

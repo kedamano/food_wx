@@ -4,6 +4,7 @@
 2) 生成 backend/sql/demo_data.sql：商家/商品/订单/明细/收藏/优惠券/评价/地址各约 500 条
 """
 import io
+import json
 import os
 import random
 from PIL import Image, ImageDraw, ImageFont
@@ -74,21 +75,16 @@ for cat, names in DISHES.items():
         rel = 'foods/food_%02d.jpg' % idx
         save_jpg(img, rel)
         food_files.append('/images/foods/food_%02d.jpg' % idx)
-# 把原有 15 张 PNG 也纳入轮换池
-for f in sorted(os.listdir(os.path.join(FLOOR_IMG, 'foods'))):
-    if f.endswith('.png'):
-        food_files.append('/images/foods/' + f)
+# 原有 15 张 PNG 一并入池（真实图池由 fetch_real_images.py 提供）
+if os.path.exists('tmp_img/pools.json'):
+    food_files = json.load(open('tmp_img/pools.json'))['foods'] + food_files
 
 print('生成商家图...')
 STORE_WORDS = ['蜀香', '粤海', '北方', '江南', '食在', '味觉', '暖胃', '深夜', '转角', '巷子',
                '老王', '阿强', '幸福', '旺角', '高分', '味道', '磁石', '小满', '功夫', '遇见']
 store_files = []
-for i in range(12):
-    c1, c2 = CAT_HUES[(i % 10) + 1]
-    img = grad_tile(300, 300, c1, c2, STORE_WORDS[i], 44)
-    rel = 'stores/store_logo_%02d.jpg' % (i + 1)
-    save_jpg(img, rel)
-    store_files.append('/images/stores/store_logo_%02d.jpg' % (i + 1))
+if os.path.exists('tmp_img/pools.json'):
+    store_files = json.load(open('tmp_img/pools.json'))['stores']
 
 # ============ 2. SQL 生成 ============
 CITIES = ('广东省', '深圳市')
@@ -283,6 +279,11 @@ while rv < 500:
     sql.append("INSERT INTO reviews (order_id, user_id, food_id, rating, content, images, status, create_time, update_time) "
                "VALUES (%d, %d, %d, %d, '%s', '%s', 1, '%s', '%s');"
                % (oid, owner, food['id'], rating, esc(content), imgs, created, created))
+
+banner_files = json.load(open('tmp_img/pools.json'))['banners'] if os.path.exists('tmp_img/pools.json') else []
+if len(banner_files) >= 3:
+    for bi, bfile in enumerate(banner_files[:3]):
+        sql.append("UPDATE banners SET image_url = '%s' WHERE id = %d;" % (bfile, bi + 1))
 
 out = os.path.join(ROOT, 'backend', 'sql', 'demo_data.sql')
 io.open(out, 'w', encoding='utf-8', newline='\n').write('\n'.join(sql) + '\n')

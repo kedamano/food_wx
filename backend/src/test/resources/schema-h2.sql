@@ -246,3 +246,51 @@ CREATE TABLE banners (
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS points_products (
+  product_id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(100) NOT NULL,
+  points_cost INT NOT NULL,
+  stock INT DEFAULT 0,
+  image VARCHAR(255),
+  coupon_template_id INT,
+  description VARCHAR(255),
+  status TINYINT DEFAULT 1
+);
+CREATE TABLE IF NOT EXISTS review_likes (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  review_id INT NOT NULL,
+  user_id INT NOT NULL,
+  create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_review_user (review_id, user_id)
+);
+CREATE TABLE IF NOT EXISTS review_replies (
+  reply_id INT PRIMARY KEY AUTO_INCREMENT,
+  review_id INT NOT NULL,
+  user_id INT NOT NULL,
+  content VARCHAR(500) NOT NULL,
+  create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS food_favorites (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  food_id INT NOT NULL,
+  create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_user_food (user_id, food_id)
+);
+CREATE TABLE IF NOT EXISTS user_devices (
+  device_id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  device_name VARCHAR(100),
+  device_model VARCHAR(100),
+  platform VARCHAR(50),
+  login_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS topics (
+  topic_id INT PRIMARY KEY AUTO_INCREMENT,
+  title VARCHAR(100) NOT NULL,
+  description VARCHAR(500),
+  cover VARCHAR(255),
+  store_ids VARCHAR(500),
+  participant_count INT DEFAULT 0
+);

@@ -83,6 +83,14 @@ Page({
     return year + '-' + month + '-' + day;
   },
 
+  // 微信原生头像选择（open-type=chooseAvatar）
+  onWechatAvatar: function(e) {
+    var avatarUrl = e.detail && e.detail.avatarUrl;
+    if (!avatarUrl) return;
+    this.setData({ tempAvatar: avatarUrl, 'userInfo.avatar': avatarUrl });
+    this.uploadAvatar(avatarUrl);
+  },
+
   // 选择头像
   onChooseAvatar: function() {
     var self = this;

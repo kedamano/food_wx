@@ -240,6 +240,37 @@ public class UserController {
         return userService.register(user);
     }
 
+    @PostMapping("/refresh-token")
+    @ApiOperation(value = "刷新Token", notes = "签名合法但已过期的 Token 可换发新 Token；非法 Token 拒绝")
+    public BaseResult refreshToken(@RequestBody Map<String, String> request) {
+        String token = request.get("token");
+        if (token == null || token.isEmpty()) {
+            return BaseResult.error(400, "token不能为空");
+        }
+
+        io.jsonwebtoken.Claims claims = jwtUtil.parseTokenIgnoreExpiry(token);
+        if (claims == null) {
+            return BaseResult.error(401, "Token无效");
+        }
+
+        Integer userId;
+        try {
+            userId = Integer.parseInt(claims.getSubject());
+        } catch (NumberFormatException e) {
+            return BaseResult.error(401, "Token无效");
+        }
+
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            return BaseResult.error(401, "用户不存在");
+        }
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("token", jwtUtil.generateToken(userId));
+        data.put("userId", userId);
+        return BaseResult.success("刷新成功", data);
+    }
+
     @PostMapping("/wechat-login")
     @ApiOperation(value = "微信登录", notes = "使用微信code换取openid，匹配已绑定用户返回登录态")
     public BaseResult wechatLogin(@RequestBody Map<String, String> request) {

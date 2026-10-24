@@ -175,9 +175,24 @@ Page({
 
   // 点赞评价
   onLikeReview: function(e) {
-    // 评价点赞暂无后端支持
-    wx.showToast({ title: '点赞功能即将上线', icon: 'none' });
-    return;
+    var review = e.currentTarget.dataset.review;
+    var self = this;
+    app.authRequest({
+      url: '/review/' + review.reviewId + '/like',
+      method: 'POST'
+    }).then(function(res) {
+      if (res && res.code === 200 && res.data) {
+        var reviews = self.data.reviews;
+        for (var i = 0; i < reviews.length; i++) {
+          if (reviews[i].reviewId === review.reviewId) {
+            reviews[i].liked = !!res.data.liked;
+            reviews[i].likeCount = res.data.likeCount;
+          }
+        }
+        self.attachLikeSummary(reviews);
+        self.setData({ reviews: reviews });
+      }
+    }).catch(function() {});
   },
   onLikeReviewOld: function(e) {
     var review = e.currentTarget.dataset.review;
@@ -217,9 +232,32 @@ Page({
 
   // 回复评价
   onReplyReview: function(e) {
-    // 商家回复暂无后端支持
-    wx.showToast({ title: '回复功能即将上线', icon: 'none' });
-    return;
+    var review = e.currentTarget.dataset.review;
+    var self = this;
+    wx.showModal({
+      title: '回复评价',
+      editable: true,
+      placeholderText: '写下你的回复（至少2个字）',
+      success: function(mr) {
+        if (!mr.confirm) return;
+        var content = (mr.content || '').trim();
+        if (content.length < 2) {
+          wx.showToast({ title: '回复太短了', icon: 'none' });
+          return;
+        }
+        app.authRequest({
+          url: '/review/' + review.reviewId + '/reply',
+          method: 'POST',
+          data: { content: content }
+        }).then(function(res) {
+          if (res && res.code === 200) {
+            wx.showToast({ title: '回复成功', icon: 'success' });
+          }
+        }).catch(function() {
+          wx.showToast({ title: '回复失败', icon: 'none' });
+        });
+      }
+    });
   },
   onReplyReviewOld: function(e) {
     var review = e.currentTarget.dataset.review;
@@ -263,5 +301,43 @@ Page({
     wx.navigateTo({
       url: '/pages/orders/orders?status=completed'
     });
+  },
+
+  // 批量附加点赞摘要
+  attachLikeSummary: function(reviews) {
+    if (!reviews || reviews.length === 0) return;
+    var ids = [];
+    for (var i = 0; i < reviews.length; i++) ids.push(reviews[i].reviewId);
+    app.authRequest({
+      url: '/review/likes?ids=' + ids.join(','),
+      method: 'GET'
+    }).then(function(res) {
+      if (!(res && res.code === 200 && res.data)) return;
+      var map = {};
+      for (var k = 0; k < res.data.length; k++) {
+        map[res.data[k].reviewId] = res.data[k];
+      }
+      var updated = [];
+      for (var j = 0; j < reviews.length; j++) {
+        var r = reviews[j];
+        var hit = map[r.reviewId];
+        updated.push({
+          reviewId: r.reviewId,
+          liked: hit ? !!hit.likedByMe : false,
+          likeCount: hit ? hit.likeCount : (r.likeCount || 0),
+          raw: r
+        });
+      }
+      // 合并回原对象（保留其它字段）
+      var merged = [];
+      for (var m2 = 0; m2 < reviews.length; m2++) {
+        var base = reviews[m2];
+        var extra = updated[m2];
+        base.liked = extra.liked;
+        base.likeCount = extra.likeCount;
+        merged.push(base);
+      }
+      self.setData({ reviews: merged });
+    }).catch(function() {});
   }
 });

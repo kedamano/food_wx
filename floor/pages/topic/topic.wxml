@@ -5,7 +5,7 @@
   </view>
 
   <view class="topic-list">
-    <view class="topic-item" wx:for="{{topics}}" wx:key="id" bindtap="onTopicTap" data-topic="{{item.title}}">
+    <view class="topic-item" wx:for="{{topics}}" wx:key="id" bindtap="onTopicTap" data-id="{{item.id}}">
       <view class="topic-icon">
         <text class="i i-{{item.icon || 'star-fill'}}"></text>
       </view>

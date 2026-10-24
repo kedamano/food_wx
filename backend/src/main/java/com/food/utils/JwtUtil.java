@@ -72,6 +72,25 @@ public class JwtUtil {
     }
 
     /**
+     * 宽松解析：签名合法但已过期的 Token 仍返回 Claims（供刷新换发新 Token）
+     * @return Claims；签名非法等情形返回 null
+     */
+    public Claims parseTokenIgnoreExpiry(String token) {
+        try {
+            return Jwts.parser()
+                    .setSigningKey(secret)
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            // 仅过期：签名仍合法
+            return e.getClaims();
+        } catch (Exception e) {
+            log.debug("Token 宽松解析失败: {}", e.getClass().getSimpleName());
+            return null;
+        }
+    }
+
+    /**
      * 从Token中获取用户ID
      * @param token Token字符串
      * @return 用户ID
