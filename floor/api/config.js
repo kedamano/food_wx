@@ -1,7 +1,10 @@
 // API 接口配置文件
-// 环境自适应：微信开发者工具/开发版走 localhost，体验版/正式版走线上域名
+// 环境自适应：开发者工具走 localhost；真机调试走电脑局域网 IP；体验版/正式版走线上域名
 // 上线前把 PRODUCTION_BASEURL 替换为真实域名，并在小程序后台配置 request 合法域名
 var PRODUCTION_BASEURL = 'https://your-api-domain.com/api';
+
+// 真机调试：改成你电脑的局域网 IP（ipconfig 查看 IPv4 地址），手机需与电脑同一 Wi-Fi
+var LAN_BASEURL = 'http://192.168.1.7:8080/api';
 
 function detectEnv() {
   try {
@@ -13,10 +16,23 @@ function detectEnv() {
   }
 }
 
+// 开发环境下区分运行载体：开发者工具用 localhost，真机用局域网 IP
+function resolveDevBaseURL() {
+  try {
+    var info = wx.getDeviceInfo ? wx.getDeviceInfo() : wx.getSystemInfoSync();
+    if (info.platform === 'devtools') {
+      return 'http://localhost:8080/api';
+    }
+    return LAN_BASEURL;
+  } catch (e) {
+    return 'http://localhost:8080/api';
+  }
+}
+
 module.exports = {
   environments: {
     development: {
-      baseURL: 'http://localhost:8080/api',
+      baseURL: resolveDevBaseURL(),
       timeout: 10000
     },
     production: {
