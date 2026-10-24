@@ -62,6 +62,9 @@ public class VerifyCodeUtil {
      * @return 验证是否成功
      */
     public static boolean verifyCode(String phone, String code) {
+        if (phone == null || code == null) {
+            return false;
+        }
         String storedCode = verifyCodeCache.get(phone);
         if (storedCode == null) {
             return false;

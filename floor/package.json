@@ -1,0 +1,15 @@
+{
+  "name": "food-wx-miniprogram",
+  "version": "1.0.0",
+  "description": "美食微信小程序 - 前端测试",
+  "private": true,
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.0",
+    "@vitest/coverage-v8": "^2.1.0"
+  }
+}

@@ -157,8 +157,13 @@ public class RegisterTest {
             }
         }
 
-        // 清理数据
-        cleanUpTestUsers(inviter, phone);
+        // 清理数据 - 查找被邀请人后一起清理
+        User cleanupInvitee = userMapper.selectByPhone(phone);
+        if (cleanupInvitee != null) {
+            cleanUpTestUsers(inviter, cleanupInvitee);
+        } else {
+            cleanUpTestUsers(inviter);
+        }
         System.out.println("=== 邀请码测试完成 ===");
     }
 
