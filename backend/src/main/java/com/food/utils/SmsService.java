@@ -44,12 +44,32 @@ public class SmsService {
     }
 
     /**
+     * 是否处于开发模式：AK/SK 未配置（保持占位符）时，不调用阿里云，
+     * 验证码直接打印到控制台供本地预览使用
+     */
+    private boolean isDevMode() {
+        return accessKeyId == null || accessKeyId.isEmpty()
+                || "your_access_key_id".equals(accessKeyId)
+                || accessKeySecret == null || accessKeySecret.isEmpty()
+                || "your_access_key_secret".equals(accessKeySecret);
+    }
+
+    /**
      * 发送短信验证码
      * @param phoneNumber 手机号
      * @param verifyCode 验证码
      * @return 发送是否成功
      */
     public boolean sendVerifyCode(String phoneNumber, String verifyCode) {
+        // 开发模式：未配置阿里云短信时模拟发送成功，验证码打印到控制台
+        if (isDevMode()) {
+            System.out.println("==================================================");
+            System.out.println("【开发模式】短信未配置，模拟发送验证码");
+            System.out.println("【开发模式】手机号: " + phoneNumber + "  验证码: " + verifyCode);
+            System.out.println("==================================================");
+            return true;
+        }
+
         try {
             initClient();
 
