@@ -90,7 +90,7 @@ aliyun:
 
 # 文件存储配置
 file:
-  upload-dir: ${FILE_UPLOAD_DIR:./uploads}    # 用户上传文件保存目录（头像/评价图片）
+  upload-dir: ${FILE_UPLOAD_DIR:D:/work/项目/food_wx/backend/uploads}  # 用户上传目录（绝对路径；服务器部署用环境变量覆盖）
   image-dir: ${FILE_IMAGE_DIR:file:///D:/work/项目/food_wx/images/}  # 内置演示图片目录
 
 # 缓存配置：memory-本地内存（默认，无需额外组件）；redis-分布式缓存

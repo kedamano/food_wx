@@ -77,11 +77,12 @@ public class FileController {
         // UUID 重命名：避免覆盖与路径注入
         String savedName = UUID.randomUUID().toString().replace("-", "") + "." + ext;
         try {
-            File dir = new File(uploadDir);
+            // transferTo 对相对 File 按 tomcat 临时目录解析，必须转绝对路径
+            File dir = new File(uploadDir).getAbsoluteFile();
             if (!dir.exists() && !dir.mkdirs()) {
                 return BaseResult.error(500, "创建上传目录失败");
             }
-            file.transferTo(new File(dir, savedName));
+            file.transferTo(new File(dir, savedName).getAbsoluteFile());
         } catch (IOException e) {
             return BaseResult.error(500, "文件保存失败: " + e.getMessage());
         }
