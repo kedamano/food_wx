@@ -453,6 +453,10 @@ App({
    */
   addToCart: function(foodItem) {
     var self = this;
+    if (!foodItem || !foodItem.foodId) {
+      wx.showToast({ title: '商品信息异常，无法加入购物车', icon: 'none' });
+      return;
+    }
     var cart = this.globalData.cart;
     var existingIndex = -1;
     for (var i = 0; i < cart.length; i++) {

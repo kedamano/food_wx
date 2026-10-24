@@ -22,6 +22,13 @@ public class GlobalExceptionHandler {
         return BaseResult.error(400, e.getMessage());
     }
 
+    /** 路径/参数类型不匹配（如 /food/undefined）：客户端错误而非服务器故障 */
+    @ExceptionHandler(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class)
+    public BaseResult handleTypeMismatch(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException e) {
+        log.warn("参数类型错误: {}", e.getMessage());
+        return BaseResult.error(400, "参数格式不正确");
+    }
+
     /** 业务规则错误（Service 中主动抛出的 RuntimeException） */
     @ExceptionHandler(RuntimeException.class)
     public BaseResult handleRuntime(RuntimeException e) {

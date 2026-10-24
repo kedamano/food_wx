@@ -206,6 +206,8 @@ Page({
             var f = list[i];
             var food = {};
             for (var key in f) { food[key] = f[key]; }
+            // 后端主键是 foodId，页面点击/加购统一使用 id
+            food.id = f.foodId || f.id;
             food.image = app.resolveImageUrl ? app.resolveImageUrl(f.image) : f.image;
             foods.push(food);
           }
