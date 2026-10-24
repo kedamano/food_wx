@@ -17,12 +17,14 @@ Page({
   },
 
   onLoad: function (options) {
-    if (options && options.category) {
-      var idx = this.findCategoryIndex(options.category);
-      if (idx >= 0) {
-        this.onCategoryTap({ currentTarget: { dataset: { index: idx, category: this.data.mainCategories[idx] } } });
+    var self = this;
+    var pendingName = options && options.category;
+    // 进入页面即从后端加载真实分类，完成后再处理入口参数
+    this.loadCategoriesFromServer(function () {
+      if (pendingName) {
+        self.selectByName(pendingName);
       }
-    }
+    });
   },
 
   onShow: function () {
