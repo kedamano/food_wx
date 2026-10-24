@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -27,13 +26,18 @@ public class RegionController {
     @SuppressWarnings("unchecked")
     @GetMapping("/tree")
     @ApiOperation(value = "省市区树", notes = "省 -> 市 -> 区 三级名称树")
-    public BaseResult tree() throws IOException {
+    public BaseResult tree() {
         if (cache == null) {
             synchronized (this) {
                 if (cache == null) {
-                    String text = new String(new ClassPathResource("region.json")
-                            .getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-                    cache = com.alibaba.fastjson.JSON.parseObject(text, List.class);
+                    // Java 8 兼容：用 Spring StreamUtils 读取（readAllBytes 是 Java 9+ API）
+                    try (java.io.InputStream is = new ClassPathResource("region.json").getInputStream()) {
+                        String text = org.springframework.util.StreamUtils.copyToString(
+                                is, java.nio.charset.StandardCharsets.UTF_8);
+                        cache = com.alibaba.fastjson.JSON.parseObject(text, List.class);
+                    } catch (java.io.IOException e) {
+                        throw new IllegalStateException("region.json 加载失败", e);
+                    }
                 }
             }
         }
