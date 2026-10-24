@@ -151,6 +151,45 @@ App({
     return this.apiConfig.environments[this.apiConfig.currentEnv].baseURL;
   },
 
+  /**
+   * 尝试用旧 Token 换发新 Token（签名合法但过期的场景）；全局单飞防并发刷爆
+   */
+  tryRefreshToken: function(done) {
+    var self = this;
+    if (this._refreshing) {
+      setTimeout(function() { self.tryRefreshToken(done); }, 300);
+      return;
+    }
+    this._refreshing = true;
+    var oldToken = this.globalData.token || wx.getStorageSync('token');
+    if (!oldToken) {
+      this._refreshing = false;
+      done(false);
+      return;
+    }
+    wx.request({
+      url: this.apiBase() + '/user/refresh-token',
+      method: 'POST',
+      header: { 'Content-Type': 'application/json' },
+      data: { token: oldToken },
+      success: function(res) {
+        self._refreshing = false;
+        if (res.statusCode === 200 && res.data && res.data.code === 200 && res.data.data && res.data.data.token) {
+          var newToken = res.data.data.token;
+          self.globalData.token = newToken;
+          wx.setStorageSync('token', newToken);
+          done(true);
+        } else {
+          done(false);
+        }
+      },
+      fail: function() {
+        self._refreshing = false;
+        done(false);
+      }
+    });
+  },
+
   getAuthHeaderConfig: function() {
     var token = this.globalData.token || wx.getStorageSync('token');
     if (token) {

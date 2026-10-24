@@ -96,7 +96,13 @@ Page({
     wx.scanCode({
       onlyFromCamera: false,
       success: function (res) {
-        wx.showToast({ title: '扫码成功', icon: 'success' });
+        var result = res.result || '';
+        // 结果为纯数字时视为商品ID，跳转商品详情
+        if (/^\d+$/.test(result)) {
+          wx.navigateTo({ url: '/pages/food-detail/food-detail?foodId=' + result });
+          return;
+        }
+        wx.showModal({ title: '扫码结果', content: result || '（空）', showCancel: false });
       },
       fail: function () {}
     });
@@ -149,6 +155,16 @@ Page({
     this._countdownTimer = timer;
   },
 
+  // 切后台时暂停倒计时（tab 页常驻，避免后台空转每秒 setData）
+  onHide: function () {
+    if (this._countdownTimer) { clearInterval(this._countdownTimer); this._countdownTimer = null; }
+  },
+
+  onShow: function () {
+    // 从后台回来且没有计时器时恢复
+    if (!this._countdownTimer && this.startCountdown) this.startCountdown();
+  },
+
   onUnload: function () {
     if (this._countdownTimer) clearInterval(this._countdownTimer);
   },
@@ -189,6 +205,17 @@ Page({
     wx.showToast({ title: '已加载全部', icon: 'none' });
   },
 
+  // 错误重试（error-retry 组件）
+  onDataRetry: function () {
+    this.setData({ isRefreshing: true, showError: false });
+    var self = this;
+    self.loadDataFromServer().then(function () {
+      self.setData({ isRefreshing: false });
+    }).catch(function () {
+      self.setData({ isRefreshing: false });
+    });
+  },
+
   // 下拉刷新
   onPullDownRefresh: function () {
     var self = this;
@@ -205,6 +232,7 @@ Page({
     var self = this;
     wx.showLoading({ title: '加载中...' });
 
+    self.setData({ showError: false });
     return new Promise(function (resolve, reject) {
       // 并行请求 banners、foods、stores
       var bannersDone = false;
@@ -219,6 +247,7 @@ Page({
         if (bannersDone && foodsDone && storesDone) {
           if (hasError) {
             wx.hideLoading();
+            self.setData({ showError: true });
             reject(new Error('部分数据加载失败'));
             return;
           }

@@ -11,7 +11,8 @@ TAG_RE = re.compile(r'<(/?)([a-zA-Z][a-zA-Z0-9-]*)((?:"[^"]*"|\'[^\']*\'|[^>"\']
 
 bad = []
 checked = 0
-for root, dirs, files in os.walk('pages'):
+for root, dirs, files in os.walk('.'):
+    if 'node_modules' in root or 'coverage' in root or os.path.join('node_modules') in root: continue
     for f in files:
         if not f.endswith('.wxml'):
             continue

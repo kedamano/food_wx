@@ -395,34 +395,20 @@ Page({
     }).catch(function() {});
   },
 
-  // 依据商品所属分类生成筛选 tab（全部 + 实际存在的分类）
+  // 依据商品所属分类生成筛选 tab（纯函数已抽至 utils/category-tabs）
   buildCategoryTabs: function(list, activeId) {
     var app = getApp();
-    var seen = {};
-    var cats = [{ id: 0, name: '全部' }];
-    for (var i = 0; i < list.length; i++) {
-      var cid = list[i].categoryId;
-      if (cid && !seen[cid]) {
-        seen[cid] = true;
-        cats.push({ id: cid, name: app.globalData.categoryNames[cid] || ('分类' + cid) });
-      }
+    var tabs = categoryTabs.buildTabs(list);
+    for (var i = 0; i < tabs.length; i++) {
+      if (tabs[i].id !== 0) tabs[i].name = app.globalData.categoryNames[tabs[i].id] || tabs[i].name;
     }
-    this.setData({ categories: cats, currentCategory: activeId || 0 });
+    this.setData({ categories: tabs, currentCategory: activeId || 0 });
     this.applyCategoryFilter(activeId || 0);
   },
 
-  // 本地按分类过滤
+  // 本地按分类过滤（纯函数）
   applyCategoryFilter: function(catId) {
-    var all = this.data._allFoods || [];
-    if (!catId) {
-      this.setData({ foodList: all });
-      return;
-    }
-    var filtered = [];
-    for (var i = 0; i < all.length; i++) {
-      if (all[i].categoryId === catId) filtered.push(all[i]);
-    }
-    this.setData({ foodList: filtered });
+    this.setData({ foodList: categoryTabs.applyFilter(this.data._allFoods || [], catId) });
   },
 
   loadReviews: function() {

@@ -239,28 +239,19 @@ Page({
     var itemId = e.currentTarget.dataset.itemId;
     var cartItems = this.data.cartItems;
 
-    var updatedItems = [];
+    // 局部 setData：只更新目标项的数量与小计，避免整组数组重渲染
     for (var i = 0; i < cartItems.length; i++) {
-      var item = cartItems[i];
-      if (item.id === itemId) {
-        var newQuantity = item.quantity - 1;
+      if (cartItems[i].id === itemId) {
+        var newQuantity = cartItems[i].quantity - 1;
         if (newQuantity >= 1) {
-          var newItem = {};
-          for (var key in item) {
-            newItem[key] = item[key];
-          }
-          newItem.quantity = newQuantity;
-          newItem.itemTotal = (item.price * newQuantity).toFixed(2);
-          updatedItems.push(newItem);
-        } else {
-          updatedItems.push(item);
+          this.setData({
+            ['cartItems[' + i + '].quantity']: newQuantity,
+            ['cartItems[' + i + '].itemTotal']: (cartItems[i].price * newQuantity).toFixed(2)
+          });
         }
-      } else {
-        updatedItems.push(item);
+        break;
       }
     }
-
-    this.setData({ cartItems: updatedItems });
     this.syncQuantityChange(itemId);
     this.calculateCosts();
   },
@@ -269,24 +260,16 @@ Page({
     var itemId = e.currentTarget.dataset.itemId;
     var cartItems = this.data.cartItems;
 
-    var updatedItems = [];
     for (var i = 0; i < cartItems.length; i++) {
-      var item = cartItems[i];
-      if (item.id === itemId) {
-        var newQuantity = item.quantity + 1;
-        var newItem = {};
-        for (var key in item) {
-          newItem[key] = item[key];
-        }
-        newItem.quantity = newQuantity;
-        newItem.itemTotal = (item.price * newQuantity).toFixed(2);
-        updatedItems.push(newItem);
-      } else {
-        updatedItems.push(item);
+      if (cartItems[i].id === itemId) {
+        var newQuantity = cartItems[i].quantity + 1;
+        this.setData({
+          ['cartItems[' + i + '].quantity']: newQuantity,
+          ['cartItems[' + i + '].itemTotal']: (cartItems[i].price * newQuantity).toFixed(2)
+        });
+        break;
       }
     }
-
-    this.setData({ cartItems: updatedItems });
     this.syncQuantityChange(itemId);
     this.calculateCosts();
   },

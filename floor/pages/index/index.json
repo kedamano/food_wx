@@ -1,4 +1,5 @@
 {
   "usingComponents": {
+    "error-retry": "/components/error-retry/error-retry"
   }
 }

@@ -1,5 +1,6 @@
 <!-- 首页 - 大众点评风格 -->
 <view class="page-index">
+  <error-retry wx:if="{{showError}}" message="首页数据加载失败" bind:retry="onDataRetry"></error-retry>
   <!-- 顶部定位栏 -->
   <view class="top-bar">
     <!-- 位置 -->

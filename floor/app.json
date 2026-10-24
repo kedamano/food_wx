@@ -1,43 +1,14 @@
 {
   "pages": [
-    "pages/login/login",
-    "pages/register/register",
     "pages/index/index",
     "pages/category/category",
-    "pages/topic/topic",
-    "pages/logs/logs",
-    "pages/food-detail/food-detail",
     "pages/cart/cart",
     "pages/profile/profile",
-    "pages/reviews/reviews",
-    "pages/address/address",
-    "pages/address-edit/address-edit",
-    "pages/orders/orders",
-    "pages/order-confirm/order-confirm",
-    "pages/order-review/order-review",
-    "pages/delivery-track/delivery-track",
-    "pages/coupons/coupons",
-    "pages/points/points",
-    "pages/points-history/points-history",
-    "pages/settings/settings",
-    "pages/user-reviews/user-reviews",
-    "pages/order-detail/order-detail",
-    "pages/store-detail/store-detail",
+    "pages/login/login",
+    "pages/register/register",
     "pages/forgot-password/forgot-password",
-    "pages/account-info/account-info",
-    "pages/security/security",
-    "pages/privacy/privacy",
-    "pages/about/about",
-    "pages/help/help",
-    "pages/feedback/feedback",
-    "pages/device-management/device-management",
-    "pages/privacy-policy/privacy-policy",
-    "pages/user-agreement/user-agreement",
-    "pages/search/search",
-    "pages/favorites/favorites",
-    "pages/spending/spending",
-    "pages/customer/customer",
-    "pages/topic-detail/topic-detail"
+    "pages/food-detail/food-detail",
+    "pages/store-detail/store-detail"
   ],
   "window": {
     "backgroundTextStyle": "dark",
@@ -81,5 +52,54 @@
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json",
-  "lazyCodeLoading": "requiredComponents"
+  "lazyCodeLoading": "requiredComponents",
+  "subPackages": [
+    {
+      "root": "pkg-list",
+      "pages": [
+        "orders/orders",
+        "order-detail/order-detail",
+        "order-confirm/order-confirm",
+        "order-review/order-review",
+        "delivery-track/delivery-track",
+        "spending/spending",
+        "reviews/reviews",
+        "user-reviews/user-reviews"
+      ]
+    },
+    {
+      "root": "pkg-user",
+      "pages": [
+        "address/address",
+        "address-edit/address-edit",
+        "coupons/coupons",
+        "points/points",
+        "points-history/points-history",
+        "favorites/favorites",
+        "search/search",
+        "settings/settings",
+        "security/security",
+        "account-info/account-info",
+        "feedback/feedback",
+        "help/help",
+        "about/about",
+        "customer/customer",
+        "privacy/privacy",
+        "privacy-policy/privacy-policy",
+        "user-agreement/user-agreement",
+        "device-management/device-management",
+        "topic/topic",
+        "topic-detail/topic-detail",
+        "logs/logs"
+      ]
+    }
+  ],
+  "preloadRule": {
+    "pages/index/index": {
+      "network": "all",
+      "packages": [
+        "pkg-list"
+      ]
+    }
+  }
 }

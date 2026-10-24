@@ -63,28 +63,29 @@ DISHES = {
     10: ['智利车厘子', '阳光玫瑰葡萄', '有机蔬菜拼', '谷饲牛排', '土鸡蛋', '五常大米'],
 }
 
-print('生成菜品图...')
-food_files = []
-idx = 0
-for cat, names in DISHES.items():
-    for name in names:
-        idx += 1
-        c1, c2 = CAT_HUES[cat]
-        label = name if len(name) <= 5 else name[:5]
-        img = grad_tile(300, 225, c1, c2, label, 34)
-        rel = 'foods/food_%02d.jpg' % idx
-        save_jpg(img, rel)
-        food_files.append('/images/foods/food_%02d.jpg' % idx)
-# 原有 15 张 PNG 一并入池（真实图池由 fetch_real_images.py 提供）
-if os.path.exists('tmp_img/pools.json'):
-    food_files = json.load(open('tmp_img/pools.json'))['foods'] + food_files
+print('构建真实图片池（floor/images 优先，过滤 0 字节/不存在文件）...')
+def build_pool(subdir, prefix):
+    pool = []
+    seen = set()
+    for base in (FLOOR_IMG, ROOT_IMG):
+        d = os.path.join(base, subdir)
+        if not os.path.isdir(d):
+            continue
+        for f in sorted(os.listdir(d)):
+            fp = os.path.join(d, f)
+            rel = '/images/' + subdir + '/' + f
+            if rel in seen or f.startswith('.'):
+                continue
+            if os.path.getsize(fp) <= 0:
+                continue
+            seen.add(rel)
+            pool.append(rel)
+    return pool
 
-print('生成商家图...')
-STORE_WORDS = ['蜀香', '粤海', '北方', '江南', '食在', '味觉', '暖胃', '深夜', '转角', '巷子',
-               '老王', '阿强', '幸福', '旺角', '高分', '味道', '磁石', '小满', '功夫', '遇见']
-store_files = []
-if os.path.exists('tmp_img/pools.json'):
-    store_files = json.load(open('tmp_img/pools.json'))['stores']
+food_files = build_pool('foods', 'dish_')
+store_files = build_pool('stores', 'store_photo')
+assert len(food_files) > 20, '菜品图池过小: %d' % len(food_files)
+assert len(store_files) > 5, '商家图池过小: %d' % len(store_files)
 
 # ============ 2. SQL 生成 ============
 CITIES = ('广东省', '深圳市')
