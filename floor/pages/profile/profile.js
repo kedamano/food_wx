@@ -156,51 +156,44 @@ Page({
         return;
       }
 
-      // 使用计数器处理 Promise.all
+      // 使用计数器处理 Promise.all；结果分对象存储，避免共享对象被整体覆盖
       var completedCount = 0;
       var totalCount = 4;
-      var userStatsResult = null;
-      var orderStatsResult = null;
+      var statsResult = null;        // /order/statistics
+      var favoriteCount = null;      // 收藏数
+      var couponCountResult = null;  // 优惠券数
 
       function checkAllComplete() {
         completedCount++;
-        if (completedCount >= totalCount) {
-          // 手动合并对象
-          if (userStatsResult) {
-            var newUserStats = {};
-            var key;
-            for (key in self.data.userStats) {
-              newUserStats[key] = self.data.userStats[key];
-            }
-            for (key in userStatsResult) {
-              newUserStats[key] = userStatsResult[key];
-            }
-            self.setData({ userStats: newUserStats });
+        if (completedCount < totalCount) return;
+
+        // /order/statistics 字段映射（totalSpent -> totalSpending）
+        var st = statsResult || {};
+        self.setData({
+          userStats: {
+            totalOrders: st.totalOrders || 0,
+            favoriteStores: favoriteCount || 0,
+            totalSpending: st.totalSpent || 0,
+            couponCount: couponCountResult || 0
+          },
+          orderStats: {
+            pending: st.pendingOrders || 0,
+            preparing: st.preparingOrders || 0,
+            delivering: st.deliveringOrders || 0,
+            completed: st.completedOrders || 0
           }
-          if (orderStatsResult) {
-            // /order/statistics 返回 xxxOrders 命名，映射到页面字段
-            self.setData({
-              orderStats: {
-                pending: orderStatsResult.pendingOrders || 0,
-                preparing: orderStatsResult.preparingOrders || 0,
-                delivering: orderStatsResult.deliveringOrders || 0,
-                completed: orderStatsResult.completedOrders || 0
-              }
-            });
-          }
-          resolve();
-        }
+        });
+        resolve();
       }
 
       app.authRequest({
         url: '/order/statistics',
         method: 'GET'
       }).then(function(res) {
-        userStatsResult = (res && res.code === 200 && res.data) ? res.data : { totalOrders: 0, totalSpending: 0 };
+        statsResult = (res && res.code === 200 && res.data) ? res.data : {};
         checkAllComplete();
       }).catch(function(error) {
         console.error('获取用户统计失败:', error);
-        userStatsResult = { totalOrders: 0, totalSpending: 0 };
         checkAllComplete();
       });
 
@@ -210,12 +203,10 @@ Page({
         url: '/favorite/user/' + userId,
         method: 'GET'
       }).then(function(res) {
-        userStatsResult = userStatsResult || {};
-        userStatsResult.favoriteStores = (res && res.code === 200 && Array.isArray(res.data)) ? res.data.length : 0;
+        favoriteCount = (res && res.code === 200 && Array.isArray(res.data)) ? res.data.length : 0;
         checkAllComplete();
       }).catch(function() {
-        userStatsResult = userStatsResult || {};
-        userStatsResult.favoriteStores = 0;
+        favoriteCount = 0;
         checkAllComplete();
       });
 
@@ -224,12 +215,10 @@ Page({
         url: '/coupon/user/' + userId,
         method: 'GET'
       }).then(function(res) {
-        userStatsResult = userStatsResult || {};
-        userStatsResult.couponCount = (res && res.code === 200 && Array.isArray(res.data)) ? res.data.length : 0;
+        couponCountResult = (res && res.code === 200 && Array.isArray(res.data)) ? res.data.length : 0;
         checkAllComplete();
       }).catch(function() {
-        userStatsResult = userStatsResult || {};
-        userStatsResult.couponCount = 0;
+        couponCountResult = 0;
         checkAllComplete();
       });
 
