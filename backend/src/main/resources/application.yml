@@ -7,6 +7,17 @@ spring:
   application:
     name: food-wx-backend
 
+  # springfox 3.0.0 与 Spring Boot 2.6+ 不兼容，必须回退 ant 路径匹配
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+  # 文件上传配置
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
+
   # 数据库配置
   datasource:
     url: jdbc:mysql://localhost:3306/food_wx?useUnicode=true&character_set_server=utf8mb4&useSSL=false&serverTimezone=Asia/Shanghai
@@ -82,9 +93,3 @@ logging:
     org.springframework: INFO
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"
-
-# 文件上传配置
-servlet:
-  multipart:
-    max-file-size: 10MB
-    max-request-size: 100MB
