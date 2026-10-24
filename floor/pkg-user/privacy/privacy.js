@@ -108,14 +108,14 @@ Page({
   // 查看隐私政策
   onPrivacyPolicy: function() {
     wx.navigateTo({
-      url: '/pages/privacy-policy/privacy-policy'
+      url: '/pkg-user/privacy-policy/privacy-policy'
     });
   },
 
   // 查看用户协议
   onUserAgreement: function() {
     wx.navigateTo({
-      url: '/pages/user-agreement/user-agreement'
+      url: '/pkg-user/user-agreement/user-agreement'
     });
   },
 

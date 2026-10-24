@@ -36,7 +36,7 @@ Page({
   // 意见反馈
   onFeedback: function() {
     wx.navigateTo({
-      url: '/pages/feedback/feedback'
+      url: '/pkg-user/feedback/feedback'
     });
   },
 

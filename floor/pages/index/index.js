@@ -88,7 +88,7 @@ Page({
 
   // 搜索
   onSearchTap: function () {
-    wx.navigateTo({ url: '/pages/search/search' });
+    wx.navigateTo({ url: '/pkg-user/search/search' });
   },
 
   // 扫码

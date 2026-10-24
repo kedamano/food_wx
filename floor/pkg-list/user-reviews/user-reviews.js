@@ -299,7 +299,7 @@ Page({
   // 去评价
   onGoOrders: function() {
     wx.navigateTo({
-      url: '/pages/orders/orders?status=completed'
+      url: '/pkg-list/orders/orders?status=completed'
     });
   },
 

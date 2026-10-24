@@ -209,7 +209,7 @@ Page({
   // 登录设备管理
   onDeviceManagement: function() {
     wx.navigateTo({
-      url: '/pages/device-management/device-management'
+      url: '/pkg-user/device-management/device-management'
     });
   },
 

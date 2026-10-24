@@ -64,7 +64,7 @@ Page({
   onSelectAddress: function() {
     var self = this;
     wx.navigateTo({
-      url: '/pages/address/address?selectMode=true',
+      url: '/pkg-user/address/address?selectMode=true',
       events: {
         // 监听地址页面回传的 addressSelected 事件
         addressSelected: function(data) {
@@ -235,7 +235,7 @@ Page({
 
         setTimeout(function() {
           wx.redirectTo({
-            url: '/pages/order-detail/order-detail?orderId=' + orderId
+            url: '/pkg-list/order-detail/order-detail?orderId=' + orderId
           });
         }, 2000);
       } else {

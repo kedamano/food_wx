@@ -47,21 +47,21 @@ Page({
   // 账号信息
   onAccountInfo: function() {
     wx.navigateTo({
-      url: '/pages/account-info/account-info'
+      url: '/pkg-user/account-info/account-info'
     });
   },
 
   // 安全设置
   onSecurity: function() {
     wx.navigateTo({
-      url: '/pages/security/security'
+      url: '/pkg-user/security/security'
     });
   },
 
   // 隐私设置
   onPrivacy: function() {
     wx.navigateTo({
-      url: '/pages/privacy/privacy'
+      url: '/pkg-user/privacy/privacy'
     });
   },
 
@@ -187,21 +187,21 @@ Page({
   // 关于小程序
   onAbout: function() {
     wx.navigateTo({
-      url: '/pages/about/about'
+      url: '/pkg-user/about/about'
     });
   },
 
   // 帮助中心
   onHelp: function() {
     wx.navigateTo({
-      url: '/pages/help/help'
+      url: '/pkg-user/help/help'
     });
   },
 
   // 意见反馈
   onFeedback: function() {
     wx.navigateTo({
-      url: '/pages/feedback/feedback'
+      url: '/pkg-user/feedback/feedback'
     });
   },
 

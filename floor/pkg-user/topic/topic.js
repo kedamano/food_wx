@@ -46,7 +46,7 @@ Page({
   onTopicTap: function(e) {
     var id = e.currentTarget.dataset.id;
     wx.navigateTo({
-      url: '/pages/topic-detail/topic-detail?id=' + id
+      url: '/pkg-user/topic-detail/topic-detail?id=' + id
     });
   }
 });

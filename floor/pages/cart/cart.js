@@ -463,7 +463,7 @@ Page({
     app.globalData.currentOrder = orderInfo;
 
     wx.navigateTo({
-      url: '/pages/order-confirm/order-confirm',
+      url: '/pkg-list/order-confirm/order-confirm',
       success: function (res) {
       },
       fail: function (err) {

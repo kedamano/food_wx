@@ -37,7 +37,7 @@ Page({
 
   // 新建地址
   onAddAddress: function() {
-    wx.navigateTo({ url: '/pages/address-edit/address-edit' });
+    wx.navigateTo({ url: '/pkg-user/address-edit/address-edit' });
   },
 
   // 点击地址（选择模式返回，普通模式编辑）
@@ -59,13 +59,13 @@ Page({
       return;
     }
     // 普通模式：直接进编辑
-    wx.navigateTo({ url: '/pages/address-edit/address-edit?id=' + address.id });
+    wx.navigateTo({ url: '/pkg-user/address-edit/address-edit?id=' + address.id });
   },
 
   // 编辑地址
   onEditAddress: function(e) {
     var address = e.currentTarget.dataset.address;
-    wx.navigateTo({ url: '/pages/address-edit/address-edit?id=' + address.id });
+    wx.navigateTo({ url: '/pkg-user/address-edit/address-edit?id=' + address.id });
   },
 
   // 设为默认

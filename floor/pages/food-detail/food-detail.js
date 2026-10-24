@@ -620,7 +620,7 @@ Page({
 
     // 跳转到订单确认页
     wx.navigateTo({
-      url: '/pages/order-confirm/order-confirm',
+      url: '/pkg-list/order-confirm/order-confirm',
       success: function() {
       },
       fail: function(err) {
@@ -667,7 +667,7 @@ Page({
   // 查看全部评价
   onViewAllReviews: function() {
     wx.navigateTo({
-      url: '/pages/reviews/reviews?foodId=' + this.data.food.id
+      url: '/pkg-list/reviews/reviews?foodId=' + this.data.food.id
     });
   },
 

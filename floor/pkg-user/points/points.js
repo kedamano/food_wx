@@ -224,7 +224,7 @@ Page({
         wx.switchTab({ url: '/pages/index/index' });
         break;
       case '评价订单':
-        wx.navigateTo({ url: '/pages/orders/orders?status=completed' });
+        wx.navigateTo({ url: '/pkg-list/orders/orders?status=completed' });
         break;
       case '分享小程序':
         wx.showToast({ title: '请在菜单中分享', icon: 'none' });
@@ -344,7 +344,7 @@ Page({
         wx.showToast({ title: '兑换成功', icon: 'success' });
 
         setTimeout(function() {
-          wx.navigateTo({ url: '/pages/coupons/coupons' });
+          wx.navigateTo({ url: '/pkg-user/coupons/coupons' });
         }, 1500);
       } else {
         wx.showToast({ title: res.message || '兑换失败', icon: 'none' });
@@ -360,7 +360,7 @@ Page({
   // 查看积分记录
   onViewHistory: function() {
     wx.navigateTo({
-      url: '/pages/points-history/points-history'
+      url: '/pkg-user/points-history/points-history'
     });
   },
 

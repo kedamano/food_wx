@@ -92,6 +92,6 @@ Page({
 
   // 反馈
   onFeedback: function() {
-    wx.navigateTo({ url: '/pages/feedback/feedback' });
+    wx.navigateTo({ url: '/pkg-user/feedback/feedback' });
   }
 });

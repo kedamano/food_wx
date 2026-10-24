@@ -300,7 +300,7 @@ Page({
     } else {
       // 已登录，跳转到个人信息页面
       wx.navigateTo({
-        url: '/pages/account-info/account-info',
+        url: '/pkg-user/account-info/account-info',
       });
     }
   },
@@ -310,7 +310,7 @@ Page({
    */
   onSettingsClick: function() {
     wx.navigateTo({
-      url: '/pages/settings/settings',
+      url: '/pkg-user/settings/settings',
     });
   },
 
@@ -350,7 +350,7 @@ Page({
    */
   onAbout: function() {
     wx.navigateTo({
-      url: '/pages/about/about',
+      url: '/pkg-user/about/about',
     });
   },
 
@@ -367,7 +367,7 @@ Page({
     }
 
     wx.navigateTo({
-      url: '/pages/orders/orders',
+      url: '/pkg-list/orders/orders',
     });
   },
 
@@ -394,7 +394,7 @@ Page({
     var tabStatus = statusMap[status] || status;
 
     wx.navigateTo({
-      url: '/pages/orders/orders?status=' + tabStatus,
+      url: '/pkg-list/orders/orders?status=' + tabStatus,
     });
   },
 
@@ -414,17 +414,17 @@ Page({
     switch (stat) {
       case 'orders':
         wx.navigateTo({
-          url: '/pages/orders/orders',
+          url: '/pkg-list/orders/orders',
         });
         break;
       case 'favorites':
         wx.navigateTo({
-          url: '/pages/favorites/favorites',
+          url: '/pkg-user/favorites/favorites',
         });
         break;
       case 'spending':
         wx.navigateTo({
-          url: '/pages/spending/spending',
+          url: '/pkg-list/spending/spending',
         });
         break;
       default:
@@ -458,7 +458,7 @@ Page({
     switch (menu) {
       case 'address':
         wx.navigateTo({
-          url: '/pages/address/address',
+          url: '/pkg-user/address/address',
         });
         break;
       case 'payment':
@@ -468,12 +468,12 @@ Page({
         break;
       case 'coupons':
         wx.navigateTo({
-          url: '/pages/coupons/coupons',
+          url: '/pkg-user/coupons/coupons',
         });
         break;
       case 'reviews':
         wx.navigateTo({
-          url: '/pages/user-reviews/user-reviews',
+          url: '/pkg-list/user-reviews/user-reviews',
         });
         break;
       case 'share':
@@ -481,17 +481,17 @@ Page({
         break;
       case 'points':
         wx.navigateTo({
-          url: '/pages/points/points',
+          url: '/pkg-user/points/points',
         });
         break;
       case 'customer':
         wx.navigateTo({
-          url: '/pages/customer/customer',
+          url: '/pkg-user/customer/customer',
         });
         break;
       case 'settings':
         wx.navigateTo({
-          url: '/pages/settings/settings',
+          url: '/pkg-user/settings/settings',
         });
         break;
       default:

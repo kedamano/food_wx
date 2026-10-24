@@ -183,7 +183,7 @@ Page({
   onOrderDetail: function(e) {
     var orderId = e.currentTarget.dataset.orderId;
     wx.navigateTo({
-      url: '/pages/order-detail/order-detail?orderId=' + orderId
+      url: '/pkg-list/order-detail/order-detail?orderId=' + orderId
     });
   }
 });

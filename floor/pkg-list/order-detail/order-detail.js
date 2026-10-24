@@ -290,7 +290,7 @@ Page({
           ]
         };
         wx.navigateTo({
-          url: '/pages/delivery-track/delivery-track?orderId=' + orderId + '&trackingData=' + encodeURIComponent(JSON.stringify(trackingData))
+          url: '/pkg-list/delivery-track/delivery-track?orderId=' + orderId + '&trackingData=' + encodeURIComponent(JSON.stringify(trackingData))
         });
       } else {
         wx.showToast({ title: '获取配送信息失败', icon: 'none' });
@@ -382,7 +382,7 @@ Page({
         } else {
           // 未评价，跳转到评价页面
           wx.navigateTo({
-            url: '/pages/order-review/order-review?orderId=' + orderId
+            url: '/pkg-list/order-review/order-review?orderId=' + orderId
           });
         }
       },

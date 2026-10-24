@@ -1,4 +1,5 @@
 // 商家详情页 - 大众点评风格
+var categoryTabs = require('../../utils/category-tabs');
 Page({
   data: {
     storeInfo: { id: 0, name: '', banner: '', distance: '', deliveryTime: '', price: 0, rating: 0, notice: '', status: '' },
@@ -272,7 +273,7 @@ Page({
     var app = getApp();
     app.globalData.currentOrder = orderInfo;
     wx.navigateTo({
-      url: '/pages/order-confirm/order-confirm',
+      url: '/pkg-list/order-confirm/order-confirm',
       fail: function() {
         wx.showModal({
           title: '订单信息',

@@ -148,7 +148,7 @@ Page({
   },
 
   onSearchClick: function () {
-    wx.navigateTo({ url: '/pages/search/search' });
+    wx.navigateTo({ url: '/pkg-user/search/search' });
   },
 
   onCategoryTap: function (e) {
