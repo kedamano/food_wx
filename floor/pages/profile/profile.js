@@ -192,19 +192,17 @@ Page({
         }
       }
 
-      userApi.getUserStats()
-        .then(function(data) {
-          userStatsResult = data;
-          checkAllComplete();
-        })
-        .catch(function(error) {
-          console.error('获取用户统计失败:', error);
-          userStatsResult = {
-            totalOrders: 0,
-            totalSpending: 0,
-          };
-          checkAllComplete();
-        });
+      app.authRequest({
+        url: '/order/statistics',
+        method: 'GET'
+      }).then(function(res) {
+        userStatsResult = (res && res.code === 200 && res.data) ? res.data : { totalOrders: 0, totalSpending: 0 };
+        checkAllComplete();
+      }).catch(function(error) {
+        console.error('获取用户统计失败:', error);
+        userStatsResult = { totalOrders: 0, totalSpending: 0 };
+        checkAllComplete();
+      });
 
       // 收藏商家数
       var userId = app.globalData.userId || wx.getStorageSync('userId');
@@ -221,13 +219,13 @@ Page({
         checkAllComplete();
       });
 
-      // 优惠券数
+      // 优惠券数（与收藏同构：取用户券列表长度）
       app.authRequest({
-        url: '/coupon/statistics/' + userId,
+        url: '/coupon/user/' + userId,
         method: 'GET'
       }).then(function(res) {
         userStatsResult = userStatsResult || {};
-        userStatsResult.couponCount = (res && res.code === 200 && res.data) ? (res.data.total || 0) : 0;
+        userStatsResult.couponCount = (res && res.code === 200 && Array.isArray(res.data)) ? res.data.length : 0;
         checkAllComplete();
       }).catch(function() {
         userStatsResult = userStatsResult || {};
