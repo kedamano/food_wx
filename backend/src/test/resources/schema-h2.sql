@@ -94,6 +94,16 @@ CREATE TABLE orders (
     status VARCHAR(20) DEFAULT '待付款',
     coupon_id INT,
     address VARCHAR(255),
+    rider_id INT,
+    rider_name VARCHAR(50),
+    rider_phone VARCHAR(20),
+    rider_avatar VARCHAR(255),
+    rider_longitude DECIMAL(10,6),
+    rider_latitude DECIMAL(10,6),
+    dispatch_time TIMESTAMP,
+    estimated_delivery_time TIMESTAMP,
+    actual_delivery_time TIMESTAMP,
+    delivery_progress INT DEFAULT 0,
     phone VARCHAR(20),
     remark VARCHAR(255),
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -133,16 +143,22 @@ CREATE TABLE reviews (
     FOREIGN KEY (food_id) REFERENCES foods(food_id)
 );
 
--- 用户地址表
-CREATE TABLE user_addresses (
+-- 收货地址表
+CREATE TABLE address (
     address_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
-    receiver_name VARCHAR(50) NOT NULL,
+    name VARCHAR(50) NOT NULL,
     phone VARCHAR(20) NOT NULL,
-    address VARCHAR(255) NOT NULL,
-    is_default TINYINT DEFAULT 0,
+    province VARCHAR(50),
+    city VARCHAR(50),
+    district VARCHAR(50),
+    detail VARCHAR(255) NOT NULL,
+    full_address VARCHAR(500),
+    tag VARCHAR(20) DEFAULT 'other',
+    is_default TINYINT(1) DEFAULT 0,
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_deleted TINYINT(1) DEFAULT 0,
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 

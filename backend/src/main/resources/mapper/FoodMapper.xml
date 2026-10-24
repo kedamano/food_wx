@@ -59,6 +59,18 @@
         WHERE food_id = #{foodId}
     </select>
 
+    <select id="selectPage" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM foods
+        ORDER BY food_id DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*) FROM foods
+    </select>
+
     <select id="selectByIds" resultMap="BaseResultMap">
         SELECT
         <include refid="BaseColumnList"/>

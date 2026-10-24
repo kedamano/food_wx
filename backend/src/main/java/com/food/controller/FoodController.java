@@ -1,6 +1,8 @@
 package com.food.controller;
 
 import com.food.annotation.RequireRole;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import com.food.dto.BaseResult;
 import com.food.entity.Banner;
 import com.food.entity.Category;
@@ -60,8 +62,14 @@ public class FoodController {
     }
 
     @GetMapping("/all")
-    @ApiOperation(value = "获取所有菜品", notes = "获取所有菜品列表")
-    public BaseResult getAllFoods() {
+    @ApiOperation(value = "获取所有菜品", notes = "获取所有菜品列表；传 page+size 时走服务端分页（返回 list/total）")
+    public BaseResult getAllFoods(@RequestParam(required = false) Integer page,
+                                  @RequestParam(required = false) Integer size) {
+        if (page != null && size != null) {
+            int p = Math.max(page, 1);
+            int s = Math.min(Math.max(size, 1), 100);
+            return foodService.getAllFoods(p, s);
+        }
         return foodService.getAllFoods();
     }
 
@@ -91,6 +99,7 @@ public class FoodController {
         return foodService.getFoodsByRating(minRating);
     }
 
+    @Cacheable(value = "popularFoods")
     @GetMapping("/popular")
     @ApiOperation(value = "获取热门菜品", notes = "获取评分4.0以上的热门菜品")
     public BaseResult getPopularFoods() {
@@ -116,6 +125,7 @@ public class FoodController {
         return allFoods;
     }
 
+    @Cacheable(value = "banners", key = "'all'")
     @GetMapping("/banners")
     @ApiOperation(value = "获取轮播图", notes = "获取首页轮播图数据")
     public BaseResult getBanners() {
@@ -128,6 +138,7 @@ public class FoodController {
         }
     }
 
+    @Cacheable(value = "categories", key = "'all'")
     @GetMapping("/categories")
     @ApiOperation(value = "获取分类", notes = "获取美食分类数据")
     public BaseResult getCategories() {

@@ -24,6 +24,26 @@ public interface OrderMapper {
 
     int updateStatus(@Param("orderId") Integer orderId, @Param("status") String status);
 
+    int updateDispatch(@Param("orderId") Integer orderId,
+                       @Param("riderId") Integer riderId,
+                       @Param("riderName") String riderName,
+                       @Param("riderPhone") String riderPhone);
+
+    int updateRiderLocation(@Param("orderId") Integer orderId,
+                            @Param("longitude") java.math.BigDecimal longitude,
+                            @Param("latitude") java.math.BigDecimal latitude,
+                            @Param("progress") Integer progress);
+
+    int updateDelivered(@Param("orderId") Integer orderId);
+
+    List<Order> selectByUserIdPage(@Param("userId") Integer userId,
+                                   @Param("status") String status,
+                                   @Param("offset") int offset,
+                                   @Param("limit") int limit);
+
+    long countByUserId(@Param("userId") Integer userId,
+                       @Param("status") String status);
+
     int deleteById(Integer orderId);
 
 }

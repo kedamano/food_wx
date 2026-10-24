@@ -93,7 +93,7 @@ Page({
     this.setData({ submitting: true });
 
     var app = getApp();
-    var userId = app.globalData.userId || 0;
+    var userId = app.getCurrentUserId() || 0;
 
     var feedbackData = {
       userId: userId,
@@ -101,6 +101,56 @@ Page({
       content: content.trim(),
       contact: contactInfo.trim()
     };
+
+    // 先上传图片，附图 URL 拼进反馈内容（feedback 表无图片字段）
+    wx.showLoading({ title: '提交中...' });
+    self.uploadImages(images, function(imageUrls) {
+      if (imageUrls.length > 0) {
+        feedbackData.content = feedbackData.content + '\n（附图：' + imageUrls.join(' ') + '）';
+      }
+      doSubmit(feedbackData);
+    });
+  },
+
+  // 批量上传图片
+  uploadImages: function(localPaths, done) {
+    var self = this;
+    var app = getApp();
+    var token = app.globalData.token || wx.getStorageSync('token');
+    var uploaded = [];
+    if (!localPaths || localPaths.length === 0) {
+      done(uploaded);
+      return;
+    }
+    var pending = localPaths.length;
+    for (var i = 0; i < localPaths.length; i++) {
+      (function(path) {
+        wx.uploadFile({
+          url: app.resolveApiUrl('/file/upload'),
+          filePath: path,
+          name: 'file',
+          header: token ? { 'Authorization': 'Bearer ' + token } : {},
+          success: function(res) {
+            try {
+              var body = JSON.parse(res.data);
+              if (res.statusCode === 200 && body && body.code === 200 && body.data) {
+                uploaded.push(app.resolveImageUrl(body.data));
+              }
+            } catch (e) { /* 单张失败忽略 */ }
+          },
+          complete: function() {
+            pending--;
+            if (pending === 0) done(uploaded);
+          }
+        });
+      })(localPaths[i]);
+    }
+  },
+
+  // 实际提交
+  doSubmit: function(feedbackData) {
+    var self = this;
+    var app = getApp();
 
     wx.showLoading({ title: '提交中...' });
 

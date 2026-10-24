@@ -18,6 +18,10 @@ public interface FoodMapper {
 
     List<Food> selectAll();
 
+    List<Food> selectPage(@Param("offset") int offset, @Param("limit") int limit);
+
+    long countAll();
+
     List<Food> selectByCategoryId(Integer categoryId);
 
     List<Food> selectByStoreId(Integer storeId);

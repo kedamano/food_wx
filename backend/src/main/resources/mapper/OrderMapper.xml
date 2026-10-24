@@ -13,6 +13,26 @@
         <result column="pay_amount" jdbcType="DECIMAL" property="payAmount"/>
         <result column="status" jdbcType="VARCHAR" property="status"/>
         <result column="coupon_id" jdbcType="INTEGER" property="couponId"/>
+        <result column="rider_id" jdbcType="INTEGER" property="riderId"/>
+        <result column="rider_name" jdbcType="VARCHAR" property="riderName"/>
+        <result column="rider_phone" jdbcType="VARCHAR" property="riderPhone"/>
+        <result column="rider_avatar" jdbcType="VARCHAR" property="riderAvatar"/>
+        <result column="rider_longitude" jdbcType="DECIMAL" property="riderLongitude"/>
+        <result column="rider_latitude" jdbcType="DECIMAL" property="riderLatitude"/>
+        <result column="dispatch_time" jdbcType="TIMESTAMP" property="dispatchTime"/>
+        <result column="estimated_delivery_time" jdbcType="TIMESTAMP" property="estimatedDeliveryTime"/>
+        <result column="actual_delivery_time" jdbcType="TIMESTAMP" property="actualDeliveryTime"/>
+        <result column="delivery_progress" jdbcType="INTEGER" property="deliveryProgress"/>
+        <result column="rider_id" jdbcType="INTEGER" property="riderId"/>
+        <result column="rider_name" jdbcType="VARCHAR" property="riderName"/>
+        <result column="rider_phone" jdbcType="VARCHAR" property="riderPhone"/>
+        <result column="rider_avatar" jdbcType="VARCHAR" property="riderAvatar"/>
+        <result column="rider_longitude" jdbcType="DECIMAL" property="riderLongitude"/>
+        <result column="rider_latitude" jdbcType="DECIMAL" property="riderLatitude"/>
+        <result column="dispatch_time" jdbcType="TIMESTAMP" property="dispatchTime"/>
+        <result column="estimated_delivery_time" jdbcType="TIMESTAMP" property="estimatedDeliveryTime"/>
+        <result column="actual_delivery_time" jdbcType="TIMESTAMP" property="actualDeliveryTime"/>
+        <result column="delivery_progress" jdbcType="INTEGER" property="deliveryProgress"/>
         <result column="address" jdbcType="VARCHAR" property="address"/>
         <result column="phone" jdbcType="VARCHAR" property="phone"/>
         <result column="remark" jdbcType="VARCHAR" property="remark"/>
@@ -94,6 +114,89 @@
             update_time = CURRENT_TIMESTAMP
         WHERE order_id = #{orderId}
     </update>
+
+    <update id="updateDispatch">
+        UPDATE orders
+        SET rider_id = #{riderId},
+            rider_name = #{riderName},
+            rider_phone = #{riderPhone},
+            dispatch_time = CURRENT_TIMESTAMP,
+            estimated_delivery_time = DATE_ADD(NOW(), INTERVAL 30 MINUTE),
+            delivery_progress = 10,
+            status = '配送中',
+            update_time = CURRENT_TIMESTAMP
+        WHERE order_id = #{orderId}
+    </update>
+
+    <update id="updateRiderLocation">
+        UPDATE orders
+        SET rider_longitude = #{longitude},
+            rider_latitude = #{latitude},
+            delivery_progress = #{progress},
+            update_time = CURRENT_TIMESTAMP
+        WHERE order_id = #{orderId}
+    </update>
+
+    <update id="updateDelivered">
+        UPDATE orders
+        SET status = '已完成',
+            actual_delivery_time = CURRENT_TIMESTAMP,
+            delivery_progress = 100,
+            update_time = CURRENT_TIMESTAMP
+        WHERE order_id = #{orderId}
+    </update>
+
+    <update id="updateDispatch">
+        UPDATE orders
+        SET rider_id = #{riderId},
+            rider_name = #{riderName},
+            rider_phone = #{riderPhone},
+            dispatch_time = CURRENT_TIMESTAMP,
+            estimated_delivery_time = DATE_ADD(NOW(), INTERVAL 30 MINUTE),
+            delivery_progress = 10,
+            status = '配送中',
+            update_time = CURRENT_TIMESTAMP
+        WHERE order_id = #{orderId}
+    </update>
+
+    <update id="updateRiderLocation">
+        UPDATE orders
+        SET rider_longitude = #{longitude},
+            rider_latitude = #{latitude},
+            delivery_progress = #{progress},
+            update_time = CURRENT_TIMESTAMP
+        WHERE order_id = #{orderId}
+    </update>
+
+    <update id="updateDelivered">
+        UPDATE orders
+        SET status = '已完成',
+            actual_delivery_time = CURRENT_TIMESTAMP,
+            delivery_progress = 100,
+            update_time = CURRENT_TIMESTAMP
+        WHERE order_id = #{orderId}
+    </update>
+
+    <select id="selectByUserIdPage" resultMap="BaseResultMap">
+        SELECT o.*, s.store_name
+        FROM orders o
+        LEFT JOIN stores s ON o.store_id = s.store_id
+        WHERE o.user_id = #{userId}
+        <if test="status != null and status != ''">
+            AND o.status = #{status}
+        </if>
+        ORDER BY o.create_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="countByUserId" resultType="long">
+        SELECT COUNT(*)
+        FROM orders o
+        WHERE o.user_id = #{userId}
+        <if test="status != null and status != ''">
+            AND o.status = #{status}
+        </if>
+    </select>
 
     <delete id="deleteById">
         DELETE FROM orders

@@ -450,6 +450,28 @@ public class UserController {
         return userService.updateUserInfo(user);
     }
 
+    @PutMapping("/{userId}")
+    @ApiOperation(value = "更新指定用户信息", notes = "更新用户基本信息（仅本人）")
+    public BaseResult updateUserById(@PathVariable Integer userId,
+                                     @RequestBody User user,
+                                     HttpServletRequest request) {
+        String token = extractToken(request);
+        if (token == null || token.isEmpty()) {
+            return BaseResult.error(401, "未登录");
+        }
+
+        Integer currentUserId = jwtUtil.getUserIdFromToken(token);
+        if (currentUserId == null) {
+            return BaseResult.error(401, "Token无效");
+        }
+        if (!currentUserId.equals(userId)) {
+            return BaseResult.error(403, "只能修改自己的信息");
+        }
+
+        user.setUserId(userId);
+        return userService.updateUserInfo(user);
+    }
+
     @PutMapping("/points")
     @ApiOperation(value = "更新用户积分", notes = "增加或减少用户积分（仅管理员可用）")
     @ApiImplicitParams({
@@ -605,7 +627,7 @@ public class UserController {
             int consecutiveDays = calculateConsecutiveDays(userId);
 
             // 计算奖励积分（连续签到有额外奖励）
-            int basePoints = com.food.utils.SignInUtil.SIGN_IN_POINTS;
+            int basePoints = 20; // 每日签到基础积分
             int bonusPoints = 0;
             if (consecutiveDays >= 7) {
                 bonusPoints = 10; // 连续7天额外奖励10积分

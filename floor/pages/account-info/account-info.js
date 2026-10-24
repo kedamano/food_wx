@@ -28,7 +28,7 @@ Page({
   // 加载用户信息
   loadUserInfo: function() {
     var self = this;
-    var userId = app.globalData.userId || 1;
+    var userId = app.getCurrentUserId();
 
     app.authRequest({
       url: '/user/' + userId,
@@ -111,14 +111,42 @@ Page({
     });
   },
 
-  // 上传头像
+  // 上传头像（真实上传到 /file/upload，成功后更新用户资料）
   uploadAvatar: function(filePath) {
+    var self = this;
+    var app = getApp();
+    var token = app.globalData.token || wx.getStorageSync('token');
+
     wx.showLoading({ title: '上传中...' });
 
-    setTimeout(function() {
-      wx.hideLoading();
-      wx.showToast({ title: '头像上传成功', icon: 'success', duration: 1500 });
-    }, 1000);
+    wx.uploadFile({
+      url: app.resolveApiUrl('/file/upload'),
+      filePath: filePath,
+      name: 'file',
+      header: token ? { 'Authorization': 'Bearer ' + token } : {},
+      success: function(res) {
+        wx.hideLoading();
+        var body = null;
+        try { body = JSON.parse(res.data); } catch (e) { body = null; }
+
+        if (res.statusCode === 200 && body && body.code === 200 && body.data) {
+          var url = body.data;
+          wx.showToast({ title: '头像上传成功', icon: 'success', duration: 1500 });
+          // 展示完整 URL 并持久化到用户资料
+          var fullUrl = app.resolveImageUrl(url);
+          self.setData({ 'userInfo.avatar': fullUrl, tempAvatar: '' });
+          self.updateUserInfo({ avatar: url });
+          app.updateUserInfo({ avatar: fullUrl });
+        } else {
+          wx.showToast({ title: (body && body.message) || '头像上传失败', icon: 'none' });
+        }
+      },
+      fail: function(err) {
+        wx.hideLoading();
+        console.error('头像上传失败', err);
+        wx.showToast({ title: '网络连接失败', icon: 'none' });
+      }
+    });
   },
 
   // 修改用户名

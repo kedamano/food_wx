@@ -120,8 +120,12 @@ public class OrderController {
     }
 
     @GetMapping("/user/{userId}")
-    @ApiOperation(value = "获取用户订单", notes = "获取指定用户的订单列表")
-    public BaseResult getOrdersByUserId(@PathVariable Integer userId, HttpServletRequest request) {
+    @ApiOperation(value = "获取用户订单", notes = "获取指定用户的订单列表；传 size 时走服务端分页（返回 list/total/page/size），不传保持全量")
+    public BaseResult getOrdersByUserId(@PathVariable Integer userId,
+                                        @RequestParam(required = false) Integer page,
+                                        @RequestParam(required = false) Integer size,
+                                        @RequestParam(required = false) String status,
+                                        HttpServletRequest request) {
         Integer currentUserId = getUserIdFromRequest(request);
         if (currentUserId == null) {
             return BaseResult.error(401, "未登录");
@@ -131,7 +135,13 @@ public class OrderController {
             return BaseResult.error(403, "无权查看该用户的订单");
         }
 
-        return orderService.getOrdersByUserId(userId);
+        // 兼容旧调用：不传 size 返回全量
+        if (size == null) {
+            return orderService.getOrdersByUserId(userId);
+        }
+        int p = (page == null || page < 1) ? 1 : page;
+        int s = Math.min(Math.max(size, 1), 50);
+        return orderService.getOrdersByUserPage(userId, status, p, s);
     }
 
     @GetMapping("/store/{storeId}")
@@ -174,7 +184,7 @@ public class OrderController {
     private static final Map<String, List<String>> ALLOWED_STATUS_TRANSITIONS = new HashMap<String, List<String>>() {{
         put("待付款", Arrays.asList("已取消", "已支付"));
         put("已支付", Arrays.asList("制作中", "已退款"));
-        put("制作中", Arrays.asList("配送中"));
+        put("制作中", Arrays.asList("配送中", "已退款"));
         put("配送中", Arrays.asList("已完成"));
         put("已完成", Arrays.asList());
         put("已取消", Arrays.asList());
@@ -317,6 +327,30 @@ public class OrderController {
         }
 
         return "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>";
+    }
+
+    @PutMapping("/{orderId}/refund")
+    @ApiOperation(value = "订单退款", notes = "已支付/制作中的订单退款（本人或商家/管理员），同步标记支付流水并回补优惠券")
+    public BaseResult refundOrder(@PathVariable Integer orderId, HttpServletRequest request) {
+        Integer userId = getUserIdFromRequest(request);
+        if (userId == null) {
+            return BaseResult.error(401, "未登录");
+        }
+
+        Order order = (Order) orderService.getOrderById(orderId).getData();
+        if (order == null) {
+            return BaseResult.error(404, "订单不存在");
+        }
+
+        // 本人、商家或管理员可发起退款
+        User currentUser = userService.getUserById(userId);
+        String role = currentUser != null ? currentUser.getRole() : null;
+        boolean privileged = "ADMIN".equals(role) || "MERCHANT".equals(role);
+        if (!privileged && !order.getUserId().equals(userId)) {
+            return BaseResult.error(403, "无权操作该订单");
+        }
+
+        return orderService.refundOrder(orderId);
     }
 
     @GetMapping("/{orderId}/rider")

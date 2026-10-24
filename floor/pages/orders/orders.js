@@ -29,12 +29,12 @@ Page({
 
   onShow: function() {
     // 每次显示页面时刷新数据
-    this.loadOrders()
+    this.loadOrders(true)
     this.loadStatistics()
   },
 
   onPullDownRefresh: function() {
-    this.loadOrders()
+    this.loadOrders(true)
     this.loadStatistics()
     wx.stopPullDownRefresh()
   },
@@ -72,8 +72,8 @@ Page({
     })
   },
 
-  // 加载订单列表
-  loadOrders: function() {
+  // 加载订单列表（服务端分页）
+  loadOrders: function(reset) {
     var app = getApp()
     var self = this
 
@@ -83,44 +83,40 @@ Page({
       return
     }
 
+    if (reset || !this._page) {
+      this._page = 1
+    }
+
     self.setData({ loading: true })
 
+    var url = '/order/user/' + app.getCurrentUserId()
+      + '?page=' + this._page + '&size=' + this.PAGE_SIZE
+    if (this.data.activeTab !== 'all') {
+      url += '&status=' + encodeURIComponent(this.data.activeTab)
+    }
+
     app.authRequest({
-      url: '/order/user/' + app.getCurrentUserId(),
+      url: url,
       method: 'GET'
     }).then(function(res) {
       self.setData({ loading: false })
 
       if (res && res.code === 200 && res.data) {
-        var orders = res.data
+        var list = res.data.list || []
+        var total = res.data.total || 0
 
-        // 根据当前标签筛选订单
-        if (self.data.activeTab !== 'all') {
-          var filtered = []
-          for (var i = 0; i < orders.length; i++) {
-            if (orders[i].status === self.data.activeTab) {
-              filtered.push(orders[i])
-            }
-          }
-          orders = filtered
-        }
-
-        // 格式化订单数据
         var formatted = []
-        for (var i = 0; i < orders.length; i++) {
-          formatted.push(self.formatOrder(orders[i]))
+        for (var i = 0; i < list.length; i++) {
+          formatted.push(self.formatOrder(list[i]))
         }
-        orders = formatted
 
-        // 全量缓存在页面实例上，按页渲染，触底加载更多
-        self._allOrders = orders
+        var merged = self._page === 1 ? formatted : self.data.orders.concat(formatted)
         self.setData({
-          orders: orders.slice(0, self.PAGE_SIZE),
-          empty: orders.length === 0,
-          hasMore: orders.length > self.PAGE_SIZE
+          orders: merged,
+          empty: merged.length === 0,
+          hasMore: merged.length < total
         })
       } else {
-        self._allOrders = []
         self.setData({
           orders: [],
           empty: true,
@@ -130,7 +126,6 @@ Page({
     }).catch(function(err) {
       self.setData({ loading: false })
       console.error('加载订单失败', err)
-      self._allOrders = []
       self.setData({
         orders: [],
         empty: true,
@@ -139,16 +134,11 @@ Page({
     })
   },
 
-  // 触底加载更多（本地分页）
+  // 触底加载下一页（服务端分页）
   onReachBottom: function() {
-    if (!this._allOrders || !this.data.hasMore) return
-    var next = this.data.orders.concat(
-      this._allOrders.slice(this.data.orders.length, this.data.orders.length + this.PAGE_SIZE)
-    )
-    this.setData({
-      orders: next,
-      hasMore: this._allOrders.length > next.length
-    })
+    if (!this.data.hasMore || this.data.loading) return
+    this._page = (this._page || 1) + 1
+    this.loadOrders(false)
   },
 
   // 格式化订单数据
@@ -207,7 +197,7 @@ Page({
   onTabChange: function(e) {
     var status = e.currentTarget.dataset.status
     this.setData({ activeTab: status })
-    this.loadOrders()
+    this.loadOrders(true)
   },
 
   // 跳转到订单详情

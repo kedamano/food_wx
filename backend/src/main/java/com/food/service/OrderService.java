@@ -243,6 +243,104 @@ public class OrderService {
         }
     }
 
+    /**
+     * 分页获取用户订单（status 可选过滤）
+     */
+    public BaseResult getOrdersByUserPage(Integer userId, String status, int page, int size) {
+        try {
+            long total = orderMapper.countByUserId(userId, status);
+            int offset = Math.max(0, (page - 1) * size);
+            List<Order> orders = orderMapper.selectByUserIdPage(userId, status, offset, size);
+            fillOrderDetails(orders);
+            java.util.Map<String, Object> result = new java.util.HashMap<>();
+            result.put("list", orders);
+            result.put("total", total);
+            result.put("page", page);
+            result.put("size", size);
+            return BaseResult.success(result);
+        } catch (Exception e) {
+            return BaseResult.error("获取订单列表失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 骑手接单/派单：将制作中的订单指派给骑手，进入配送中
+     */
+    public BaseResult dispatchOrder(Integer orderId, Integer riderId, String riderName, String riderPhone) {
+        try {
+            Order order = orderMapper.selectById(orderId);
+            if (order == null) {
+                return BaseResult.error(404, "订单不存在");
+            }
+            if (!"制作中".equals(order.getStatus())) {
+                return BaseResult.error(400, "只有制作中的订单可以派单");
+            }
+            int result = orderMapper.updateDispatch(orderId, riderId, riderName, riderPhone);
+            if (result > 0) {
+                return BaseResult.success("派单成功", order);
+            }
+            return BaseResult.error("派单失败");
+        } catch (Exception e) {
+            return BaseResult.error("派单失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 骑手上报实时位置
+     */
+    public BaseResult updateRiderLocation(Integer orderId, Integer riderId,
+                                          java.math.BigDecimal longitude, java.math.BigDecimal latitude) {
+        try {
+            Order order = orderMapper.selectById(orderId);
+            if (order == null) {
+                return BaseResult.error(404, "订单不存在");
+            }
+            if (!"配送中".equals(order.getStatus())) {
+                return BaseResult.error(400, "订单不在配送中");
+            }
+            if (order.getRiderId() == null || !order.getRiderId().equals(riderId)) {
+                return BaseResult.error(403, "只有本单骑手可以上报位置");
+            }
+            Integer progress = order.getDeliveryProgress() != null
+                    ? Integer.parseInt(order.getDeliveryProgress()) : 10;
+            int next = Math.min(90, progress + 5);
+            int result = orderMapper.updateRiderLocation(orderId, longitude, latitude, next);
+            if (result > 0) {
+                return BaseResult.success("位置已更新");
+            }
+            return BaseResult.error("位置更新失败");
+        } catch (NumberFormatException e) {
+            return BaseResult.error("位置更新失败: " + e.getMessage());
+        } catch (Exception e) {
+            return BaseResult.error("位置更新失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 骑手送达：配送中 → 已完成
+     */
+    public BaseResult deliverOrder(Integer orderId, Integer riderId) {
+        try {
+            Order order = orderMapper.selectById(orderId);
+            if (order == null) {
+                return BaseResult.error(404, "订单不存在");
+            }
+            if (!"配送中".equals(order.getStatus())) {
+                return BaseResult.error(400, "订单不在配送中");
+            }
+            if (order.getRiderId() == null || !order.getRiderId().equals(riderId)) {
+                return BaseResult.error(403, "只有本单骑手可以确认送达");
+            }
+            int result = orderMapper.updateDelivered(orderId);
+            if (result > 0) {
+                return BaseResult.success("订单已送达");
+            }
+            return BaseResult.error("送达更新失败");
+        } catch (Exception e) {
+            return BaseResult.error("送达更新失败: " + e.getMessage());
+        }
+    }
+
     public BaseResult getOrdersByStatus(String status) {
         try {
             List<Order> orders = orderMapper.selectByStatus(status);
@@ -350,6 +448,46 @@ public class OrderService {
         } catch (Exception e) {
             TxSupport.rollbackIfActive();
             return BaseResult.error("支付失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 退款：已支付/制作中的订单可退，状态置为已退款、支付流水同步标记、优惠券回补
+     */
+    @Transactional
+    public BaseResult refundOrder(Integer orderId) {
+        try {
+            Order order = orderMapper.selectById(orderId);
+            if (order == null) {
+                return BaseResult.error(404, "订单不存在");
+            }
+            if (!"已支付".equals(order.getStatus()) && !"制作中".equals(order.getStatus())) {
+                return BaseResult.error(400, "当前状态不支持退款");
+            }
+
+            int result = orderMapper.updateStatus(orderId, "已退款");
+            if (result <= 0) {
+                return BaseResult.error("退款失败");
+            }
+
+            // 支付流水同步标记为已退款
+            paymentRecordMapper.updateStatusByOrderId(orderId, "已退款");
+
+            // 已核销的优惠券随退款回补
+            if (order.getCouponId() != null) {
+                UserCoupon userCoupon = userCouponMapper.selectById(order.getCouponId());
+                if (userCoupon != null && orderId.equals(userCoupon.getOrderId())) {
+                    userCoupon.setIsUsed(0);
+                    userCoupon.setUsedTime(null);
+                    userCoupon.setOrderId(null);
+                    userCouponMapper.update(userCoupon);
+                }
+            }
+
+            return BaseResult.success("退款成功", order);
+        } catch (Exception e) {
+            TxSupport.rollbackIfActive();
+            return BaseResult.error("退款失败: " + e.getMessage());
         }
     }
 

@@ -65,7 +65,8 @@ public class SmsService {
             
             // 检查发送结果
             if (response.getCode() != null && response.getCode().equals("OK")) {
-                System.out.println("短信发送成功，手机号：" + phoneNumber + "，验证码：" + verifyCode);
+                // 不打印验证码明文，避免日志泄露
+                System.out.println("短信发送成功，手机号：" + phoneNumber.substring(0, 3) + "****" + phoneNumber.substring(7));
                 return true;
             } else {
                 System.err.println("短信发送失败，手机号：" + phoneNumber + "，错误码：" + response.getCode());

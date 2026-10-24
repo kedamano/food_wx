@@ -2,6 +2,7 @@ package com.food.config;
 
 import com.food.interceptor.JwtInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -24,7 +25,7 @@ public class WebConfig extends WebMvcConfigurationSupport {
                 .allowedOriginPatterns("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
-                .allowCredentials(true)
+                // 通配源不允许携带凭据，避免不安全组合
                 .maxAge(3600);
     }
 
@@ -36,13 +37,19 @@ public class WebConfig extends WebMvcConfigurationSupport {
                 .excludePathPatterns("/user/register", "/user/login");
     }
 
+    @Value("${file.image-dir:file:///D:/work/项目/food_wx/images/}")
+    private String imageDir;
+
+    @Value("${file.upload-dir:./uploads}")
+    private String uploadDir;
+
     @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // 静态资源处理 - 使用 file: 协议前缀（绝对路径）
-        // 注意：这里直接写中文路径，Spring Boot 会正确处理
-        String imagePath = "file:///D:/work/项目/food_wx/images/";
+        // 静态资源处理 - 可通过 file.image-dir / file.upload-dir 配置
         registry.addResourceHandler("/images/**")
-                .addResourceLocations(imagePath);
+                .addResourceLocations(ensureTrailingSlash(imageDir));
+        registry.addResourceHandler("/upload/**")
+                .addResourceLocations(ensureTrailingSlash("file:" + uploadDir));
         
         registry.addResourceHandler("/static/**")
                 .addResourceLocations("classpath:/static/");
@@ -52,5 +59,9 @@ public class WebConfig extends WebMvcConfigurationSupport {
         
         registry.addResourceHandler("/webjars/**")
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
+    }
+
+    private String ensureTrailingSlash(String path) {
+        return path.endsWith("/") ? path : path + "/";
     }
 }

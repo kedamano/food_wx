@@ -11,7 +11,7 @@
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.7.14-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Java](https://img.shields.io/badge/Java-8-orange.svg)](https://openjdk.java.net/)
 [![WeChat Mini Program](https://img.shields.io/badge/微信-小程序-blue.svg)](https://developers.weixin.qq.com/miniprogram/dev/framework/)
-[![Tests](https://img.shields.io/badge/tests-109%20passing-success.svg)](#-测试与-ci)
+[![Tests](https://img.shields.io/badge/tests-111%20passing-success.svg)](#-测试与-ci)
 
 </div>
 
@@ -22,7 +22,7 @@
 - **完整外卖闭环** — 浏览 / 加购 / 下单 / 优惠券抵扣 / 微信支付 / 确认收货 / 评价，一条链路真实可用，无假数据冒充
 - **真实微信能力** — `code2session` 微信登录、微信支付 V2 JSAPI 下单 + 回调验签，未配置商户号时自动降级为模拟支付
 - **安全内建** — JWT + BCrypt + 角色鉴权（`@RequireRole`）+ 数据归属校验（防越权 IDOR）+ 支付回调验签，杜绝常见 Web 漏洞
-- **测试门禁** — 后端 72 例（JUnit 5 + Mockito + H2 集成测试）+ 前端 37 例（Vitest），GitHub Actions 自动执行
+- **测试门禁** — 后端 74 例（JUnit 5 + Mockito + H2 集成测试）+ 前端 37 例（Vitest），GitHub Actions 自动执行
 - **清爽架构** — Controller / Service / Mapper 分层，全局异常处理，动态 SQL 更新，批量查询消除 N+1
 
 ## 📊 系统架构
@@ -57,15 +57,18 @@ graph LR
 | 👤 用户 | 账密注册/登录、短信验证码、微信登录、找回密码、邀请码奖励（邀请人 +100 积分） | ✅ |
 | 🏠 首页 | 轮播图、推荐美食、附近商家、搜索（美食 + 商家）、限时抢购 | ✅ |
 | 🛒 购物车 | 加购/增减/删除/清空，本地与云端双模式，登录自动合并，批量查询 | ✅ |
-| 📦 订单 | 下单、优惠券抵扣、取消（自动回补券）、模拟支付、确认收货发积分、催单、订单统计 | ✅ |
+| 📦 订单 | 下单、优惠券抵扣、取消（自动回补券）、退款（回补券+流水标记）、模拟支付、确认收货发积分、催单、订单统计、服务端分页 | ✅ |
 | 💳 支付 | 微信支付 JSAPI 下单 + 回调验签（需商户号），未配置时降级模拟支付 | ✅ |
 | 🎫 优惠券 | 兑换、本人券包、下单核销、取消回补、门槛/有效期校验 | ✅ |
 | ⭐ 评价 | 订单评价（发积分）、菜品评价列表与统计、全部评价筛选 | ✅ |
 | 📍 地址 | 增删改查、默认地址、下单自动带入 | ✅ |
 | 🎁 积分 | 签到（连续奖励）、积分明细、积分兑换 | ✅ |
 | 🔐 安全 | 角色鉴权（ADMIN/MERCHANT/USER）、越权防护、支付回调验签 | ✅ |
-| 👨‍💼 商家/管理端 | 菜品管理、商家订单、状态流转（`@RequireRole`，需手工授权角色） | ⚙️ 接口就绪 |
-| 🛵 骑手配送 | 实时定位、派单、退款流程、消息通知 | 🗺️ Roadmap |
+| 🛵 骑手端 | 待配送订单池、接单派单、实时位置上报、确认送达（RIDER 角色 API） | ✅ API 就绪 |
+| 📷 文件上传 | 头像、评价图片、反馈附图真实上传（白名单校验 + UUID 重命名） | ✅ |
+| ⚡ 缓存 | 轮播图/分类/热门菜品热点读缓存，内存（默认）/Redis 双模式 | ✅ |
+| 👨‍💼 商家管理后台 | 可视化运营界面（接口已就绪） | 🗺️ Roadmap |
+| 🔔 消息通知 | 催单/派单通知推送 | 🗺️ Roadmap |
 
 > ⚙️ 角色通过 `users.role` 字段手工授权（`ADMIN` / `MERCHANT`），没有内置管理后台。
 
@@ -208,7 +211,9 @@ cd floor && npm install && npm test   # 37 个用例
 | POST | `/order/{orderId}/pay-params` | 获取支付参数（wechat / mock 双模式） |
 | POST | `/order/pay-notify` | 微信支付回调（验签，幂等） |
 | PUT | `/order/{orderId}/cancel` · `/complete` · `/remind` | 取消（回补券）/确认收货/催单 |
-| GET | `/order/user/{userId}` · `/order/statistics` | 订单列表/统计 |
+| PUT | `/order/{orderId}/refund` | 退款（本人/商家，回补券 + 流水标记） |
+| GET | `/order/user/{userId}?page=&size=&status=` | 订单列表（服务端分页，可选过滤） |
+| GET | `/order/statistics` | 订单统计 |
 | PUT | `/order/{orderId}/status` · GET `/order/store/{storeId}` | 状态流转/商家订单（商家/管理员） |
 </details>
 
@@ -224,6 +229,10 @@ cd floor && npm install && npm test   # 37 个用例
 | GET/POST/PUT/DELETE | `/address/**` | 收货地址 CRUD + 设默认 |
 | GET/POST/DELETE | `/favorite/**` | 收藏商家 |
 | POST | `/feedback` | 意见反馈 |
+| GET | `/rider/orders/pending` | 待配送订单池（RIDER/MERCHANT/ADMIN） |
+| POST | `/rider/orders/{id}/dispatch` | 接单派单（订单进入配送中） |
+| PUT | `/rider/orders/{id}/location` · `/deliver` | 骑手位置上报 / 确认送达 |
+| POST | `/file/upload` | 图片上传（multipart，字段名 file） |
 </details>
 
 ## 🗄️ 数据库设计
@@ -248,20 +257,23 @@ cd floor && npm install && npm test   # 37 个用例
 
 | 套件 | 用例数 | 覆盖 |
 |------|:----:|------|
-| 后端 `mvn test` | 72 | Service 单测（Mockito）+ 集成测试（H2 内存库）+ JWT/验证码工具 |
+| 后端 `mvn test` | 74 | Service 单测（Mockito）+ 集成测试（H2 内存库）+ JWT/验证码工具 |
 | 前端 `npm test` | 37 | 请求封装（拦截器/401/错误处理）+ 工具函数 |
 
 GitHub Actions 在每次 push / PR 时自动运行两个测试作业（[ci.yml](.github/workflows/ci.yml)）。
 
 ## 🗺️ Roadmap
 
-- [ ] 退款流程（当前状态机已支持「已支付 → 已退款」，缺退款执行逻辑）
-- [ ] 骑手端：派单、实时位置上报（orders 表骑手字段已预留）
-- [ ] 服务端分页（订单/商品列表当前为全量返回 + 前端本地分页）
-- [ ] 文件上传（头像/评价图片，当前未实现真实上传）
-- [ ] Redis 缓存热点数据（轮播图/分类/推荐）
+- [x] 退款流程（本人/商家可发起，同步支付流水并回补优惠券）
+- [x] 骑手端 API：待配送订单池、接单派单、实时位置上报、确认送达（`RIDER` 角色）
+- [x] 服务端分页（订单列表 + 菜品列表，`page/size` 可选参数，向后兼容）
+- [x] 文件上传（`POST /file/upload`：头像 / 评价图片 / 反馈附图）
+- [x] 热点读缓存（内存 / Redis 双模式，`cache.type` 切换）
+- [ ] 附近商家按真实距离排序（stores 表经纬度已就绪）
 - [ ] 微信支付升级 V3 API
+- [ ] 骑手端小程序界面（当前为 API + 角色授权，无独立客户端）
 - [ ] 商家管理后台（角色数据模型已就绪）
+- [ ] 验证码迁移 Redis（当前 JVM 内存存储，多实例部署需先完成此项）
 
 ## 🤝 贡献
 

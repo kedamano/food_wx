@@ -159,25 +159,64 @@ Page({
     }
 
     var app = getApp();
-    app.authRequest({
-      url: '/review/order/' + orderId,
-      method: 'POST',
-      data: reviewData
-    }).then(function(res) {
-      wx.hideLoading();
-      if (res && res.code === 200) {
-        wx.showToast({ title: '评价成功', icon: 'success' });
-        setTimeout(function() { wx.navigateBack(); }, 1500);
-      } else {
+
+    // 先上传图片，拿到服务端 URL 再提交评价
+    self.uploadImages(self.data.images, function(imageUrls) {
+      reviewData.images = imageUrls;
+      app.authRequest({
+        url: '/review/order/' + orderId,
+        method: 'POST',
+        data: reviewData
+      }).then(function(res) {
+        wx.hideLoading();
+        if (res && res.code === 200) {
+          wx.showToast({ title: '评价成功', icon: 'success' });
+          setTimeout(function() { wx.navigateBack(); }, 1500);
+        } else {
+          self.setData({ isLoading: false });
+          wx.showModal({ title: '提示', content: (res && res.message) || '评价提交失败', showCancel: false });
+        }
+      }).catch(function(err) {
+        wx.hideLoading();
         self.setData({ isLoading: false });
-        wx.showModal({ title: '提示', content: (res && res.message) || '评价提交失败', showCancel: false });
-      }
-    }).catch(function(err) {
-      wx.hideLoading();
-      self.setData({ isLoading: false });
-      console.error('评价提交请求失败：', err);
-      wx.showModal({ title: '提示', content: '网络连接失败', showCancel: false });
+        console.error('评价提交请求失败：', err);
+        wx.showModal({ title: '提示', content: '网络连接失败', showCancel: false });
+      });
     });
+  },
+
+  // 批量上传图片：完成（含个别失败忽略）后回调服务端 URL 列表
+  uploadImages: function(localPaths, done) {
+    var app = getApp();
+    var token = app.globalData.token || wx.getStorageSync('token');
+    var uploaded = [];
+    if (!localPaths || localPaths.length === 0) {
+      done(uploaded);
+      return;
+    }
+    var pending = localPaths.length;
+    for (var i = 0; i < localPaths.length; i++) {
+      (function(path) {
+        wx.uploadFile({
+          url: app.resolveApiUrl('/file/upload'),
+          filePath: path,
+          name: 'file',
+          header: token ? { 'Authorization': 'Bearer ' + token } : {},
+          success: function(res) {
+            try {
+              var body = JSON.parse(res.data);
+              if (res.statusCode === 200 && body && body.code === 200 && body.data) {
+                uploaded.push(app.resolveImageUrl(body.data));
+              }
+            } catch (e) { /* 单张失败忽略 */ }
+          },
+          complete: function() {
+            pending--;
+            if (pending === 0) done(uploaded);
+          }
+        });
+      })(localPaths[i]);
+    }
   },
 
   onBack: function() {

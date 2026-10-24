@@ -25,16 +25,4 @@ public class TestController {
         return BaseResult.success("系统运行正常", null);
     }
 
-    @GetMapping("/config")
-    @ApiOperation(value = "获取配置信息", notes = "返回系统配置信息")
-    public BaseResult getConfig() {
-        return BaseResult.success("系统配置信息", new ConfigInfo());
-    }
-
-    private static class ConfigInfo {
-        public String version = "1.0.0";
-        public String environment = "development";
-        public String database = "MySQL 8.0";
-        public String framework = "Spring Boot 2.7.14";
-    }
 }

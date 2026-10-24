@@ -84,6 +84,25 @@ public class FoodService {
         }
     }
 
+    /**
+     * 分页获取菜品
+     */
+    public BaseResult getAllFoods(int page, int size) {
+        try {
+            long total = foodMapper.countAll();
+            int offset = Math.max(0, (page - 1) * size);
+            List<Food> foods = foodMapper.selectPage(offset, size);
+            java.util.Map<String, Object> result = new java.util.HashMap<>();
+            result.put("list", foods);
+            result.put("total", total);
+            result.put("page", page);
+            result.put("size", size);
+            return BaseResult.success(result);
+        } catch (Exception e) {
+            return BaseResult.error("获取菜品列表失败: " + e.getMessage());
+        }
+    }
+
     public BaseResult getFoodsByCategory(Integer categoryId) {
         try {
             List<Food> foods = foodMapper.selectByCategoryId(categoryId);

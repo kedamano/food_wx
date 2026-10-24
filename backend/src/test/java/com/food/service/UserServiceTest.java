@@ -1,6 +1,7 @@
 package com.food.service;
 
 import com.food.dto.BaseResult;
+import com.food.entity.PointsLog;
 import com.food.entity.User;
 import com.food.mapper.PointsLogMapper;
 import com.food.mapper.UserMapper;
@@ -18,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 /**
@@ -263,6 +265,70 @@ class UserServiceTest {
             BaseResult result = userService.updateUserPoints(999, 50);
 
             assertEquals(404, result.getCode());
+        }
+    }
+
+    @Nested
+    @DisplayName("邀请码测试")
+    class InviteTests {
+
+        @Test
+        @DisplayName("注册携带邀请码应关联邀请人并给邀请人加100积分")
+        void shouldRewardInviterOnRegister() {
+            User invitee = new User();
+            invitee.setUsername("invitee");
+            invitee.setPhone("13800138001");
+            invitee.setPassword("password123");
+            invitee.setInviteCode("ABCD1234"); // 传入的是邀请人的邀请码
+
+            User inviter = new User();
+            inviter.setUserId(9);
+            inviter.setPoints(50);
+
+            when(userMapper.selectByUsername("invitee")).thenReturn(null);
+            when(userMapper.selectByPhone("13800138001")).thenReturn(null);
+            when(userMapper.selectByInviteCode("ABCD1234")).thenReturn(inviter);
+            when(userMapper.insert(any(User.class))).thenReturn(1);
+            when(jwtUtil.generateToken(any())).thenReturn("token");
+            // updateUserPoints（邀请人加积分）内部调用
+            when(userMapper.selectById(9)).thenReturn(inviter);
+            when(userMapper.update(any(User.class))).thenReturn(1);
+            when(pointsLogMapper.insert(any(PointsLog.class))).thenReturn(1);
+
+            BaseResult result = userService.register(invitee);
+
+            assertEquals(200, result.getCode());
+            // 被邀请人应关联邀请人
+            assertEquals(9, invitee.getInvitedBy());
+            // 自己的邀请码应重新生成，而不是沿用邀请人的
+            assertNotNull(invitee.getInviteCode());
+            assertNotEquals("ABCD1234", invitee.getInviteCode());
+            // 邀请人 +100 积分并落积分日志
+            assertEquals(150, inviter.getPoints());
+            verify(pointsLogMapper).insert(argThat(log ->
+                    log.getUserId() == 9 && log.getChange() == 100));
+        }
+
+        @Test
+        @DisplayName("无效邀请码不应阻断注册也不发奖励")
+        void shouldIgnoreInvalidInviteCode() {
+            User user = new User();
+            user.setUsername("lonelyuser");
+            user.setPhone("13800138002");
+            user.setPassword("password123");
+            user.setInviteCode("NOTEXIST");
+
+            when(userMapper.selectByUsername("lonelyuser")).thenReturn(null);
+            when(userMapper.selectByPhone("13800138002")).thenReturn(null);
+            when(userMapper.selectByInviteCode("NOTEXIST")).thenReturn(null);
+            when(userMapper.insert(any(User.class))).thenReturn(1);
+            when(jwtUtil.generateToken(any())).thenReturn("token");
+
+            BaseResult result = userService.register(user);
+
+            assertEquals(200, result.getCode());
+            assertNull(user.getInvitedBy());
+            verify(pointsLogMapper, never()).insert(any(PointsLog.class));
         }
     }
 }

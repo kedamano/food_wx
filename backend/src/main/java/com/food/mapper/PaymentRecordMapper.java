@@ -14,4 +14,7 @@ public interface PaymentRecordMapper {
 
     PaymentRecord selectByOrderId(Integer orderId);
 
+    int updateStatusByOrderId(@org.apache.ibatis.annotations.Param("orderId") Integer orderId,
+                              @org.apache.ibatis.annotations.Param("status") String status);
+
 }

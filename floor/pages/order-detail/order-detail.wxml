@@ -142,8 +142,12 @@
       <button class="action-btn cancel-btn" bindtap="onCancelOrder">取消订单</button>
       <button class="action-btn pay-btn" bindtap="onPayOrder">立即付款</button>
     </block>
+    <block wx:if="{{orderInfo.status === 'paid'}}">
+      <button class="action-btn cancel-btn" bindtap="onRefundOrder">申请退款</button>
+    </block>
     <block wx:if="{{orderInfo.status === 'preparing'}}">
       <button class="action-btn remind-btn" bindtap="onRemindOrder">催单</button>
+      <button class="action-btn cancel-btn" bindtap="onRefundOrder">申请退款</button>
     </block>
     <block wx:if="{{orderInfo.status === 'delivering'}}">
       <button class="action-btn track-btn" bindtap="onTrackDelivery">查看配送</button>

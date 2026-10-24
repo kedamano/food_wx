@@ -461,7 +461,8 @@ Page({
         }
         var orderInfo = {
           orderId: order.orderId || orderId,
-          status: order.status || 'pending',
+          // wxml 按英文标识判断按钮显隐，这里统一归一化
+          status: self.getStatusCls(order.status),
           statusText: self.getStatusText(order.status),
           subtotal: parseFloat(order.totalAmount) || 0,
           deliveryFee: parseFloat(order.deliveryFee) || 5,
@@ -516,13 +517,60 @@ Page({
   getStatusText: function(status) {
     var map = {
       '待付款': '待付款', 'pending': '待付款',
+      '已支付': '已支付', 'paid': '已支付',
       '待接单': '待接单', '已接单': '已接单',
       '制作中': '制作中', 'preparing': '制作中',
       '配送中': '配送中', 'delivering': '配送中',
       '已完成': '已完成', 'completed': '已完成',
-      '已取消': '已取消', 'cancelled': '已取消'
+      '已取消': '已取消', 'cancelled': '已取消',
+      '已退款': '已退款', 'refunded': '已退款'
     };
     return map[status] || status || '未知';
+  },
+
+  // 状态 → wxml 用的英文标识
+  getStatusCls: function(status) {
+    var map = {
+      '待付款': 'pending', 'pending': 'pending',
+      '已支付': 'paid', 'paid': 'paid',
+      '制作中': 'preparing', 'preparing': 'preparing',
+      '配送中': 'delivering', 'delivering': 'delivering',
+      '已完成': 'completed', 'completed': 'completed',
+      '已取消': 'cancelled', 'cancelled': 'cancelled',
+      '已退款': 'refunded', 'refunded': 'refunded'
+    };
+    return map[status] || 'pending';
+  },
+
+  // 退款
+  onRefundOrder: function() {
+    var self = this;
+    var orderId = this.data.orderInfo.orderId;
+    wx.showModal({
+      title: '申请退款',
+      content: '确定要对该订单发起退款吗？',
+      success: function(res) {
+        if (res.confirm) {
+          wx.showLoading({ title: '处理中...' });
+          app.authRequest({
+            url: '/order/' + orderId + '/refund',
+            method: 'PUT'
+          }).then(function(res) {
+            wx.hideLoading();
+            if (res && res.code === 200) {
+              wx.showToast({ title: '退款成功', icon: 'success' });
+              self.loadOrderDetail(orderId);
+            } else {
+              wx.showToast({ title: (res && res.message) || '退款失败', icon: 'none' });
+            }
+          }).catch(function(err) {
+            wx.hideLoading();
+            console.error('退款失败', err);
+            wx.showToast({ title: '退款失败', icon: 'none' });
+          });
+        }
+      }
+    });
   },
 
   // 获取进度文字
