@@ -8,7 +8,7 @@
     <text class="nav-title">订单详情</text>
     <button class="nav-right share-btn" open-type="share">
       <text class="-share-alt share-icon">↗</text>
-    </view>
+    </button>
   </view>
 
   <!-- 订单状态 -->
