@@ -69,6 +69,13 @@
         WHERE phone = #{phone}
     </select>
 
+    <select id="selectByOpenid" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM users
+        WHERE openid = #{openid}
+    </select>
+
     <select id="selectByInviteCode" resultMap="BaseResultMap">
         SELECT
         <include refid="BaseColumnList"/>

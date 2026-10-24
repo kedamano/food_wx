@@ -138,22 +138,22 @@ Page({
   // 微信登录后端验证
   weChatLoginToBackend: function(code) {
     var self = this;
-    wx.request({
-      url: 'http://localhost:8080/api/user/wechat-login',
+    var app = getApp();
+    app.authRequest({
+      url: '/user/wechat-login',
       method: 'POST',
-      header: {
-        'Content-Type': 'application/json'
-      },
       data: {
         code: code
       },
       success: function(res) {
-        if (res.statusCode === 200 && res.data.code === 200) {
-          // 登录成功
-          self.handleLoginSuccess(res.data.data);
+        if (res && res.code === 200) {
+          // 登录成功（res 为 {code, message, data:{token, user}}）
+          self.handleLoginSuccess(res);
+        } else if (res && res.token) {
+          self.handleLoginSuccess(res);
         } else {
           wx.showToast({
-            title: res.data.message || '微信登录失败',
+            title: (res && res.message) || '微信登录失败',
             icon: 'none'
           });
         }
@@ -299,6 +299,9 @@ Page({
 
     // 调用 app 的登录方法
     app.userLogin(user);
+
+    // 登录成功后：合并本地购物车到服务端，并拉取服务端购物车
+    app.mergeLocalCartToServer();
 
     // 处理记住我
     if (this.data.rememberMe) {

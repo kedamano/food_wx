@@ -60,6 +60,7 @@ public class OrderController {
         order.setUserId(userId);
         order.setStoreId(orderRequest.getStoreId());
         order.setDeliveryFee(orderRequest.getDeliveryFee());
+        order.setCouponId(orderRequest.getCouponId());
         order.setAddress(orderRequest.getAddress());
         order.setPhone(orderRequest.getPhone());
         order.setRemark(orderRequest.getRemark());
@@ -231,7 +232,7 @@ public class OrderController {
     }
 
     @PutMapping("/{orderId}/pay")
-    @ApiOperation(value = "支付订单", notes = "支付指定订单")
+    @ApiOperation(value = "支付订单（模拟支付）", notes = "模拟支付：直接将订单置为已支付，生产环境应走 /pay-params + 微信支付")
     public BaseResult payOrder(@PathVariable Integer orderId, HttpServletRequest request) {
         Integer userId = getUserIdFromRequest(request);
         if (userId == null) {
@@ -245,6 +246,77 @@ public class OrderController {
         }
 
         return orderService.payOrder(orderId);
+    }
+
+    @Autowired
+    private com.food.utils.WechatPayService wechatPayService;
+
+    @Autowired
+    private com.food.utils.WechatService wechatService;
+
+    @PostMapping("/{orderId}/pay-params")
+    @ApiOperation(value = "获取支付参数", notes = "返回微信支付JSAPI参数；未配置商户号时返回 mode=mock（前端回退模拟支付）")
+    public BaseResult getPayParams(@PathVariable Integer orderId, HttpServletRequest request) {
+        Integer userId = getUserIdFromRequest(request);
+        if (userId == null) {
+            return BaseResult.error(401, "未登录");
+        }
+
+        Order order = (Order) orderService.getOrderById(orderId).getData();
+        if (order == null || !order.getUserId().equals(userId)) {
+            return BaseResult.error(403, "无权操作该订单");
+        }
+        if (!"待付款".equals(order.getStatus())) {
+            return BaseResult.error(400, "订单状态不允许支付");
+        }
+
+        // 未启用微信支付时降级为模拟支付
+        if (!wechatPayService.isEnabled() || !wechatPayService.isConfigured()) {
+            Map<String, Object> mock = new HashMap<>();
+            mock.put("mode", "mock");
+            return BaseResult.success(mock);
+        }
+
+        try {
+            User user = userService.getUserById(userId);
+            String openid = user != null ? user.getOpenid() : null;
+            if (openid == null || openid.isEmpty()) {
+                return BaseResult.error(400, "当前账号未绑定微信，无法使用微信支付");
+            }
+            Map<String, String> payParams = wechatPayService.createJsapiPayParams(order, openid);
+            Map<String, Object> result = new HashMap<>();
+            result.put("mode", "wechat");
+            result.putAll(payParams);
+            return BaseResult.success(result);
+        } catch (Exception e) {
+            return BaseResult.error("获取支付参数失败: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/pay-notify")
+    @ApiOperation(value = "微信支付回调", notes = "微信支付结果异步通知（无需登录态）")
+    public String payNotify(@RequestBody String xmlBody) {
+        Map<String, String> fields;
+        try {
+            fields = wechatPayService.parseXml(xmlBody);
+        } catch (Exception e) {
+            return "<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[XML解析失败]]></return_msg></xml>";
+        }
+
+        if (!"SUCCESS".equals(fields.get("return_code"))) {
+            return "<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[请求失败]]></return_msg></xml>";
+        }
+
+        // 验签：防止伪造回调
+        if (!wechatPayService.verifyNotifySign(fields, fields.get("sign"))) {
+            return "<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[验签失败]]></return_msg></xml>";
+        }
+
+        if ("SUCCESS".equals(fields.get("result_code"))) {
+            orderService.markPaidByOrderNo(fields.get("out_trade_no"), fields.get("transaction_id"));
+        }
+
+        return "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>";
     }
 
     @GetMapping("/{orderId}/rider")
@@ -490,6 +562,7 @@ public class OrderController {
         private BigDecimal deliveryFee;
         private BigDecimal discountAmount;
         private BigDecimal payAmount;
+        private Integer couponId;
         private String address;
         private String phone;
         private String remark;
@@ -509,6 +582,8 @@ public class OrderController {
         public void setDiscountAmount(BigDecimal discountAmount) { this.discountAmount = discountAmount; }
         public BigDecimal getPayAmount() { return payAmount; }
         public void setPayAmount(BigDecimal payAmount) { this.payAmount = payAmount; }
+        public Integer getCouponId() { return couponId; }
+        public void setCouponId(Integer couponId) { this.couponId = couponId; }
         public String getAddress() { return address; }
         public void setAddress(String address) { this.address = address; }
         public String getPhone() { return phone; }

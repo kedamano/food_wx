@@ -160,8 +160,59 @@ Page({
   onPayOrder: function() {
     var self = this;
     var orderId = this.data.orderInfo.orderId;
-    wx.showLoading({ title: '支付中...' });
+    wx.showLoading({ title: '获取支付参数...' });
 
+    // 先向后端要支付参数：mode=wechat 走真实微信支付，mode=mock 走模拟支付
+    app.authRequest({
+      url: '/order/' + orderId + '/pay-params',
+      method: 'POST'
+    }).then(function(res) {
+      wx.hideLoading();
+      if (!res || res.code !== 200 || !res.data) {
+        wx.showToast({ title: (res && res.message) || '获取支付参数失败', icon: 'none' });
+        return;
+      }
+
+      if (res.data.mode === 'wechat') {
+        self.requestWechatPay(orderId, res.data);
+      } else {
+        self.requestMockPay(orderId);
+      }
+    }).catch(function(err) {
+      wx.hideLoading();
+      console.error('获取支付参数失败', err);
+      wx.showToast({ title: '获取支付参数失败', icon: 'none' });
+    });
+  },
+
+  // 真实微信支付
+  requestWechatPay: function(orderId, payParams) {
+    var self = this;
+    wx.requestPayment({
+      timeStamp: payParams.timeStamp,
+      nonceStr: payParams.nonceStr,
+      package: payParams.package,
+      signType: payParams.signType || 'MD5',
+      paySign: payParams.paySign,
+      success: function() {
+        wx.showToast({ title: '支付成功', icon: 'success' });
+        self.loadOrderDetail(orderId);
+      },
+      fail: function(err) {
+        console.error('微信支付失败', err);
+        // 用户取消或支付失败后轮询一次订单状态，回调可能已到账
+        setTimeout(function() { self.loadOrderDetail(orderId); }, 1500);
+        if (err && err.errMsg && err.errMsg.indexOf('cancel') === -1) {
+          wx.showToast({ title: '支付未完成', icon: 'none' });
+        }
+      }
+    });
+  },
+
+  // 模拟支付（后端未配置微信支付商户号时的降级路径）
+  requestMockPay: function(orderId) {
+    var self = this;
+    wx.showLoading({ title: '支付中...' });
     app.authRequest({
       url: '/order/' + orderId + '/pay',
       method: 'PUT'
@@ -349,24 +400,28 @@ Page({
 
   // 再来一单
   onOrderAgain: function() {
-    var self = this;
-    console.log('再来一单');
-    wx.showLoading({
-      title: '加载中...'
+    var app = getApp();
+    var details = this.data.orderInfo.items || [];
+    if (!details || details.length === 0) {
+      wx.showToast({ title: '订单中没有商品信息', icon: 'none' });
+      return;
+    }
+
+    for (var i = 0; i < details.length; i++) {
+      var item = details[i];
+      app.addToCart({
+        foodId: item.foodId,
+        name: item.name,
+        price: Number(item.price) || 0,
+        image: item.image || '',
+        quantity: Number(item.quantity) || 1,
+        storeId: this.data.orderInfo.storeId
+      });
+    }
+
+    wx.switchTab({
+      url: '/pages/cart/cart'
     });
-
-    setTimeout(function() {
-      wx.hideLoading();
-      wx.showToast({
-        title: '已添加到购物车',
-        icon: 'success'
-      });
-
-      // 跳转到购物车
-      wx.switchTab({
-        url: '/pages/cart/cart'
-      });
-    }, 1000);
   },
 
   // 联系客服
@@ -392,7 +447,8 @@ Page({
       if (res && res.code === 200 && res.data) {
         var order = res.data;
         var items = [];
-        var rawItems = order.items || [];
+        // 后端返回字段是 orderDetails
+        var rawItems = order.orderDetails || order.items || [];
         for (var mi = 0; mi < rawItems.length; mi++) {
           var item = rawItems[mi];
           items.push({

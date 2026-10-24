@@ -192,3 +192,8 @@ SELECT COUNT(*) as order_count FROM orders;
 SELECT COUNT(*) as zhangsan_order_count FROM orders WHERE user_id = 1;
 SELECT COUNT(*) as cart_count FROM cart;
 SELECT COUNT(*) as review_count FROM reviews;
+-- 轮播图初始数据
+INSERT INTO banners (title, subtitle, image_url, background, link_type, link_value, sort_order, status) VALUES
+('新人专享大礼包', '注册即领188元优惠券', '/images/foods/beef_burger.png', '#FF7A45', 'topic', 'new-user', 1, 1),
+('限时折扣', '热门美食低至5折', '/images/foods/kung_pao_chicken.png', '#FF4D4F', 'topic', 'discount', 2, 1),
+('招牌川菜', '正宗川味，辣得过瘾', '/images/foods/sichuan_cuisine.png', '#FFA940', 'store', '1', 3, 1);

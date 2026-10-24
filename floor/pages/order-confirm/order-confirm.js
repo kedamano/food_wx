@@ -218,6 +218,8 @@ Page({
       deliveryFee: parseFloat(orderInfo.deliveryFee) || 5,
       discount: parseFloat(orderInfo.discount) || 0,
       payAmount: parseFloat(orderInfo.finalAmount) || 0,
+      // 选中优惠券的用户券ID（user_coupons），服务端会校验并核销
+      couponId: this.data.selectedCoupon ? this.data.selectedCoupon.id : null,
       receiverName: address.name,
       phone: address.phone,
       address: (address.province || '') + (address.city || '') + (address.district || '') + (address.detail || ''),
@@ -238,9 +240,8 @@ Page({
         var orderId = res.data ? (res.data.orderId || res.data) : Date.now();
         wx.showToast({ title: '订单提交成功', icon: 'success', duration: 2000 });
 
-        // 清空购物车
-        app.globalData.cart = [];
-        app.globalData.cartCount = 0;
+        // 已下单的购物车项服务端已删除，重新拉取服务端购物车保持一致
+        app.syncCartFromServer();
 
         setTimeout(function() {
           wx.redirectTo({
@@ -336,36 +337,41 @@ Page({
   loadCoupons: function() {
     var self = this;
     var app = getApp();
-    var userId = app.globalData.userId || wx.getStorageSync('userId') || 1;
+
+    // 未登录没有用户优惠券
+    if (!app.isLoggedIn()) {
+      self.setData({ coupons: [] });
+      return;
+    }
 
     app.authRequest({
-      url: '/coupon/user/' + userId,
+      url: '/coupon/user/' + app.getCurrentUserId(),
       method: 'GET'
     }).then(function(res) {
       if (res && res.code === 200 && res.data) {
         var rawList = Array.isArray(res.data) ? res.data : [];
-        // 手动 filter + map
-        var filtered = [];
-        for (var fi = 0; fi < rawList.length; fi++) {
-          if (rawList[fi].status === 0) {
-            filtered.push(rawList[fi]);
-          }
-        }
+        // 后端返回的 status 是 "available"/"used"/"expired" 字符串
         var list = [];
-        for (var mi = 0; mi < filtered.length; mi++) {
-          var item = filtered[mi];
+        for (var mi = 0; mi < rawList.length; mi++) {
+          var item = rawList[mi];
+          if (item.status !== 'available') {
+            continue;
+          }
           list.push({
-            id: item.couponId || item.id,
-            name: item.couponName || item.name || '优惠券',
-            discount: item.discount || item.amount || 0,
-            condition: item.minAmount ? '满' + item.minAmount + '可用' : '无门槛',
-            minAmount: item.minAmount || 0
+            // item.id 是用户优惠券ID（user_coupons），下单核销要用它
+            id: item.id,
+            name: item.name || '优惠券',
+            discount: Number(item.discount) || 0,
+            minAmount: Number(item.minAmount) || 0,
+            condition: item.condition || '无门槛',
+            expiry: item.expiry || ''
           });
         }
         self.setData({ coupons: list });
       }
     }).catch(function(err) {
       console.error('加载优惠券失败', err);
+      self.setData({ coupons: [] });
     });
   }
 });

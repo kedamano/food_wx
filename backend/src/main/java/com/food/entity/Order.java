@@ -19,6 +19,7 @@ public class Order implements Serializable {
     private BigDecimal discountAmount;
     private BigDecimal payAmount;
     private String status;
+    private Integer couponId; // 使用的用户优惠券ID（user_coupons.user_coupon_id）
     private String address;
     private String phone;
     private String remark;

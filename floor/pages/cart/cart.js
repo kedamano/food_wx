@@ -49,8 +49,14 @@ Page({
     var self = this;
     var app = getApp();
 
+    // 未登录时使用本地购物车（登录后会自动合并到服务端）
+    if (!app.isLoggedIn()) {
+      self.useGlobalCartData();
+      return;
+    }
+
     app.authRequest({
-      url: '/cart/user/' + (app.globalData.userId || 1),
+      url: '/cart/user/' + app.getCurrentUserId(),
       method: 'GET',
       success: function (res) {
         if (res && res.code === 200 && res.data && res.data.length > 0) {
@@ -60,14 +66,14 @@ Page({
             var item = cartData[i];
             formattedCartItems.push({
               id: item.foodId,
-              name: item.name,
-              price: Number(item.price) || 0,
-              image: app.resolveImageUrl(item.image) || self.getDefaultFoodImage(item.name),
+              name: item.foodName || item.name,
+              price: Number(item.foodPrice) || Number(item.price) || 0,
+              image: app.resolveImageUrl(item.foodImage || item.image) || self.getDefaultFoodImage(item.foodName),
               quantity: Number(item.quantity) || 0,
               selected: true,
               cartId: item.cartId,
               storeId: item.storeId,
-              itemTotal: Number((Number(item.price) || 0) * (Number(item.quantity) || 0)).toFixed(2)
+              itemTotal: ((Number(item.foodPrice) || Number(item.price) || 0) * (Number(item.quantity) || 0)).toFixed(2)
             });
           }
 
@@ -89,6 +95,7 @@ Page({
           }
           app.globalData.cartCount = totalCount;
         } else {
+          // 服务端购物车为空时回退本地
           self.useGlobalCartData();
         }
       },
@@ -215,7 +222,7 @@ Page({
     }
 
     this.setData({ cartItems: updatedItems });
-    this.updateGlobalCart(updatedItems);
+    this.syncQuantityChange(itemId);
     this.calculateCosts();
   },
 
@@ -241,7 +248,7 @@ Page({
     }
 
     this.setData({ cartItems: updatedItems });
-    this.updateGlobalCart(updatedItems);
+    this.syncQuantityChange(itemId);
     this.calculateCosts();
   },
 
@@ -272,7 +279,7 @@ Page({
     }
 
     this.setData({ cartItems: updatedItems });
-    this.updateGlobalCart(updatedItems);
+    this.syncQuantityChange(itemId);
     this.calculateCosts();
   },
 
@@ -280,12 +287,23 @@ Page({
     var itemId = e.currentTarget.dataset.itemId;
     var cartItems = this.data.cartItems;
     var self = this;
+    var app = getApp();
 
     wx.showModal({
       title: '确认删除',
       content: '确定要从购物车中删除这个商品吗？',
       success: function (res) {
         if (res.confirm) {
+          // 找到被删项的 cartId，登录态下同步删除服务端
+          var deletedCartId = null;
+          for (var d = 0; d < cartItems.length; d++) {
+            if (cartItems[d].id === itemId) {
+              deletedCartId = cartItems[d].cartId;
+              break;
+            }
+          }
+          app.removeFromCart(itemId, deletedCartId);
+
           var updatedItems = [];
           for (var i = 0; i < cartItems.length; i++) {
             if (cartItems[i].id !== itemId) {
@@ -294,7 +312,6 @@ Page({
           }
 
           self.setData({ cartItems: updatedItems });
-          self.updateGlobalCart(updatedItems);
           self.calculateCosts();
           wx.showToast({ title: '已删除', icon: 'success' });
         }
@@ -499,6 +516,22 @@ Page({
     }
   },
 
+  /**
+   * 数量变更后同步：更新全局缓存，登录态下再同步到服务端
+   */
+  syncQuantityChange: function (itemId) {
+    var target = null;
+    for (var i = 0; i < this.data.cartItems.length; i++) {
+      if (this.data.cartItems[i].id === itemId) {
+        target = this.data.cartItems[i];
+        break;
+      }
+    }
+    if (!target) return;
+    this.updateGlobalCart(this.data.cartItems);
+    app.updateCartItemQuantity(target.id, target.quantity, target.cartId);
+  },
+
   updateGlobalCart: function (cartItems) {
     var globalCart = [];
     for (var i = 0; i < cartItems.length; i++) {
@@ -509,7 +542,8 @@ Page({
         price: item.price,
         image: item.image,
         quantity: item.quantity,
-        storeId: this.data.storeInfo.id || 1
+        storeId: item.storeId || this.data.storeInfo.id || 1,
+        cartId: item.cartId
       });
     }
     app.updateCart(globalCart);
@@ -517,8 +551,13 @@ Page({
 
   onShow: function () {
     console.log('购物车页面显示');
-    this.useGlobalCartData();
-    this.calculateCosts();
+    // 登录态以服务端购物车为准，未登录使用本地
+    if (app.isLoggedIn()) {
+      this.loadCartData();
+    } else {
+      this.useGlobalCartData();
+      this.calculateCosts();
+    }
   },
 
   onShareAppMessage: function () {

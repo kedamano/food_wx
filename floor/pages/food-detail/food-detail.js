@@ -445,21 +445,17 @@ Page({
     var index = e.currentTarget.dataset.index;
     var app = getApp();
     var cart = app.globalData.cart || [];
+    var item = cart[index];
+    if (!item) return;
 
-    if (cart[index].quantity > 1) {
-      cart[index].quantity -= 1;
+    if (item.quantity > 1) {
+      app.updateCartItemQuantity(item.foodId, item.quantity - 1, item.cartId);
     } else {
       // 数量为1时删除
-      cart.splice(index, 1);
+      app.removeFromCart(item.foodId, item.cartId);
     }
 
-    app.globalData.cart = cart;
-    var cartCount = 0;
-    for (var i = 0; i < cart.length; i++) {
-      cartCount += cart[i].quantity;
-    }
-    app.globalData.cartCount = cartCount;
-    this.refreshCartPopup(cart);
+    this.refreshCartPopup(app.globalData.cart);
     this.updateCartCount();
   },
 
@@ -468,23 +464,18 @@ Page({
     var index = e.currentTarget.dataset.index;
     var app = getApp();
     var cart = app.globalData.cart || [];
+    var item = cart[index];
+    if (!item) return;
 
-    cart[index].quantity += 1;
-    app.globalData.cart = cart;
-    var cartCount = 0;
-    for (var i = 0; i < cart.length; i++) {
-      cartCount += cart[i].quantity;
-    }
-    app.globalData.cartCount = cartCount;
-    this.refreshCartPopup(cart);
+    app.updateCartItemQuantity(item.foodId, item.quantity + 1, item.cartId);
+    this.refreshCartPopup(app.globalData.cart);
     this.updateCartCount();
   },
 
   // 清空购物车
   clearCart: function() {
     var app = getApp();
-    app.globalData.cart = [];
-    app.globalData.cartCount = 0;
+    app.clearCart(true);
     this.setData({
       cartPopupItems: [],
       cartPopupCount: 0,
@@ -541,7 +532,7 @@ Page({
       return;
     }
 
-    // 添加到购物车
+    // 添加到购物车（app.addToCart 内部做本地合并并在登录态下同步服务端）
     var cartItem = {
       foodId: food.id,
       name: food.name,
@@ -551,38 +542,11 @@ Page({
       storeId: this.data.store.id
     };
 
-    // 获取现有购物车数据
     var app = getApp();
-    var cart = app.globalData.cart || [];
-
-    // 检查是否已存在
-    var existingItemIndex = -1;
-    for (var i = 0; i < cart.length; i++) {
-      if (cart[i].foodId === food.id) {
-        existingItemIndex = i;
-        break;
-      }
-    }
-    if (existingItemIndex !== -1) {
-      // 更新数量
-      cart[existingItemIndex].quantity += quantity;
-    } else {
-      // 添加新商品
-      cart.push(cartItem);
-    }
-
-    // 使用 app.updateCart 统一更新，自动保存到本地存储
-    app.updateCart(cart);
+    app.addToCart(cartItem);
 
     // 更新购物车数量显示
     this.updateCartCount();
-
-    // 显示成功提示
-    wx.showToast({
-      title: '已加入购物车',
-      icon: 'success',
-      duration: 2000
-    });
 
     console.log('添加到购物车：', cartItem);
   },

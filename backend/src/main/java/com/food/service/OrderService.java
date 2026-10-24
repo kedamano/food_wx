@@ -5,6 +5,7 @@ import com.food.entity.Cart;
 import com.food.entity.Food;
 import com.food.entity.Order;
 import com.food.entity.OrderDetail;
+import com.food.entity.UserCoupon;
 import com.food.mapper.*;
 import com.food.controller.OrderController.OrderItemRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,9 @@ public class OrderService {
 
     @Autowired
     private PaymentRecordMapper paymentRecordMapper;
+
+    @Autowired
+    private UserCouponMapper userCouponMapper;
 
     @Transactional
     public BaseResult createOrder(Order order, List<Integer> cartIds, List<OrderItemRequest> items) {
@@ -109,15 +113,61 @@ public class OrderService {
 
             // 设置订单金额
             BigDecimal deliveryFee = order.getDeliveryFee() != null ? order.getDeliveryFee() : BigDecimal.ZERO;
-            order.setTotalAmount(totalAmount.add(deliveryFee));
+            BigDecimal totalWithDelivery = totalAmount.add(deliveryFee);
+
+            // 优惠券抵扣：校验归属/状态/有效期/门槛，通过后核销
+            BigDecimal discountAmount = BigDecimal.ZERO;
+            UserCoupon userCoupon = null;
+            if (order.getCouponId() != null) {
+                userCoupon = userCouponMapper.selectById(order.getCouponId());
+                if (userCoupon == null) {
+                    return BaseResult.error(400, "优惠券不存在");
+                }
+                if (order.getUserId() == null || !order.getUserId().equals(userCoupon.getUserId())) {
+                    return BaseResult.error(403, "无权使用该优惠券");
+                }
+                if (userCoupon.getIsUsed() != null && userCoupon.getIsUsed() == 1) {
+                    return BaseResult.error(400, "优惠券已被使用");
+                }
+                if (userCoupon.getEndTime() != null && !userCoupon.getEndTime().isEmpty()) {
+                    try {
+                        LocalDateTime endTime = LocalDateTime.parse(userCoupon.getEndTime() + " 23:59:59",
+                                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                        if (endTime.isBefore(LocalDateTime.now())) {
+                            return BaseResult.error(400, "优惠券已过期");
+                        }
+                    } catch (Exception ignored) {
+                        // 日期格式异常时按未过期处理
+                    }
+                }
+                if (userCoupon.getMinAmount() != null
+                        && totalAmount.doubleValue() < userCoupon.getMinAmount()) {
+                    return BaseResult.error(400, "订单金额未满" + userCoupon.getMinAmount().intValue() + "元，无法使用该优惠券");
+                }
+                discountAmount = BigDecimal.valueOf(
+                        userCoupon.getDiscountAmount() != null ? userCoupon.getDiscountAmount() : 0);
+                if (discountAmount.compareTo(totalWithDelivery) > 0) {
+                    discountAmount = totalWithDelivery;
+                }
+            }
+
+            order.setTotalAmount(totalWithDelivery);
             order.setDeliveryFee(deliveryFee);
-            order.setDiscountAmount(BigDecimal.ZERO);
-            order.setPayAmount(order.getTotalAmount());
+            order.setDiscountAmount(discountAmount);
+            order.setPayAmount(totalWithDelivery.subtract(discountAmount));
 
             // 插入订单
             int result = orderMapper.insert(order);
             if (result <= 0) {
                 return BaseResult.error("创建订单失败");
+            }
+
+            // 核销优惠券（回填订单号）
+            if (userCoupon != null) {
+                userCoupon.setIsUsed(1);
+                userCoupon.setUsedTime(LocalDateTime.now());
+                userCoupon.setOrderId(order.getOrderId());
+                userCouponMapper.update(userCoupon);
             }
 
             // 插入订单详情
@@ -221,6 +271,16 @@ public class OrderService {
             }
             int result = orderMapper.updateStatus(orderId, "已取消");
             if (result > 0) {
+                // 取消订单时回补优惠券
+                if (order.getCouponId() != null) {
+                    UserCoupon userCoupon = userCouponMapper.selectById(order.getCouponId());
+                    if (userCoupon != null && orderId.equals(userCoupon.getOrderId())) {
+                        userCoupon.setIsUsed(0);
+                        userCoupon.setUsedTime(null);
+                        userCoupon.setOrderId(null);
+                        userCouponMapper.update(userCoupon);
+                    }
+                }
                 return BaseResult.success("订单已取消");
             }
             return BaseResult.error("取消订单失败");
@@ -240,27 +300,49 @@ public class OrderService {
                 return BaseResult.error(400, "订单状态不允许支付");
             }
 
-            // 更新订单状态
-            int result = orderMapper.updateStatus(orderId, "制作中");
-            if (result <= 0) {
-                return BaseResult.error("支付失败");
-            }
-
-            // 创建支付记录
-            com.food.entity.PaymentRecord paymentRecord = new com.food.entity.PaymentRecord();
-            paymentRecord.setOrderId(orderId);
-            paymentRecord.setPaymentNo("PAY" + System.currentTimeMillis());
-            paymentRecord.setPaymentMethod("微信支付");
-            paymentRecord.setAmount(order.getPayAmount());
-            paymentRecord.setStatus("已支付");
-            paymentRecord.setPayTime(LocalDateTime.now());
-            paymentRecord.setCreateTime(LocalDateTime.now());
-            paymentRecordMapper.insert(paymentRecord);
-
-            return BaseResult.success("支付成功", order);
+            // 模拟支付：直接置为已支付状态并落支付流水
+            return markPaid(order, "PAY" + System.currentTimeMillis(), "模拟支付");
         } catch (Exception e) {
             return BaseResult.error("支付失败: " + e.getMessage());
         }
+    }
+
+    /**
+     * 标记订单为已支付：更新状态并写入支付流水（微信支付回调与模拟支付共用）
+     */
+    @Transactional
+    public BaseResult markPaid(Order order, String paymentNo, String paymentMethod) {
+        int result = orderMapper.updateStatus(order.getOrderId(), "制作中");
+        if (result <= 0) {
+            return BaseResult.error("支付失败");
+        }
+
+        com.food.entity.PaymentRecord paymentRecord = new com.food.entity.PaymentRecord();
+        paymentRecord.setOrderId(order.getOrderId());
+        paymentRecord.setPaymentNo(paymentNo);
+        paymentRecord.setPaymentMethod(paymentMethod);
+        paymentRecord.setAmount(order.getPayAmount());
+        paymentRecord.setStatus("已支付");
+        paymentRecord.setPayTime(LocalDateTime.now());
+        paymentRecord.setCreateTime(LocalDateTime.now());
+        paymentRecordMapper.insert(paymentRecord);
+
+        return BaseResult.success("支付成功", order);
+    }
+
+    /**
+     * 微信支付回调：按订单号标记已支付（幂等）
+     */
+    public BaseResult markPaidByOrderNo(String orderNo, String transactionId) {
+        Order order = orderMapper.selectByOrderNo(orderNo);
+        if (order == null) {
+            return BaseResult.error(404, "订单不存在");
+        }
+        if (!"待付款".equals(order.getStatus())) {
+            // 已处理过，幂等返回成功
+            return BaseResult.success("支付成功", order);
+        }
+        return markPaid(order, transactionId, "微信支付");
     }
 
     public BaseResult completeOrder(Integer orderId) {

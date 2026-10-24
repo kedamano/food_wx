@@ -128,32 +128,17 @@ Page({
   },
 
   onAddToCart: function(e) {
-    var self = this;
     var item = e.currentTarget.dataset.item;
     var app = getApp();
-    var cart = app.globalData.cart || [];
-    var idx = -1;
-    for (var i = 0; i < cart.length; i++) {
-      if (cart[i].foodId === item.id) {
-        idx = i;
-        break;
-      }
-    }
-    if (idx !== -1) {
-      cart[idx].quantity += 1;
-    } else {
-      cart.push({
-        foodId: item.id,
-        name: item.name,
-        price: item.price,
-        image: item.image || '',
-        quantity: 1,
-        storeId: this.data.storeInfo.id
-      });
-    }
-    app.updateCart(cart);
+    app.addToCart({
+      foodId: item.id,
+      name: item.name,
+      price: item.price,
+      image: item.image || '',
+      quantity: 1,
+      storeId: this.data.storeInfo.id
+    });
     this.updateCartDisplay();
-    wx.showToast({ title: '已加入购物车', icon: 'success', duration: 800 });
   },
 
   onCartTap: function() {
@@ -190,48 +175,37 @@ Page({
   },
 
   onCartItemMinus: function(e) {
-    var self = this;
     var index = e.currentTarget.dataset.index;
     var app = getApp();
     var cart = app.globalData.cart || [];
+    var item = cart[index];
+    if (!item) return;
 
-    if (cart[index].quantity > 1) {
-      cart[index].quantity -= 1;
+    if (item.quantity > 1) {
+      app.updateCartItemQuantity(item.foodId, item.quantity - 1, item.cartId);
     } else {
-      cart.splice(index, 1);
+      app.removeFromCart(item.foodId, item.cartId);
     }
 
-    app.globalData.cart = cart;
-    var cartCount = 0;
-    for (var i = 0; i < cart.length; i++) {
-      cartCount += cart[i].quantity;
-    }
-    app.globalData.cartCount = cartCount;
-    this.refreshCartPopup(cart);
+    this.refreshCartPopup(app.globalData.cart);
     this.updateCartDisplay();
   },
 
   onCartItemPlus: function(e) {
-    var self = this;
     var index = e.currentTarget.dataset.index;
     var app = getApp();
     var cart = app.globalData.cart || [];
+    var item = cart[index];
+    if (!item) return;
 
-    cart[index].quantity += 1;
-    app.globalData.cart = cart;
-    var cartCount = 0;
-    for (var i = 0; i < cart.length; i++) {
-      cartCount += cart[i].quantity;
-    }
-    app.globalData.cartCount = cartCount;
-    this.refreshCartPopup(cart);
+    app.updateCartItemQuantity(item.foodId, item.quantity + 1, item.cartId);
+    this.refreshCartPopup(app.globalData.cart);
     this.updateCartDisplay();
   },
 
   clearCart: function() {
     var app = getApp();
-    app.globalData.cart = [];
-    app.globalData.cartCount = 0;
+    app.clearCart(true);
     this.setData({
       cartPopupItems: [],
       cartPopupCount: 0,

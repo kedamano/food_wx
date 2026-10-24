@@ -92,6 +92,7 @@ CREATE TABLE orders (
     discount_amount DECIMAL(10,2) DEFAULT 0,
     pay_amount DECIMAL(10,2) NOT NULL,
     status VARCHAR(20) DEFAULT '待付款',
+    coupon_id INT,
     address VARCHAR(255),
     phone VARCHAR(20),
     remark VARCHAR(255),
@@ -213,4 +214,19 @@ CREATE TABLE feedback (
     contact VARCHAR(100),
     status VARCHAR(20) DEFAULT 'pending',
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 轮播图表
+CREATE TABLE banners (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(100),
+    subtitle VARCHAR(200),
+    image_url VARCHAR(255),
+    background VARCHAR(255),
+    link_type VARCHAR(20),
+    link_value VARCHAR(100),
+    sort_order INT DEFAULT 0,
+    status TINYINT DEFAULT 1,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

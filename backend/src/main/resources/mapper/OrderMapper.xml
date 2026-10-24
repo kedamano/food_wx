@@ -12,6 +12,7 @@
         <result column="discount_amount" jdbcType="DECIMAL" property="discountAmount"/>
         <result column="pay_amount" jdbcType="DECIMAL" property="payAmount"/>
         <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="coupon_id" jdbcType="INTEGER" property="couponId"/>
         <result column="address" jdbcType="VARCHAR" property="address"/>
         <result column="phone" jdbcType="VARCHAR" property="phone"/>
         <result column="remark" jdbcType="VARCHAR" property="remark"/>
@@ -26,9 +27,9 @@
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="orderId">
         INSERT INTO orders (
-            order_no, user_id, store_id, total_amount, delivery_fee, discount_amount, pay_amount, status, address, phone, remark
+            order_no, user_id, store_id, total_amount, delivery_fee, discount_amount, pay_amount, status, coupon_id, address, phone, remark
         ) VALUES (
-            #{orderNo}, #{userId}, #{storeId}, #{totalAmount}, #{deliveryFee}, #{discountAmount}, #{payAmount}, #{status}, #{address}, #{phone}, #{remark}
+            #{orderNo}, #{userId}, #{storeId}, #{totalAmount}, #{deliveryFee}, #{discountAmount}, #{payAmount}, #{status}, #{couponId}, #{address}, #{phone}, #{remark}
         )
     </insert>
 

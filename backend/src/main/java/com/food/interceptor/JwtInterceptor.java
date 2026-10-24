@@ -23,8 +23,10 @@ public class JwtInterceptor implements HandlerInterceptor {
         // 对于某些不需要验证的路径，直接放行（包括静态资源）
         String uri = request.getRequestURI();
         System.out.println("=== JwtInterceptor: uri = " + uri);
-        if (uri.contains("/user/register") || uri.contains("/user/login") || 
-            uri.contains("/food/all") || uri.contains("/food/popular") || 
+        if (uri.contains("/user/register") || uri.contains("/user/login") ||
+            uri.contains("/user/wechat-login") || uri.contains("/user/wechat-register") ||
+            uri.contains("/order/pay-notify") ||
+            uri.contains("/food/all") || uri.contains("/food/popular") ||
             uri.contains("/food/recommend") || uri.contains("/food/*/rating") ||
             uri.contains("/images/") || uri.endsWith(".png") || uri.endsWith(".jpg") || uri.endsWith(".jpeg")) {
             System.out.println("=== JwtInterceptor: 放行（静态资源）");

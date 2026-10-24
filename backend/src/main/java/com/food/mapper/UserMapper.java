@@ -18,6 +18,8 @@ public interface UserMapper {
 
     User selectByPhone(String phone);
 
+    User selectByOpenid(String openid);
+
     User selectByInviteCode(String inviteCode);
 
     List<User> selectAll();

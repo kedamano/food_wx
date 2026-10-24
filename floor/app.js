@@ -160,7 +160,8 @@ App({
     var token = this.globalData.token || wx.getStorageSync('token');
     if (token) {
       return {
-        'Authorization': token,
+        // 统一使用 Bearer 前缀，与 api/request.js 保持一致
+        'Authorization': 'Bearer ' + token,
         'Content-Type': 'application/json'
       };
     }
@@ -228,7 +229,11 @@ App({
         console.log('开始发送请求...');
         extendedOptions.success = function(res) {
           console.log('响应：' + res.statusCode + ' ' + options.url);
-          if (res.statusCode === 200) {
+          if (res.statusCode === 401) {
+            // HTTP 401 统一走重新登录
+            self.handleAuthError({ message: '登录已过期', code: 'AUTH_ERROR' });
+            reject(new Error('登录已过期'));
+          } else if (res.statusCode === 200) {
             if (res.data && (res.data.code === 401 || res.data.message === '未登录')) {
               self.handleAuthError({ message: '未登录', code: 'AUTH_ERROR' });
               reject(new Error('未登录'));
@@ -279,11 +284,101 @@ App({
   loadUserInfo: function() {
     var token = wx.getStorageSync('token');
     var userInfo = wx.getStorageSync('userInfo');
+    var userId = wx.getStorageSync('userId');
     if (token && userInfo) {
       this.globalData.token = token;
       this.globalData.userInfo = userInfo;
+      if (userId) this.globalData.userId = userId;
       console.log('用户信息加载成功：', userInfo);
+      // 登录态下以后端购物车为准
+      this.syncCartFromServer();
     }
+  },
+
+  /**
+   * 是否处于登录态（有 token 且能确定 userId）
+   */
+  isLoggedIn: function() {
+    var token = this.globalData.token || wx.getStorageSync('token');
+    var userId = this.globalData.userId || wx.getStorageSync('userId');
+    return !!(token && userId);
+  },
+
+  getCurrentUserId: function() {
+    return this.globalData.userId || wx.getStorageSync('userId');
+  },
+
+  /**
+   * 登录后合并本地购物车到服务端，并拉取服务端购物车
+   */
+  mergeLocalCartToServer: function() {
+    var self = this;
+    var userId = this.getCurrentUserId();
+    if (!userId || !this.globalData.cart || this.globalData.cart.length === 0) {
+      this.syncCartFromServer();
+      return;
+    }
+    var items = [];
+    for (var i = 0; i < this.globalData.cart.length; i++) {
+      var item = this.globalData.cart[i];
+      items.push({
+        foodId: item.foodId,
+        quantity: item.quantity,
+        storeId: item.storeId
+      });
+    }
+    wx.request({
+      url: 'http://localhost:8080/api/cart/user/' + userId + '/merge',
+      method: 'POST',
+      header: this.getAuthHeaderConfig(),
+      data: items,
+      success: function(res) {
+        // 合并完成后清空本地购物车，以服务端为准
+        self.globalData.cart = [];
+        self.globalData.cartCount = 0;
+        wx.removeStorageSync('cart');
+        wx.removeStorageSync('cartCount');
+        self.syncCartFromServer();
+      },
+      fail: function(err) {
+        console.error('合并购物车失败：', err);
+      }
+    });
+  },
+
+  /**
+   * 拉取服务端购物车并更新本地缓存（仅登录态）
+   */
+  syncCartFromServer: function() {
+    var self = this;
+    if (!this.isLoggedIn()) return;
+    var userId = this.getCurrentUserId();
+    wx.request({
+      url: 'http://localhost:8080/api/cart/user/' + userId,
+      method: 'GET',
+      header: this.getAuthHeaderConfig(),
+      success: function(res) {
+        if (res.statusCode === 200 && res.data && res.data.code === 200 && Array.isArray(res.data.data)) {
+          var serverCart = [];
+          for (var i = 0; i < res.data.data.length; i++) {
+            var item = res.data.data[i];
+            serverCart.push({
+              foodId: item.foodId,
+              name: item.foodName,
+              price: Number(item.foodPrice) || 0,
+              image: item.foodImage,
+              quantity: Number(item.quantity) || 1,
+              storeId: item.storeId,
+              cartId: item.cartId
+            });
+          }
+          self.updateCart(serverCart);
+        }
+      },
+      fail: function(err) {
+        console.error('同步购物车失败：', err);
+      }
+    });
   },
 
   updateCart: function(cartItems) {
@@ -307,7 +402,11 @@ App({
     }
   },
 
+  /**
+   * 加入购物车：本地立即生效；登录态下同步到服务端
+   */
   addToCart: function(foodItem) {
+    var self = this;
     var cart = this.globalData.cart;
     var existingIndex = -1;
     for (var i = 0; i < cart.length; i++) {
@@ -320,18 +419,68 @@ App({
     }
     this.updateCart(cart);
     wx.showToast({ title: '已加入购物车', icon: 'success' });
+
+    if (this.isLoggedIn()) {
+      wx.request({
+        url: 'http://localhost:8080/api/cart',
+        method: 'POST',
+        header: this.getAuthHeaderConfig(),
+        data: {
+          foodId: foodItem.foodId,
+          quantity: foodItem.quantity,
+          storeId: foodItem.storeId
+        },
+        success: function(res) {
+          if (res.statusCode === 200 && res.data && res.data.code === 200) {
+            // 回填服务端 cartId，便于后续更新/删除
+            var saved = res.data.data;
+            for (var k = 0; k < self.globalData.cart.length; k++) {
+              if (self.globalData.cart[k].foodId === foodItem.foodId && !self.globalData.cart[k].cartId && saved) {
+                self.globalData.cart[k].cartId = saved.cartId;
+              }
+            }
+            wx.setStorageSync('cart', self.globalData.cart);
+          } else if (res.statusCode === 401) {
+            self.handleAuthError({ message: '登录已过期' });
+          }
+        }
+      });
+    }
   },
 
-  removeFromCart: function(foodId) {
+  /**
+   * 从购物车移除：本地立即生效；登录态下同步删除服务端
+   */
+  removeFromCart: function(foodId, cartId) {
     var cart = this.globalData.cart;
     var updatedCart = [];
     for (var i = 0; i < cart.length; i++) {
       if (cart[i].foodId !== foodId) updatedCart.push(cart[i]);
     }
     this.updateCart(updatedCart);
+
+    if (this.isLoggedIn()) {
+      var userId = this.getCurrentUserId();
+      var url = cartId
+        ? 'http://localhost:8080/api/cart/' + cartId
+        : 'http://localhost:8080/api/cart/user/' + userId + '/food/' + foodId;
+      wx.request({
+        url: url,
+        method: 'DELETE',
+        header: this.getAuthHeaderConfig(),
+        success: function(res) {
+          if (res.statusCode === 401) {
+            getApp().handleAuthError({ message: '登录已过期' });
+          }
+        }
+      });
+    }
   },
 
-  updateCartItemQuantity: function(foodId, quantity) {
+  /**
+   * 更新购物车项数量：本地立即生效；登录态下同步到服务端
+   */
+  updateCartItemQuantity: function(foodId, quantity, cartId) {
     var cart = this.globalData.cart;
     for (var i = 0; i < cart.length; i++) {
       if (cart[i].foodId === foodId) {
@@ -340,11 +489,42 @@ App({
         break;
       }
     }
+
+    if (this.isLoggedIn() && cartId) {
+      wx.request({
+        url: 'http://localhost:8080/api/cart/' + cartId,
+        method: 'PUT',
+        header: this.getAuthHeaderConfig(),
+        data: { quantity: quantity },
+        success: function(res) {
+          if (res.statusCode === 401) {
+            getApp().handleAuthError({ message: '登录已过期' });
+          }
+        }
+      });
+    }
   },
 
-  clearCart: function() {
+  clearCart: function(syncServer) {
     this.globalData.cart = [];
     this.globalData.cartCount = 0;
+    // 本地存储也要清空，与内存保持一致
+    wx.removeStorageSync('cart');
+    wx.removeStorageSync('cartCount');
+
+    if (syncServer && this.isLoggedIn()) {
+      var userId = this.getCurrentUserId();
+      wx.request({
+        url: 'http://localhost:8080/api/cart/user/' + userId + '/clear',
+        method: 'DELETE',
+        header: this.getAuthHeaderConfig(),
+        success: function(res) {
+          if (res.statusCode === 401) {
+            getApp().handleAuthError({ message: '登录已过期' });
+          }
+        }
+      });
+    }
   },
 
   userLogin: function(userInfo) {

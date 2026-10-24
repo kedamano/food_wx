@@ -38,6 +38,13 @@ public class UserService {
         return userMapper.selectByUsername(username);
     }
 
+    public User findByOpenid(String openid) {
+        if (openid == null || openid.isEmpty()) {
+            return null;
+        }
+        return userMapper.selectByOpenid(openid);
+    }
+
     public BaseResult register(User user) {
         try {
             // 检查用户名是否已存在

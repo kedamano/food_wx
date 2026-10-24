@@ -12,19 +12,22 @@
         <result column="delivery_time" jdbcType="INTEGER" property="deliveryTime"/>
         <result column="delivery_fee" jdbcType="DECIMAL" property="deliveryFee"/>
         <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="lat" jdbcType="DECIMAL" property="lat"/>
+        <result column="lng" jdbcType="DECIMAL" property="lng"/>
+        <result column="price_level" jdbcType="DECIMAL" property="priceLevel"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
 
     <sql id="BaseColumnList">
-        store_id, store_name, logo, address, phone, rating, delivery_time, delivery_fee, status, create_time, update_time
+        store_id, store_name, logo, address, phone, rating, delivery_time, delivery_fee, status, lat, lng, price_level, create_time, update_time
     </sql>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="storeId">
         INSERT INTO stores (
-            store_name, logo, address, phone, rating, delivery_time, delivery_fee, status
+            store_name, logo, address, phone, rating, delivery_time, delivery_fee, status, lat, lng, price_level
         ) VALUES (
-            #{storeName}, #{logo}, #{address}, #{phone}, #{rating}, #{deliveryTime}, #{deliveryFee}, #{status}
+            #{storeName}, #{logo}, #{address}, #{phone}, #{rating}, #{deliveryTime}, #{deliveryFee}, #{status}, #{lat}, #{lng}, #{priceLevel}
         )
     </insert>
 

@@ -96,6 +96,7 @@ public class CouponController {
                 map.put("couponId", coupon.getCouponId());
                 map.put("name", coupon.getCouponName());
                 map.put("discount", coupon.getDiscountAmount());
+                map.put("minAmount", coupon.getMinAmount());
                 map.put("condition", "满" + coupon.getMinAmount().intValue() + "可用");
                 map.put("expiry", coupon.getEndTime());
                 

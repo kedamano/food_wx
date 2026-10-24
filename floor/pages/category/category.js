@@ -170,21 +170,16 @@ Page({
 
   onAddToCart: function (e) {
     var item = e.currentTarget.dataset.item;
-    var cart = app.globalData.cart || [];
-
-    var found = false;
-    for (var i = 0; i < cart.length; i++) {
-      if (cart[i].foodId === item.id) {
-        cart[i].quantity += 1;
-        found = true;
-        break;
-      }
-    }
-    if (!found) {
-      cart.push({ foodId: item.id, name: item.name, price: item.price, image: item.image || '', quantity: 1, storeId: 1 });
-    }
-    app.updateCart(cart);
-    wx.showToast({ title: '已加入购物车', icon: 'success', duration: 600 });
+    // app.addToCart 内部做本地合并并在登录态下同步服务端
+    app.addToCart({
+      foodId: item.id,
+      name: item.name,
+      price: item.price,
+      image: item.image || '',
+      quantity: 1,
+      storeId: item.storeId || 1
+    });
+    this.updateCartCount();
   },
 
   onFoodTap: function (e) {

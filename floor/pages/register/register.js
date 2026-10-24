@@ -317,21 +317,19 @@ Page({
   // 微信注册后端验证
   weChatRegisterToBackend: function(code) {
     var self = this;
-    wx.request({
-      url: 'http://localhost:8080/api/user/wechat-register',
+    var app = getApp();
+    app.authRequest({
+      url: '/user/wechat-register',
       method: 'POST',
-      header: {
-        'Content-Type': 'application/json'
-      },
       data: {
         code: code
       },
       success: function(res) {
-        if (res.statusCode === 200 && res.data.code === 200) {
-          // 注册成功
-          self.handleRegisterSuccess(res.data.data);
+        if (res && res.code === 200) {
+          // 注册成功（res.data 为 {token, user}）
+          self.handleRegisterSuccess(res.data);
         } else {
-          self.showError(res.data.message || '微信注册失败');
+          self.showError((res && res.message) || '微信注册失败');
         }
       },
       fail: function(err) {
@@ -498,6 +496,9 @@ Page({
     wx.setStorageSync('token', token);
     wx.setStorageSync('userInfo', user);
     wx.setStorageSync('userId', user.userId);
+
+    // 注册即登录：合并本地购物车到服务端
+    app.mergeLocalCartToServer();
 
     // 显示成功提示
     wx.showToast({

@@ -36,6 +36,9 @@ public class UserController {
     @Autowired
     private PointsLogMapper pointsLogMapper;
 
+    @Autowired
+    private com.food.utils.WechatService wechatService;
+
     /**
      * 从请求中提取Token（去掉Bearer前缀）
      */
@@ -180,60 +183,99 @@ public class UserController {
     }
 
     @PostMapping("/wechat-register")
-    @ApiOperation(value = "微信注册", notes = "使用微信code进行注册")
+    @ApiOperation(value = "微信注册", notes = "使用微信code换取openid并注册；username/phone 可选，已绑定的微信直接返回登录态")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "code", value = "微信登录code", required = true, paramType = "body"),
-            @ApiImplicitParam(name = "username", value = "用户名", required = true, paramType = "body"),
-            @ApiImplicitParam(name = "phone", value = "手机号", required = true, paramType = "body")
+            @ApiImplicitParam(name = "username", value = "用户名（可选）", paramType = "body"),
+            @ApiImplicitParam(name = "phone", value = "手机号（可选）", paramType = "body")
     })
     public BaseResult wechatRegister(@RequestBody Map<String, String> request) {
         String code = request.get("code");
-        String username = request.get("username");
-        String phone = request.get("phone");
-
-        // 验证参数
         if (code == null || code.isEmpty()) {
             return BaseResult.error(400, "code不能为空");
         }
+
+        String openid;
+        try {
+            openid = wechatService.getOpenidByCode(code);
+        } catch (IllegalStateException e) {
+            return BaseResult.error(500, e.getMessage());
+        } catch (Exception e) {
+            return BaseResult.error(400, e.getMessage());
+        }
+
+        // 该微信已绑定过账号，直接返回登录态
+        User boundUser = userService.findByOpenid(openid);
+        if (boundUser != null) {
+            return buildLoginResult(boundUser, "登录成功");
+        }
+
+        String username = request.get("username");
+        String phone = request.get("phone");
+        if (phone != null && !phone.isEmpty()) {
+            if (!isValidPhone(phone)) {
+                return BaseResult.error(400, "手机号格式不正确");
+            }
+            if (userService.findByPhone(phone) != null) {
+                return BaseResult.error(400, "手机号已注册");
+            }
+        }
         if (username == null || username.isEmpty()) {
-            return BaseResult.error(400, "用户名不能为空");
+            username = "微信用户" + (int) (Math.random() * 900000 + 100000);
         }
-        if (phone == null || phone.isEmpty()) {
-            return BaseResult.error(400, "手机号不能为空");
-        }
-
-        // 验证手机号格式
-        if (!isValidPhone(phone)) {
-            return BaseResult.error(400, "手机号格式不正确");
+        if (userService.findByUsername(username) != null) {
+            username = username + "_" + (System.currentTimeMillis() % 10000);
         }
 
-        // 检查用户名是否已存在
-        User existingUser = userService.findByUsername(username);
-        if (existingUser != null) {
-            return BaseResult.error(400, "用户名已存在");
-        }
-
-        // 检查手机号是否已注册
-        existingUser = userService.findByPhone(phone);
-        if (existingUser != null) {
-            return BaseResult.error(400, "手机号已注册");
-        }
-
-        // 这里应该调用微信API获取用户信息
-        // 实际项目中需要配置微信公众号或小程序的appid和secret
-        // String openid = weChatService.getOpenId(code);
-        // 为了演示，假设获取到了openid
-        String openid = "wx_" + code.substring(0, 28); // 模拟openid
-
-        // 创建用户
+        // 创建用户；密码使用随机值，微信注册不走密码登录
         User user = new User();
         user.setUsername(username);
-        user.setPhone(phone);
-        user.setPassword(passwordEncoder.encode("123456")); // 设置默认密码
+        if (phone != null && !phone.isEmpty()) {
+            user.setPhone(phone);
+        }
+        user.setPassword(java.util.UUID.randomUUID().toString());
         user.setOpenid(openid);
         user.setRegisterSource("wechat");
 
         return userService.register(user);
+    }
+
+    @PostMapping("/wechat-login")
+    @ApiOperation(value = "微信登录", notes = "使用微信code换取openid，匹配已绑定用户返回登录态")
+    public BaseResult wechatLogin(@RequestBody Map<String, String> request) {
+        String code = request.get("code");
+        if (code == null || code.isEmpty()) {
+            return BaseResult.error(400, "code不能为空");
+        }
+
+        String openid;
+        try {
+            openid = wechatService.getOpenidByCode(code);
+        } catch (IllegalStateException e) {
+            return BaseResult.error(500, e.getMessage());
+        } catch (Exception e) {
+            return BaseResult.error(400, e.getMessage());
+        }
+
+        User user = userService.findByOpenid(openid);
+        if (user == null) {
+            return BaseResult.error(404, "该微信尚未绑定账号，请先注册");
+        }
+        return buildLoginResult(user, "登录成功");
+    }
+
+    /**
+     * 组装登录成功返回（token + 用户信息）
+     */
+    private BaseResult buildLoginResult(User user, String message) {
+        String token = jwtUtil.generateToken(user.getUserId());
+        Map<String, Object> data = new HashMap<>();
+        data.put("token", token);
+        data.put("userId", user.getUserId());
+        data.put("username", user.getUsername());
+        user.setPassword(null);
+        data.put("user", user);
+        return BaseResult.success(message, data);
     }
 
     @PostMapping("/register")

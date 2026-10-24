@@ -38,6 +38,9 @@ CREATE TABLE stores (
     delivery_time INT COMMENT '预计配送时间（分钟）',
     delivery_fee DECIMAL(10,2) DEFAULT 0 COMMENT '配送费',
     status TINYINT DEFAULT 1 COMMENT '状态：1-营业中，0-休息中',
+    lat DECIMAL(10,6) DEFAULT NULL COMMENT '商家纬度',
+    lng DECIMAL(10,6) DEFAULT NULL COMMENT '商家经度',
+    price_level DECIMAL(10,2) DEFAULT 25 COMMENT '人均价格',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_store_name (store_name)
@@ -104,6 +107,7 @@ CREATE TABLE orders (
     discount_amount DECIMAL(10,2) DEFAULT 0 COMMENT '优惠金额',
     pay_amount DECIMAL(10,2) NOT NULL COMMENT '实付金额',
     status VARCHAR(20) DEFAULT '待付款' COMMENT '订单状态',
+    coupon_id INT COMMENT '使用的用户优惠券ID（user_coupons.user_coupon_id）',
     address VARCHAR(255) COMMENT '配送地址',
     phone VARCHAR(20) COMMENT '联系电话',
     remark VARCHAR(255) COMMENT '备注',
@@ -240,14 +244,20 @@ CREATE TABLE IF NOT EXISTS `user_favorites` (
   KEY `idx_store_id` (`store_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户收藏商家表';
 
--- stores 表补充字段（经纬度，若不存在则添加）
-ALTER TABLE stores ADD COLUMN IF NOT EXISTS lat DECIMAL(10,6) DEFAULT NULL COMMENT '商家纬度';
-ALTER TABLE stores ADD COLUMN IF NOT EXISTS lng DECIMAL(10,6) DEFAULT NULL COMMENT '商家经度';
-ALTER TABLE stores ADD COLUMN IF NOT EXISTS price_level DECIMAL(10,2) DEFAULT 25 COMMENT '人均价格';
-ALTER TABLE stores ADD COLUMN IF NOT EXISTS name VARCHAR(100) AS (store_name) VIRTUAL COMMENT '商家名称别名（兼容）';
-
--- users 表补充 role 字段
-ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(20) DEFAULT 'USER' COMMENT '用户角色：USER/ADMIN/MERCHANT';
+-- 轮播图表
+CREATE TABLE banners (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(100) COMMENT '标题',
+    subtitle VARCHAR(200) COMMENT '副标题',
+    image_url VARCHAR(255) COMMENT '图片地址',
+    background VARCHAR(255) COMMENT '背景色',
+    link_type VARCHAR(20) COMMENT '跳转类型：food/store/topic/none',
+    link_value VARCHAR(100) COMMENT '跳转目标',
+    sort_order INT DEFAULT 0 COMMENT '排序',
+    status TINYINT DEFAULT 1 COMMENT '状态：1-启用，0-禁用',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='轮播图表';
 
 -- 用户反馈表
 CREATE TABLE IF NOT EXISTS `feedback` (
