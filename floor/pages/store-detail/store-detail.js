@@ -1,5 +1,6 @@
 // 商家详情页 - 大众点评风格
 var categoryTabs = require('../../utils/category-tabs');
+var cache = require('../../utils/cache');
 Page({
   data: {
     storeInfo: { id: 0, name: '', banner: '', distance: '', deliveryTime: '', price: 0, rating: 0, notice: '', status: '' },
@@ -287,129 +288,67 @@ Page({
   loadStoreInfo: function(storeId) {
     var self = this;
     var app = getApp();
-    app.authRequest({
-      url: '/store/' + storeId,
-      method: 'GET',
-      success: function(res) {
-        if (res && res.code === 200 && res.data) {
-          var d = res.data;
-          var deliveryTimeStr = d.deliveryTime ? d.deliveryTime + '分钟' : '30分钟';
-          var deliveryFeeVal = d.deliveryFee || 5;
-          var priceLevelVal = d.priceLevel || d.price || 25;
-          var tagsArray = d.tags || ['味道赞', '环境好', '服务棒'];
-          var info = {
-            id: d.storeId || d.id || storeId,
-            name: d.storeName || d.name || '未知商家',
-            banner: app.resolveImageUrl(d.banner) || app.resolveImageUrl(d.logo) || '',
-            distance: d.distance || '1.5km',
-            deliveryTime: deliveryTimeStr,
-            price: priceLevelVal,
-            rating: Number(d.rating) || 4.5,
-            notice: d.notice || '欢迎光临！',
-            address: d.address || '',
-            phone: d.phone || '',
-            deliveryFee: deliveryFeeVal,
-            status: d.status === 1 ? '营业中' : '休息中',
-            reviews: d.reviews || 0,
-            tags: tagsArray,
-            businessHours: d.businessHours || '10:00 - 22:00'
-          };
-          var dealsArr = [
-            { badge: '满减', text: '满100减' + Math.floor(info.price) },
-            { badge: '新客', text: '新用户立减15元' },
-            { badge: '折扣', text: '招牌菜享8折优惠' }
-          ];
-          var storeImagesArr = [];
-          if (info.banner) {
-            storeImagesArr.push(info.banner);
-            storeImagesArr.push(info.banner);
-          }
-          self.setData({
-            storeInfo: info,
-            storeImages: storeImagesArr,
-            deals: dealsArr
-          });
-        } else {
-          wx.showToast({ title: '加载商家信息失败', icon: 'none' });
-        }
+    // SWR 缓存：二次进入秒显，后台静默刷新
+    cache.swr('store:' + storeId, 10 * 60 * 1000,
+      function(done, fail) {
+        app.authRequest({
+          url: '/store/' + storeId,
+          method: 'GET',
+          success: function(res) {
+            if (res && res.code === 200 && res.data) done(res.data);
+            else fail(new Error(res && res.message || '加载失败'));
+          },
+          fail: function(err) { fail(err); }
+        });
       },
-      fail: function() {
-        wx.showToast({ title: '网络错误', icon: 'none' });
-      }
-    });
+      {
+        onCache: function(d) { self.applyStoreInfo(d); },
+        onSuccess: function(d) { self.applyStoreInfo(d); },
+        onFail: function() { self.setData({ storeLoadError: true }); }
+      });
   },
 
-  loadCategories: function() {
-    // 分类 tab 改由 loadFoods 根据本店商品的真实分类动态生成
-  },
-
-  loadFoods: function(storeId, categoryId) {
-    var self = this;
+  // 商家数据落到页面（缓存与网络共用）
+  applyStoreInfo: function(d) {
+    var storeId = this.data.storeInfo && this.data.storeInfo.id ? this.data.storeInfo.id : d.storeId;
     var app = getApp();
-    this.ensureCategoryNames();
-    var url = '/food/store/' + storeId;
-    app.authRequest({
-      url: url,
-      method: 'GET',
-      success: function(res) {
-        if (res && res.code === 200 && res.data) {
-          var list = [];
-          for (var i = 0; i < res.data.length; i++) {
-            var f = res.data[i];
-            list.push({
-              id: f.foodId || f.id,
-              name: f.foodName || f.name,
-              price: f.price,
-              description: f.description || '',
-              sales: f.sales || f.monthlySales || 0,
-              categoryId: f.categoryId || 0,
-              image: app.resolveImageUrl(f.image) || app.resolveImageUrl(f.cover) || ''
-            });
-          }
-          self.setData({ foodList: list, _allFoods: list });
-          // 由本店菜品的真实分类构建分类 tab
-          self.buildCategoryTabs(list, categoryId);
-        } else {
-          self.setData({ foodList: [], _allFoods: [] });
-        }
-      },
-      fail: function() {
-        self.setData({ foodList: [], _allFoods: [] });
-      }
-    });
-  },
-
-  // 拉取全局分类名映射（tab 显示用）
-  ensureCategoryNames: function() {
-    var app = getApp();
-    if (app.globalData.categoryNames && Object.keys(app.globalData.categoryNames).length > 0) return;
-    app.authRequest({
-      url: '/food/categories',
-      method: 'GET'
-    }).then(function(res) {
-      if (!(res && res.code === 200 && Array.isArray(res.data))) return;
-      var map = {};
-      for (var i = 0; i < res.data.length; i++) {
-        map[res.data[i].id] = res.data[i].name;
-      }
-      app.globalData.categoryNames = map;
-    }).catch(function() {});
-  },
-
-  // 依据商品所属分类生成筛选 tab（纯函数已抽至 utils/category-tabs）
-  buildCategoryTabs: function(list, activeId) {
-    var app = getApp();
-    var tabs = categoryTabs.buildTabs(list);
-    for (var i = 0; i < tabs.length; i++) {
-      if (tabs[i].id !== 0) tabs[i].name = app.globalData.categoryNames[tabs[i].id] || tabs[i].name;
+    var deliveryTimeStr = d.deliveryTime ? d.deliveryTime + '分钟' : '30分钟';
+    var deliveryFeeVal = d.deliveryFee || 5;
+    var priceLevelVal = d.priceLevel || d.price || 25;
+    var tagsArray = d.tags || ['味道赞', '环境好', '服务棒'];
+    var info = {
+      id: d.storeId || d.id || storeId,
+      name: d.storeName || d.name || '未知商家',
+      banner: app.resolveImageUrl(d.banner) || app.resolveImageUrl(d.logo) || '',
+      distance: d.distance || '1.5km',
+      deliveryTime: deliveryTimeStr,
+      price: priceLevelVal,
+      rating: Number(d.rating) || 4.5,
+      notice: d.notice || '欢迎光临！',
+      address: d.address || '',
+      phone: d.phone || '',
+      deliveryFee: deliveryFeeVal,
+      status: d.status === 1 ? '营业中' : '休息中',
+      reviews: d.reviews || 0,
+      tags: tagsArray,
+      businessHours: d.businessHours || '10:00 - 22:00'
+    };
+    var dealsArr = [
+      { badge: '满减', text: '满100减' + Math.floor(info.price) },
+      { badge: '新客', text: '新用户立减15元' },
+      { badge: '折扣', text: '招牌菜享8折优惠' }
+    ];
+    var storeImagesArr = [];
+    if (info.banner) {
+      storeImagesArr.push(info.banner);
+      storeImagesArr.push(info.banner);
     }
-    this.setData({ categories: tabs, currentCategory: activeId || 0 });
-    this.applyCategoryFilter(activeId || 0);
-  },
-
-  // 本地按分类过滤（纯函数）
-  applyCategoryFilter: function(catId) {
-    this.setData({ foodList: categoryTabs.applyFilter(this.data._allFoods || [], catId) });
+    this.setData({
+      storeInfo: info,
+      storeImages: storeImagesArr,
+      deals: dealsArr
+    });
+    this.loadFoods(info.id);
   },
 
   loadReviews: function() {

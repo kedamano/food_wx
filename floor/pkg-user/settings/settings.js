@@ -171,10 +171,11 @@ Page({
   clearCache: function() {
     var self = this;
 
-    // 清除本地存储（保留 token 和用户设置）
+    // 清除本地存储（保留 token 和用户设置）+ 数据缓存层
     var token = wx.getStorageSync('token');
     var userSettings = wx.getStorageSync('userSettings');
     var privacySettings = wx.getStorageSync('privacySettings');
+    cache.clearAll();
     wx.clearStorageSync();
     if (token) wx.setStorageSync('token', token);
     if (userSettings) wx.setStorageSync('userSettings', userSettings);
@@ -248,6 +249,7 @@ Page({
         if (res.confirm) {
           // 清除登录状态
           var app = getApp();
+var cache = require('../../utils/cache');
           app.globalData.userInfo = null;
           app.globalData.userId = null;
           wx.removeStorageSync('token');

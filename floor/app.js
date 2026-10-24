@@ -578,6 +578,8 @@ App({
   },
 
   userLogin: function(userInfo) {
+    // 新登录态：清掉旧账号的用户缓存
+    require('./utils/cache').clearUserCaches();
     var merged = {};
     for (var key in userInfo) merged[key] = userInfo[key];
     merged.isLoggedIn = true;
@@ -586,6 +588,7 @@ App({
   },
 
   userLogout: function() {
+    require('./utils/cache').clearUserCaches();
     this.globalData.userInfo = {
       isLoggedIn: false,
       name: '',

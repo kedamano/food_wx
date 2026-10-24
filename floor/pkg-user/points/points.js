@@ -1,5 +1,6 @@
 // pages/points/points.js
 var app = getApp();
+var cache = require('../../utils/cache');
 
 
 Page({
@@ -341,6 +342,8 @@ Page({
         wx.setStorageSync('pointsHistory', history);
         self.loadRecentHistory();
 
+        // 兑换出的优惠券立即失效列表缓存
+        cache.remove('coupons:' + app.getCurrentUserId());
         wx.showToast({ title: '兑换成功', icon: 'success' });
 
         setTimeout(function() {

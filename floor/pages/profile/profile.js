@@ -3,6 +3,7 @@
  */
 var app = getApp();
 var userApi = require('../../api/user');
+var cache = require('../../utils/cache');
 var orderApi = require('../../api/order');
 var requestModule = require('../../api/request');
 
@@ -128,6 +129,23 @@ Page({
     });
   },
 
+  // 统计数据落到页面（SWR 回调共用）
+  applyStats: function(st) {
+    st = st || {};
+    this.setData({
+      userStats: {
+        totalOrders: st.totalOrders || 0,
+        totalSpending: st.totalSpent || 0
+      },
+      orderStats: {
+        pending: st.pendingOrders || 0,
+        preparing: st.preparingOrders || 0,
+        delivering: st.deliveringOrders || 0,
+        completed: st.completedOrders || 0
+      }
+    });
+  },
+
   /**
    * 获取页面所需数据
    */
@@ -186,40 +204,40 @@ Page({
         resolve();
       }
 
-      app.authRequest({
-        url: '/order/statistics',
-        method: 'GET'
-      }).then(function(res) {
-        statsResult = (res && res.code === 200 && res.data) ? res.data : {};
-        checkAllComplete();
-      }).catch(function(error) {
-        console.error('获取用户统计失败:', error);
-        checkAllComplete();
+      cache.swr('stats:' + userId, 60 * 1000, function(done, fail) {
+        app.authRequest({ url: '/order/statistics', method: 'GET' })
+          .then(function(res) {
+            if (res && res.code === 200 && res.data) done(res.data);
+            else fail(new Error('stats'));
+          }, fail);
+      }, {
+        onCache: function(st) { self.applyStats(st); },
+        onSuccess: function(st) { self.applyStats(st); }
       });
 
       // 收藏商家数
       var userId = app.globalData.userId || wx.getStorageSync('userId');
-      app.authRequest({
-        url: '/favorite/user/' + userId,
-        method: 'GET'
-      }).then(function(res) {
-        favoriteCount = (res && res.code === 200 && Array.isArray(res.data)) ? res.data.length : 0;
-        checkAllComplete();
-      }).catch(function() {
-        favoriteCount = 0;
-        checkAllComplete();
+      cache.swr('favorites:' + userId, 60 * 1000, function(done, fail) {
+        app.authRequest({ url: '/favorite/user/' + userId, method: 'GET' })
+          .then(function(res) {
+            if (res && res.code === 200 && Array.isArray(res.data)) done(res.data.length);
+            else fail(new Error('fav'));
+          }, fail);
+      }, {
+        onCache: function(n) { favoriteCount = n; checkAllComplete(); },
+        onSuccess: function(n) { favoriteCount = n; checkAllComplete(); }
       });
 
       // 优惠券数（与收藏同构：取用户券列表长度）
-      app.authRequest({
-        url: '/coupon/user/' + userId,
-        method: 'GET'
-      }).then(function(res) {
-        couponCountResult = (res && res.code === 200 && Array.isArray(res.data)) ? res.data.length : 0;
-        checkAllComplete();
-      }).catch(function() {
-        couponCountResult = 0;
-        checkAllComplete();
+      cache.swr('coupons:' + userId, 60 * 1000, function(done, fail) {
+        app.authRequest({ url: '/coupon/user/' + userId, method: 'GET' })
+          .then(function(res) {
+            if (res && res.code === 200 && Array.isArray(res.data)) done(res.data.length);
+            else fail(new Error('coupon'));
+          }, fail);
+      }, {
+        onCache: function(n) { couponCountResult = n; checkAllComplete(); },
+        onSuccess: function(n) { couponCountResult = n; checkAllComplete(); }
       });
 
       // 顶部实时积分（不阻塞统计）

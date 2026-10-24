@@ -19,7 +19,8 @@ Page({
   },
 
   onShow: function() {
-    if (!this.data.coupons.length) {
+    // SWR 缓存命中的场景由 onLoad 处理；这里兜底空态
+    if (!this.data.coupons.length && !this.data.isLoading) {
       this.loadCoupons();
     }
   },
@@ -86,14 +87,30 @@ Page({
   loadCoupons: function() {
     var self = this;
     var app = getApp();
+var cache = require('../../utils/cache');
     var userId = app.globalData.userId || wx.getStorageSync('userId') || 1;
 
     self.setData({ isLoading: true });
 
-    app.authRequest({
-      url: '/coupon/user/' + userId,
-      method: 'GET'
-    }).then(function(res) {
+    // SWR 缓存：秒显 + 后台刷新；兑换/领券后由操作侧失效
+    cache.swr('coupons:' + userId, 60 * 1000, function(done, fail) {
+      app.authRequest({
+        url: '/coupon/user/' + userId,
+        method: 'GET'
+      }).then(function(res) {
+        if (res && res.code === 200 && Array.isArray(res.data)) done(res.data);
+        else fail(new Error('coupons'));
+      }, fail);
+    }, {
+      onCache: function(data) { self.renderCoupons(data); },
+      onSuccess: function(data) { self.renderCoupons(data); },
+      onFail: function() { self.renderCoupons([]); }
+    });
+  },
+
+  renderCoupons: function(rawList) {
+    var res = { code: 200, data: rawList };
+    {
       self.setData({ isLoading: false });
       if (res && res.code === 200 && res.data) {
         var list = Array.isArray(res.data) ? res.data : [];
@@ -161,16 +178,8 @@ Page({
           recommendCoupons: []
         });
       }
-    }).catch(function(err) {
-      console.error('加载优惠券失败', err);
-      self.setData({
-        isLoading: false,
-        coupons: [],
-        displayCoupons: [],
-        couponStats: { available: 0, used: 0, expired: 0 },
-        recommendCoupons: []
-      });
-    });
+    }
+    self.setData({ isLoading: false });
   },
 
   onPullDownRefresh: function() {
