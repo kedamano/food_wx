@@ -158,7 +158,7 @@ Page({
 
       // 使用计数器处理 Promise.all；结果分对象存储，避免共享对象被整体覆盖
       var completedCount = 0;
-      var totalCount = 4;
+      var totalCount = 3;
       var statsResult = null;        // /order/statistics
       var favoriteCount = null;      // 收藏数
       var couponCountResult = null;  // 优惠券数
@@ -222,20 +222,6 @@ Page({
         checkAllComplete();
       });
 
-      orderApi.getOrderStats()
-        .then(function(data) {
-          orderStatsResult = data;
-          checkAllComplete();
-        })
-        .catch(function(error) {
-          console.error('获取订单统计失败:', error);
-          orderStatsResult = {
-            pending: 0,
-            delivering: 0,
-            completed: 0,
-          };
-          checkAllComplete();
-        });
     });
   },
 
