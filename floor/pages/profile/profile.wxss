@@ -363,3 +363,20 @@ page {
 .bottom-safe {
   height: 40rpx;
 }
+
+/* 未登录引导条 */
+.login-guide {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: var(--r-md);
+  padding: 20rpx 26rpx;
+  margin-top: 20rpx;
+}
+.login-guide-ico { width: 34rpx; height: 34rpx; color: var(--brand); }
+.login-guide-text { flex: 1; font-size: 24rpx; color: var(--text-2); }
+.login-guide-btn {
+  font-size: 24rpx; color: #fff; background: var(--brand);
+  padding: 8rpx 26rpx; border-radius: var(--r-pill);
+}

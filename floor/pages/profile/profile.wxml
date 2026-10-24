@@ -22,6 +22,12 @@
     </view>
 
     <!-- 数据统计条 -->
+    <!-- 未登录引导：替代全 0 统计 -->
+    <view class="login-guide" wx:if="{{!userInfo.isLoggedIn}}" bindtap="onAvatarClick" hover-class="press-hover">
+      <text class="login-guide-ico i i-user"></text>
+      <text class="login-guide-text">当前未登录，登录后同步订单与数据</text>
+      <view class="login-guide-btn">去登录</view>
+    </view>
     <view class="stats-bar" wx:if="{{userInfo.isLoggedIn}}">
       <view class="stat-item" bindtap="onStatClick" data-stat="orders">
         <text class="stat-num">{{userStats.totalOrders || 0}}</text>

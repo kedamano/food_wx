@@ -264,11 +264,17 @@ Page({
       return;
     }
 
-    // 计算小计，手动 reduce
+    // 计算小计：totalPrice 缺失时按 price*quantity 兜底（不同入口构造的字段不一致）
     var items = currentOrder.items || [];
     var subtotal = 0;
     for (var si = 0; si < items.length; si++) {
-      subtotal += parseFloat(items[si].totalPrice || 0);
+      var it = items[si];
+      it.price = parseFloat(it.price) || 0;
+      it.quantity = parseInt(it.quantity) || 1;
+      if (it.totalPrice === undefined || isNaN(parseFloat(it.totalPrice))) {
+        it.totalPrice = (it.price * it.quantity).toFixed(2);
+      }
+      subtotal += parseFloat(it.totalPrice);
     }
     subtotal = subtotal.toFixed(2);
     var deliveryFee = currentOrder.deliveryFee || '5.00';
