@@ -135,20 +135,16 @@ Page({
     });
   },
 
-  // 统计数据落到页面（SWR 回调共用）
+  // 订单统计落到页面：数据路径局部更新，不触碰收藏/券字段
   applyStats: function(st) {
     st = st || {};
     this.setData({
-      userStats: {
-        totalOrders: st.totalOrders || 0,
-        totalSpending: st.totalSpent || 0
-      },
-      orderStats: {
-        pending: st.pendingOrders || 0,
-        preparing: st.preparingOrders || 0,
-        delivering: st.deliveringOrders || 0,
-        completed: st.completedOrders || 0
-      }
+      'userStats.totalOrders': st.totalOrders || 0,
+      'userStats.totalSpending': st.totalSpent || 0,
+      'orderStats.pending': st.pendingOrders || 0,
+      'orderStats.preparing': st.preparingOrders || 0,
+      'orderStats.delivering': st.deliveringOrders || 0,
+      'orderStats.completed': st.completedOrders || 0
     });
   },
 
@@ -180,36 +176,10 @@ Page({
         return;
       }
 
-      // 使用计数器处理 Promise.all；结果分对象存储，避免共享对象被整体覆盖
-      var completedCount = 0;
-      var totalCount = 3;
-      var statsResult = null;        // /order/statistics
-      var favoriteCount = null;      // 收藏数
-      var couponCountResult = null;  // 优惠券数
+      // 每个数据源独立更新自己的字段（SWR 下缓存/网络各触发一次，互不干扰）
+      var userId = app.globalData.userId || wx.getStorageSync('userId');
 
-      function checkAllComplete() {
-        completedCount++;
-        if (completedCount < totalCount) return;
-
-        // /order/statistics 字段映射（totalSpent -> totalSpending）
-        var st = statsResult || {};
-        self.setData({
-          userStats: {
-            totalOrders: st.totalOrders || 0,
-            favoriteStores: favoriteCount || 0,
-            totalSpending: st.totalSpent || 0,
-            couponCount: couponCountResult || 0
-          },
-          orderStats: {
-            pending: st.pendingOrders || 0,
-            preparing: st.preparingOrders || 0,
-            delivering: st.deliveringOrders || 0,
-            completed: st.completedOrders || 0
-          }
-        });
-        resolve();
-      }
-
+      // 订单统计 -> 订单数/消费额/四状态
       cache.swr('stats:' + userId, 60 * 1000, function(done, fail) {
         app.authRequest({ url: '/order/statistics', method: 'GET' })
           .then(function(res) {
@@ -222,7 +192,6 @@ Page({
       });
 
       // 收藏商家数
-      var userId = app.globalData.userId || wx.getStorageSync('userId');
       cache.swr('favorites:' + userId, 60 * 1000, function(done, fail) {
         app.authRequest({ url: '/favorite/user/' + userId, method: 'GET' })
           .then(function(res) {
@@ -230,8 +199,8 @@ Page({
             else fail(new Error('fav'));
           }, fail);
       }, {
-        onCache: function(n) { favoriteCount = n; checkAllComplete(); },
-        onSuccess: function(n) { favoriteCount = n; checkAllComplete(); }
+        onCache: function(n) { self.setData({ 'userStats.favoriteStores': n || 0 }); },
+        onSuccess: function(n) { self.setData({ 'userStats.favoriteStores': n || 0 }); }
       });
 
       // 优惠券数（与收藏同构：取用户券列表长度）
@@ -242,8 +211,8 @@ Page({
             else fail(new Error('coupon'));
           }, fail);
       }, {
-        onCache: function(n) { couponCountResult = n; checkAllComplete(); },
-        onSuccess: function(n) { couponCountResult = n; checkAllComplete(); }
+        onCache: function(n) { self.setData({ 'userStats.couponCount': n || 0 }); },
+        onSuccess: function(n) { self.setData({ 'userStats.couponCount': n || 0 }); }
       });
 
       // 顶部实时积分（不阻塞统计）
