@@ -158,7 +158,7 @@ Page({
     });
 
     wx.request({
-      url: 'http://localhost:8080/api/user/send-verify-code',
+      url: app.resolveApiUrl('/user/send-verify-code'),
       method: 'POST',
       header: {
         'Content-Type': 'application/json'
@@ -426,7 +426,7 @@ Page({
     var inviteCode = this.data.inviteCode || '';
 
     wx.request({
-      url: 'http://localhost:8080/api/user/register',
+      url: app.resolveApiUrl('/user/register'),
       method: 'POST',
       header: {
         'Content-Type': 'application/json'

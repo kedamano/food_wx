@@ -3,8 +3,11 @@
  * 基于微信小程序wx.request封装，支持Promise
  */
 
+// baseURL 统一取自 api/config.js 的环境自适应（工具=localhost，真机=局域网 IP，线上=域名）
+var config = require('./config');
+
 var CONFIG = {
-  baseURL: 'http://localhost:8080/api',
+  baseURL: config.environments[config.currentEnv].baseURL,
   timeout: 10000,
   header: {
     'Content-Type': 'application/json',
