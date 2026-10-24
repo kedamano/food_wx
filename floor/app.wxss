@@ -31,12 +31,10 @@ page {
 
 /* 全局容器 */
 .container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0;
+  width: 100%;
+  box-sizing: border-box;
+  /* 块级布局：子元素默认全宽，避免旧模板的 flex 居中把内容压成细条 */
+  display: block;
   box-sizing: border-box;
 }
 
@@ -286,6 +284,7 @@ page {
   background: var(--surface);
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-1);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 .press { transition: transform 0.15s ease, opacity 0.15s ease; }
 .press-hover { transform: scale(0.97); opacity: 0.85; }
@@ -393,3 +392,5 @@ page {
 .i-grid { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%23000%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M5%203h4a2%202%200%200%201%202%202v4a2%202%200%200%201-2%202H5a2%202%200%200%201-2-2V5a2%202%200%200%201%202-2ZM15%203h4a2%202%200%200%201%202%202v4a2%202%200%200%201-2%202h-4a2%202%200%200%201-2-2V5a2%202%200%200%201%202-2ZM5%2013h4a2%202%200%200%201%202%202v4a2%202%200%200%201-2%202H5a2%202%200%200%201-2-2v-4a2%202%200%200%201%202-2ZM15%2013h4a2%202%200%200%201%202%202v4a2%202%200%200%201-2%202h-4a2%202%200%200%201-2-2v-4a2%202%200%200%201%202-2Z%27/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%23000%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M5%203h4a2%202%200%200%201%202%202v4a2%202%200%200%201-2%202H5a2%202%200%200%201-2-2V5a2%202%200%200%201%202-2ZM15%203h4a2%202%200%200%201%202%202v4a2%202%200%200%201-2%202h-4a2%202%200%200%201-2-2V5a2%202%200%200%201%202-2ZM5%2013h4a2%202%200%200%201%202%202v4a2%202%200%200%201-2%202H5a2%202%200%200%201-2-2v-4a2%202%200%200%201%202-2ZM15%2013h4a2%202%200%200%201%202%202v4a2%202%200%200%201-2%202h-4a2%202%200%200%201-2-2v-4a2%202%200%200%201%202-2Z%27/%3E%3C/svg%3E"); }
 
 .i-star { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%23000%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M12%203l2.7%205.45%206.01.87-4.35%204.24%201.03%205.99L12%2016.77l-5.39%202.78%201.03-5.99L3.29%209.32l6.01-.87L12%203z%27/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%23000%27%20stroke-width=%272%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M12%203l2.7%205.45%206.01.87-4.35%204.24%201.03%205.99L12%2016.77l-5.39%202.78%201.03-5.99L3.29%209.32l6.01-.87L12%203z%27/%3E%3C/svg%3E"); }
+
+.i-add { -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%23000%27%20stroke-width=%272.2%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M12%205v14M5%2012h14%27/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%2024%2024%27%20fill=%27none%27%20stroke=%27%23000%27%20stroke-width=%272.2%27%20stroke-linecap=%27round%27%20stroke-linejoin=%27round%27%3E%3Cpath%20d=%27M12%205v14M5%2012h14%27/%3E%3C/svg%3E"); }

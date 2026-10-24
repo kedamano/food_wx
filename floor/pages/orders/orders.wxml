@@ -1,94 +1,85 @@
-<!-- 订单管理页面 - 现代化设计 -->
-<scroll-view class="container" scroll-y enable-flex>
-  <!-- 头部区域 -->
-  <view class="header-section">
-    <view class="header-content">
-      <text class="header-title">我的订单</text>
-      <view class="search-box" bindtap="onSearchOrders">
-        <text class="i -search search-icon i-search"></text>
-        <text class="search-text">搜索订单</text>
-      </view>
+<!-- 订单列表：信息层级 = 状态 → 商家 → 商品 → 金额 → 操作 -->
+<view class="page-orders">
+  <!-- 搜索入口 -->
+  <view class="search-wrap">
+    <view class="search-pill" bindtap="onSearchOrders" hover-class="press-hover">
+      <text class="i i-search search-ico"></text>
+      <text class="search-ph">搜索订单号 / 商家</text>
     </view>
   </view>
 
-  <!-- 状态标签 -->
-  <view class="status-tabs">
-    <view class="tab-item {{activeTab === item.status ? 'active' : ''}}" 
-          wx:for="{{statusTabs}}" wx:key="status" 
-          bindtap="onTabChange" data-status="{{item.status}}">
-      <text class="tab-text">{{item.name}}</text>
-      <text class="tab-badge" wx:if="{{item.count > 0}}">{{item.count}}</text>
+  <!-- 状态筛选：横向滚动 pills -->
+  <scroll-view class="tabs-scroll" scroll-x enable-flex show-scrollbar="{{false}}">
+    <view class="tab-item {{activeTab === item.status ? 'active' : ''}}"
+          wx:for="{{statusTabs}}" wx:key="status"
+          bindtap="onTabChange" data-status="{{item.status}}"
+          hover-class="press-hover">
+      <text class="tab-name">{{item.name}}</text>
+      <text class="tab-count" wx:if="{{item.count > 0}}">{{item.count}}</text>
     </view>
-  </view>
+  </scroll-view>
 
-  <!-- 订单列表 -->
-  <view class="orders-container">
-    <view class="order-card" wx:for="{{orders}}" wx:key="orderId" bindtap="onOrderDetail" data-order-id="{{item.orderId}}">
-      <!-- 订单头部 -->
-      <view class="order-header">
-        <view class="order-status {{item.status}}">
-          <text class="status-text">{{item.statusText}}</text>
-        </view>
-        <text class="order-time">{{item.orderTime}}</text>
+  <!-- 订单卡片 -->
+  <view class="order-list">
+    <view class="order-card" wx:for="{{orders}}" wx:key="orderId"
+          bindtap="onOrderDetail" data-order-id="{{item.orderId}}"
+          hover-class="press-hover">
+      <!-- 行 1：状态 + 时间 -->
+      <view class="oc-head">
+        <view class="status-chip sc-{{item.statusClass}}">{{item.statusText}}</view>
+        <text class="oc-time">{{item.orderTime}}</text>
       </view>
 
-      <!-- 商家信息 -->
-      <view class="store-section">
-        <view class="store-info">
-          <text class="i -store store-icon i-store"></text>
-          <text class="store-name">{{item.storeName}}</text>
-        </view>
+      <!-- 行 2：商家 -->
+      <view class="oc-store">
+        <text class="i i-store oc-store-ico"></text>
+        <text class="oc-store-name">{{item.storeName}}</text>
+        <text class="i i-chev-right oc-arrow"></text>
       </view>
 
-      <!-- 商品列表 -->
-      <view class="items-section">
-        <view class="item-list">
-          <view class="item-card" wx:for="{{item.items}}" wx:key="foodId">
-            <view class="item-image">
-              <image class="food-image" src="{{item.image}}" mode="aspectFill" lazy-load></image>
-              <text class="i -utensils food-icon i-store" wx:if="{{!item.image}}"></text>
-            </view>
-            <view class="item-details">
-              <text class="item-name">{{item.name}}</text>
-              <text class="item-quantity">x{{item.quantity}}</text>
-              <text class="item-price">¥{{item.price}}</text>
-            </view>
-          </view>
+      <!-- 行 3：商品（有图显示缩略图，无图显示占位图标） -->
+      <view class="oc-items" wx:if="{{item.items.length > 0}}">
+        <view class="oc-item" wx:for="{{item.items}}" wx:for-item="food" wx:key="index">
+          <image wx:if="{{food.image}}" class="oc-thumb" src="{{food.image}}" mode="aspectFill" lazy-load />
+          <view wx:else class="oc-thumb oc-thumb-ph"><text class="i i-store"></text></view>
+          <text class="oc-item-name">{{food.name}}</text>
+          <text class="oc-item-qty">x{{food.quantity}}</text>
+          <text class="oc-item-price">¥{{food.price}}</text>
         </view>
       </view>
 
-      <!-- 订单金额 -->
-      <view class="amount-section">
-        <text class="amount-label">实付金额</text>
-        <text class="amount-value">¥{{item.finalAmount}}</text>
-      </view>
-
-      <!-- 操作按钮 -->
-      <view class="action-section">
-        <block wx:if="{{item.status === 'pending'}}">
-          <button class="btn btn-secondary" bindtap="onCancelOrder" data-order-id="{{item.orderId}}">取消</button>
-          <button class="btn btn-primary" bindtap="onPayOrder" data-order-id="{{item.orderId}}">立即付款</button>
-        </block>
-        <block wx:if="{{item.status === 'preparing'}}">
-          <button class="btn btn-secondary" bindtap="onRemindOrder" data-order-id="{{item.orderId}}">催单</button>
-        </block>
-        <block wx:if="{{item.status === 'delivering'}}">
-          <button class="btn btn-secondary" bindtap="onTrackOrder" data-order-id="{{item.orderId}}">查看配送</button>
-          <button class="btn btn-primary" bindtap="onConfirmReceive" data-order-id="{{item.orderId}}">确认收货</button>
-        </block>
-        <block wx:if="{{item.status === 'completed'}}">
-          <button class="btn btn-secondary" bindtap="onReviewOrder" data-order-id="{{item.orderId}}">评价</button>
-          <button class="btn btn-outline" bindtap="onOrderAgain" data-order-id="{{item.orderId}}">再来一单</button>
-        </block>
+      <!-- 行 4：金额 + 操作（操作按钮 catchtap，避免冒泡触发卡片跳转） -->
+      <view class="oc-foot">
+        <view class="oc-total">
+          <text class="oc-total-label">实付</text>
+          <text class="oc-total-price">¥{{item.finalAmount}}</text>
+        </view>
+        <view class="oc-actions">
+          <block wx:if="{{item.status === '待付款'}}">
+            <view class="act-btn ghost" catchtap="onCancelOrder" data-order-id="{{item.orderId}}">取消订单</view>
+            <view class="act-btn primary" catchtap="onPayOrder" data-order-id="{{item.orderId}}">去支付</view>
+          </block>
+          <block wx:if="{{item.status === '制作中'}}">
+            <view class="act-btn ghost" catchtap="onRemindOrder" data-order-id="{{item.orderId}}">催单</view>
+          </block>
+          <block wx:if="{{item.status === '配送中'}}">
+            <view class="act-btn ghost" catchtap="onTrackOrder" data-order-id="{{item.orderId}}">查看配送</view>
+            <view class="act-btn primary" catchtap="onConfirmReceive" data-order-id="{{item.orderId}}">确认收货</view>
+          </block>
+          <block wx:if="{{item.status === '已完成'}}">
+            <view class="act-btn ghost" catchtap="onReviewOrder" data-order-id="{{item.orderId}}">去评价</view>
+            <view class="act-btn ghost" catchtap="onOrderAgain" data-order-id="{{item.orderId}}">再来一单</view>
+          </block>
+        </view>
       </view>
     </view>
 
-    <!-- 空状态 -->
-    <view class="empty-state" wx:if="{{orders.length === 0}}">
-      <text class="i empty-icon i-bag"></text>
+    <!-- 空态 -->
+    <view class="empty" wx:if="{{orders.length === 0 && !loading}}">
+      <text class="i i-bag empty-ico"></text>
       <text class="empty-title">还没有相关订单</text>
-      <text class="empty-desc">去首页逛逛，发现更多美食！</text>
-      <button class="btn btn-primary" bindtap="onGoShopping">去购物</button>
+      <text class="empty-desc">去首页逛逛，发现更多美食</text>
+      <view class="act-btn primary empty-btn" bindtap="onGoShopping" hover-class="press-hover">去逛逛</view>
     </view>
   </view>
-</scroll-view>
+</view>

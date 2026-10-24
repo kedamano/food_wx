@@ -179,7 +179,21 @@ Page({
     
     // 格式化金额
     var finalAmount = order.payAmount ? order.payAmount.toFixed(2) : '0.00'
-    
+
+    // 后端返回的字段是 orderDetails
+    var rawItems = order.orderDetails || order.items || []
+    var items = []
+    for (var ii = 0; ii < rawItems.length; ii++) {
+      var it = rawItems[ii]
+      items.push({
+        foodId: it.foodId,
+        name: it.foodName || it.name || '商品',
+        price: parseFloat(it.price) || 0,
+        quantity: it.quantity || 1,
+        image: it.image || ''
+      })
+    }
+
     return {
       orderId: order.orderId,
       storeName: order.storeName || '美食商家',
@@ -188,7 +202,7 @@ Page({
       statusClass: statusInfo.cls,
       orderTime: orderTime,
       finalAmount: finalAmount,
-      items: order.items || [],
+      items: items,
       address: order.address,
       phone: order.phone
     }

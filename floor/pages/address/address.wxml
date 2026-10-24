@@ -1,54 +1,45 @@
-<!-- 收货地址管理 -->
-<scroll-view class="container" scroll-y enable-flex>
-  <!-- 头部 -->
-  <view class="header">
-    <view class="header-left">
-      <text class="header-title">收货地址</text>
-      <text class="header-subtitle">管理您的收货地址</text>
-    </view>
-    <button class="add-btn" catchtap="onAddAddress">
-      <text class="btn-plus">+</text>
-      <text class="btn-text">新建地址</text>
-    </button>
+<!-- 收货地址管理：卡片信息 = 联系人行 → 地址行 → 语义化操作行；新增走底部固定主按钮 -->
+<view class="page-address">
+  <!-- 选择模式提示 -->
+  <view class="select-tip" wx:if="{{isSelectMode}}">
+    <text class="i i-location tip-ico"></text>
+    <text class="tip-text">点击地址卡片即可选用</text>
   </view>
 
   <!-- 地址列表 -->
-  <view class="address-list" wx:if="{{addresses.length > 0}}">
-    <view class="address-card {{item.isDefault ? 'default-card' : ''}}"
-          wx:for="{{addresses}}" wx:key="id">
-
-      <!-- 默认标签 -->
-      <view class="default-badge" wx:if="{{item.isDefault}}">
-        <text class="badge-text">默认</text>
-      </view>
-
-      <!-- 地址内容 -->
-      <view class="address-content" bindtap="onAddressSelect" data-address="{{item}}">
-        <view class="user-row">
-          <text class="user-name">{{item.name}}</text>
-          <text class="user-phone">{{item.phone}}</text>
-          <text class="tag-home" wx:if="{{item.isHome}}">家</text>
-          <text class="tag-work" wx:if="{{item.isWork}}">公司</text>
-        </view>
-        <view class="addr-detail-box">
-          <text class="addr-region">{{item.province}} {{item.city}} {{item.district}}</text>
-          <text class="addr-detail">{{item.detail}}</text>
+  <view class="addr-list" wx:if="{{addresses.length > 0}}">
+    <view class="addr-card {{item.isDefault ? 'is-default' : ''}}"
+          wx:for="{{addresses}}" wx:key="id"
+          hover-class="press-hover">
+      <!-- 联系人行：姓名 + 电话 + 标签 + 默认（内联 chip，不悬浮遮挡） -->
+      <view class="ac-head" bindtap="onAddressSelect" data-address="{{item}}">
+        <text class="ac-name">{{item.name}}</text>
+        <text class="ac-phone">{{item.phone}}</text>
+        <view class="ac-tag" wx:if="{{item.isHome}}">家</view>
+        <view class="ac-tag ac-tag-work" wx:if="{{item.isWork}}">公司</view>
+        <view class="ac-default-chip" wx:if="{{item.isDefault}}">
+          <text class="i i-check ac-default-ico"></text>
+          <text>默认</text>
         </view>
       </view>
 
-      <!-- 操作行 -->
-      <view class="action-row">
-        <view class="set-default-btn" wx:if="{{!item.isDefault}}" catchtap="onSetDefault" data-id="{{item.id}}">
-          <text class="set-default-text">设为默认</text>
+      <!-- 地址行 -->
+      <view class="ac-detail" bindtap="onAddressSelect" data-address="{{item}}">
+        {{item.province}}{{item.city}}{{item.district}}{{item.detail}}
+      </view>
+
+      <!-- 操作行：语义色区分（编辑中性 / 删除警示 / 设为默认品牌），catchtap 防冒泡 -->
+      <view class="ac-actions">
+        <view class="ac-action brand" wx:if="{{!item.isDefault}}" catchtap="onSetDefault" data-id="{{item.id}}">
+          设为默认
         </view>
-        <view class="action-spacer" wx:else></view>
-        <view class="edit-btn" catchtap="onEditAddress" data-address="{{item}}">
-          <text class="i edit-icon -edit i-edit"></text>
-          <text class="action-text">编辑</text>
+        <view class="ac-action" catchtap="onEditAddress" data-address="{{item}}">
+          <text class="i i-edit i-sm"></text>
+          <text>编辑</text>
         </view>
-        <view class="delete-btn" catchtap="onDeleteAddress" data-id="{{item.id}}">
-          <text class="delete-icon -times">✕</text>
-          <text class="action-text">删除</text>
+        <view class="ac-action danger" catchtap="onDeleteAddress" data-id="{{item.id}}">
+          <text class="i i-trash i-sm"></text>
+          <text>删除</text>
         </view>
       </view>
     </view>
@@ -56,10 +47,9 @@
 
   <!-- 空状态 -->
   <view class="empty-state" wx:if="{{addresses.length === 0 && !isLoading}}">
-    <text class="i empty-icon -map-marker-alt i-location" style="font-size:80rpx;"></text>
+    <text class="i i-location empty-ico"></text>
     <text class="empty-title">还没有收货地址</text>
     <text class="empty-desc">添加您的第一个收货地址</text>
-    <button class="btn-primary" bindtap="onAddAddress">+ 添加地址</button>
   </view>
 
   <!-- 加载中 -->
@@ -67,6 +57,11 @@
     <text class="loading-text">加载中...</text>
   </view>
 
-  <!-- 底部安全区域 -->
-  <view class="safe-area-bottom"></view>
-</scroll-view>
+  <!-- 底部固定：新增地址主按钮 -->
+  <view class="bottom-bar">
+    <view class="add-btn" bindtap="onAddAddress" hover-class="press-hover">
+      <text class="i i-add"></text>
+      <text>新建收货地址</text>
+    </view>
+  </view>
+</view>
