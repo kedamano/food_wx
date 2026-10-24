@@ -73,7 +73,7 @@
 
   <!-- 查看历史 -->
   <view class="history-link" bindtap="onViewHistory" hover-class="s-cell-hover">
-    <text class="history-text">📋 查看反馈历史</text>
+    <text class="history-text"><text class="i i-list"></text> 查看反馈历史</text>
   </view>
 
   <view class="safe-bottom"></view>

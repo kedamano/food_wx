@@ -1,13 +1,13 @@
 /* pages/order-detail/order-detail.wxss */
 page {
-  background-color: #F8F9FA;
+  background-color: var(--bg);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   min-height: 100vh;
 }
 
 .scrollarea {
   height: calc(100vh - 60px);
-  background-color: #F8F9FA;
+  background-color: var(--bg);
 }
 
 /* 头部导航 */
@@ -21,7 +21,7 @@ page {
   justify-content: space-between;
   padding: 18px 20px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  border-bottom: 1px solid #E9ECEF;
+  border-bottom: 1px solid var(--line);
   transition: all 0.3s ease;
 }
 
@@ -37,7 +37,7 @@ page {
 }
 
 .nav-left:hover, .nav-right:hover {
-  background: #F8F9FA;
+  background: var(--bg);
 }
 
 .nav-left:active, .nav-right:active {
@@ -46,19 +46,19 @@ page {
 
 .back-icon, .share-icon {
   font-size: 24px;
-  color: #FF6633;
+  color: var(--brand);
   transition: all 0.3s ease;
 }
 
 .nav-title {
   font-size: 20px;
   font-weight: 600;
-  color: #212529;
+  color: var(--text-1);
 }
 
 /* 订单状态 */
 .order-status-section {
-  background: linear-gradient(135deg, #FF6633 0%, #FF8855 100%);
+  background: linear-gradient(135deg, var(--brand) 0%, #FF8855 100%);
   margin: 0 0 20px;
   padding: 40px 20px 30px;
   text-align: center;
@@ -164,7 +164,7 @@ page {
 
 .progress-dot::after {
   content: '✓';
-  color: #FF6633;
+  color: var(--brand);
   font-weight: bold;
   font-size: 16px;
 }
@@ -198,7 +198,7 @@ page {
   display: block;
   font-size: 18px;
   font-weight: 600;
-  color: #212529;
+  color: var(--text-1);
   margin-bottom: 16px;
 }
 
@@ -218,7 +218,7 @@ page {
   width: 50px;
   height: 50px;
   border-radius: 25px;
-  border: 2px solid #FF6633;
+  border: 2px solid var(--brand);
 }
 
 .delivery-details {
@@ -229,18 +229,18 @@ page {
   display: block;
   font-size: 16px;
   font-weight: 500;
-  color: #212529;
+  color: var(--text-1);
   margin-bottom: 4px;
 }
 
 .delivery-phone {
   font-size: 14px;
-  color: #6C757D;
+  color: var(--text-2);
 }
 
 .contact-btn {
   padding: 8px 16px;
-  background: #FF6633;
+  background: var(--brand);
   color: #FFFFFF;
   border: none;
   border-radius: 20px;
@@ -256,7 +256,7 @@ page {
 
 .delivery-progress {
   padding: 16px;
-  background: #F8F9FA;
+  background: var(--bg);
   border-radius: 12px;
 }
 
@@ -264,13 +264,13 @@ page {
   display: block;
   font-size: 14px;
   font-weight: 500;
-  color: #212529;
+  color: var(--text-1);
   margin-bottom: 8px;
 }
 
 .progress-time {
   font-size: 12px;
-  color: #6C757D;
+  color: var(--text-2);
 }
 
 /* 收货地址 */
@@ -295,18 +295,18 @@ page {
 .user-name {
   font-size: 16px;
   font-weight: 500;
-  color: #212529;
+  color: var(--text-1);
   margin-right: 12px;
 }
 
 .user-phone {
   font-size: 14px;
-  color: #6C757D;
+  color: var(--text-2);
 }
 
 .address-detail {
   font-size: 14px;
-  color: #6C757D;
+  color: var(--text-2);
   line-height: 1.5;
   display: block;
 }
@@ -328,19 +328,19 @@ page {
 
 .store-icon {
   font-size: 24px;
-  color: #FF6633;
+  color: var(--brand);
 }
 
 .store-name {
   flex: 1;
   font-size: 16px;
   font-weight: 500;
-  color: #212529;
+  color: var(--text-1);
 }
 
 .store-distance {
   font-size: 14px;
-  color: #6C757D;
+  color: var(--text-2);
 }
 
 /* 商品清单 */
@@ -360,12 +360,12 @@ page {
   display: flex;
   align-items: center;
   padding: 16px 0;
-  border-bottom: 1px solid #E9ECEF;
+  border-bottom: 1px solid var(--line);
   transition: all 0.3s ease;
 }
 
 .item-row:hover {
-  background: #F8F9FA;
+  background: var(--bg);
   margin: 0 -12px;
   padding: 16px 12px;
 }
@@ -378,7 +378,7 @@ page {
   width: 60px;
   height: 60px;
   margin-right: 12px;
-  background: linear-gradient(45deg, #FF6633 0%, #FF8855 100%);
+  background: linear-gradient(45deg, var(--brand) 0%, #FF8855 100%);
   border-radius: 8px;
   overflow: hidden;
   display: flex;
@@ -407,27 +407,27 @@ page {
   display: block;
   font-size: 14px;
   font-weight: 500;
-  color: #212529;
+  color: var(--text-1);
   margin-bottom: 4px;
 }
 
 .item-spec {
   display: block;
   font-size: 12px;
-  color: #6C757D;
+  color: var(--text-2);
   margin-bottom: 4px;
 }
 
 .item-quantity {
   font-size: 12px;
-  color: #6C757D;
+  color: var(--text-2);
   margin-right: 8px;
 }
 
 .item-price {
   font-size: 14px;
   font-weight: 600;
-  color: #FF6633;
+  color: var(--brand);
 }
 
 /* 费用明细 */
@@ -452,34 +452,34 @@ page {
 
 .cost-label {
   font-size: 14px;
-  color: #6C757D;
+  color: var(--text-2);
 }
 
 .cost-value {
   font-size: 14px;
-  color: #212529;
+  color: var(--text-1);
 }
 
 .cost-value.discount {
-  color: #FF6633;
+  color: var(--brand);
 }
 
 .cost-row.total {
   padding-top: 15px;
-  border-top: 1px solid #E9ECEF;
+  border-top: 1px solid var(--line);
   margin-top: 12px;
 }
 
 .total-label {
   font-size: 16px;
   font-weight: 600;
-  color: #212529;
+  color: var(--text-1);
 }
 
 .total-value {
   font-size: 20px;
   font-weight: 700;
-  color: #FF6633;
+  color: var(--brand);
 }
 
 /* 订单信息 */
@@ -500,19 +500,19 @@ page {
 .info-label {
   width: 70px;
   font-size: 14px;
-  color: #6C757D;
+  color: var(--text-2);
 }
 
 .info-value {
   flex: 1;
   font-size: 14px;
-  color: #212529;
+  color: var(--text-1);
   font-weight: 500;
 }
 
 .copy-btn {
   padding: 4px 12px;
-  background: #FF6633;
+  background: var(--brand);
   color: #FFFFFF;
   border: none;
   border-radius: 12px;
@@ -554,19 +554,19 @@ page {
 }
 
 .cancel-btn {
-  background: #F8F9FA;
-  color: #6C757D;
-  border: 1px solid #E9ECEF;
+  background: var(--bg);
+  color: var(--text-2);
+  border: 1px solid var(--line);
 }
 
 .pay-btn {
-  background: linear-gradient(135deg, #FF6633 0%, #FF8855 100%);
+  background: linear-gradient(135deg, var(--brand) 0%, #FF8855 100%);
   color: #FFFFFF;
   box-shadow: 0 4px 12px rgba(255, 102, 51, 0.3);
 }
 
 .remind-btn {
-  background: #FF9800;
+  background: var(--warn);
   color: #FFFFFF;
   box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
 }
@@ -578,7 +578,7 @@ page {
 }
 
 .receive-btn {
-  background: linear-gradient(135deg, #FF6633 0%, #FF8855 100%);
+  background: linear-gradient(135deg, var(--brand) 0%, #FF8855 100%);
   color: #FFFFFF;
   box-shadow: 0 4px 12px rgba(255, 102, 51, 0.3);
 }
@@ -590,15 +590,15 @@ page {
 }
 
 .again-btn {
-  background: linear-gradient(135deg, #FF6633 0%, #FF8855 100%);
+  background: linear-gradient(135deg, var(--brand) 0%, #FF8855 100%);
   color: #FFFFFF;
   box-shadow: 0 4px 12px rgba(255, 102, 51, 0.3);
 }
 
 .help-btn {
-  background: #F8F9FA;
-  color: #6C757D;
-  border: 1px solid #E9ECEF;
+  background: var(--bg);
+  color: var(--text-2);
+  border: 1px solid var(--line);
   width: 100%;
   margin-top: 8px;
 }

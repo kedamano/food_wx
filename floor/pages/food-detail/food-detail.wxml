@@ -17,7 +17,7 @@
     <!-- 分享/收藏 -->
     <view class="nav-actions">
       <view class="nav-action-btn" bindtap="onFavoriteClick">
-        <text class="action-icon" style="font-size:36rpx;">{{isFavorite ? '❤️' : '🤍'}}</text>
+        <text class="action-icon" style="font-size:36rpx;">{{isFavorite ? '<text class="i i-heart-fill"></text>' : '<text class="i i-heart-fill"></text>'}}</text>
       </view>
       <button class="nav-action-btn share-btn" open-type="share">
         <text class="action-icon -share-alt" style="font-size:36rpx;">↗</text>
@@ -42,9 +42,9 @@
     </view>
     <text class="food-name">{{food.name}}</text>
     <view class="tags-row" wx:if="{{food.tags}}">
-      <view class="tag tag-hot" wx:if="{{food.tags.hot}}"><text class="-fire" style="margin-right:4rpx;">🔥</text>热销</view>
-      <view class="tag tag-classic" wx:if="{{food.tags.classic}}"><text class="-star" style="margin-right:4rpx;">⭐</text>经典</view>
-      <view class="tag tag-combo" wx:if="{{food.tags.combo}}"><text class="-utensils" style="margin-right:4rpx;">🍴</text>套餐</view>
+      <view class="tag tag-hot" wx:if="{{food.tags.hot}}"><text class="i -fire i-hot" style="margin-right:4rpx;"></text>热销</view>
+      <view class="tag tag-classic" wx:if="{{food.tags.classic}}"><text class="i -star i-star-fill" style="margin-right:4rpx;"></text>经典</view>
+      <view class="tag tag-combo" wx:if="{{food.tags.combo}}"><text class="i -utensils i-store" style="margin-right:4rpx;"></text>套餐</view>
       <view class="tag tag-healthy" wx:if="{{food.tags.healthy}}"><text class="-leaf" style="margin-right:4rpx;">●</text>营养</view>
     </view>
   </view>
@@ -54,7 +54,7 @@
     <view class="rating-score">
       <text class="score-num">{{food.rating}}</text>
       <view class="score-stars">
-        <text class="star" wx:for="{{5}}" wx:for-item="s" wx:key="*this">{{s <= food.rating ? '★' : '☆'}}</text>
+        <text class="star" wx:for="{{5}}" wx:for-item="s" wx:key="*this">{{s <= food.rating ? '' : ''}}</text>
       </view>
       <text class="review-count">{{food.reviews || 0}}条评价</text>
     </view>
@@ -97,7 +97,7 @@
           <view class="reviewer-info">
             <text class="reviewer-name">{{item.userName}}</text>
             <view class="review-stars">
-              <text class="star" wx:for="{{item.rating}}" wx:for-item="r" wx:key="*this">★</text>
+              <text class="star i-star-fill" wx:for="{{item.rating}}" wx:for-item="r" wx:key="*this"></text>
             </view>
           </view>
           <text class="review-time">{{item.time}}</text>
@@ -112,7 +112,7 @@
 
   <!-- 空评价 -->
   <view class="empty-reviews" wx:if="{{!isLoading && (!reviews || reviews.length === 0)}}">
-      <text class="-comments empty-icon" style="font-size:80rpx;">💬</text>
+      <text class="i -comments empty-icon i-chat" style="font-size:80rpx;"></text>
     <text class="empty-text">暂无评价，快来抢沙发</text>
   </view>
 
@@ -123,7 +123,7 @@
       <view class="store-info">
         <text class="store-name">{{store.name}}</text>
         <view class="store-meta">
-          <text class="store-rating">★ {{store.rating}}</text>
+          <text class="store-rating"> {{store.rating}}</text>
           <text class="store-divider">|</text>
           <text class="store-sales">月售{{store.monthlySales}}</text>
         </view>
@@ -143,11 +143,11 @@
 <view class="bottom-bar">
   <view class="bar-icons">
     <view class="bar-icon-item" bindtap="onFavoriteClick">
-      <text class="bar-icon" style="font-size:40rpx;">{{isFavorite ? '❤️' : '🤍'}}</text>
+      <text class="bar-icon" style="font-size:40rpx;">{{isFavorite ? '<text class="i i-heart-fill"></text>' : '<text class="i i-heart-fill"></text>'}}</text>
       <text class="bar-label">{{isFavorite ? '已收藏' : '收藏'}}</text>
     </view>
     <view class="bar-icon-item" bindtap="onCartClick">
-      <text class="bar-icon -shopping-cart" style="font-size:40rpx;">🛒</text>
+      <text class="i bar-icon -shopping-cart i-bag" style="font-size:40rpx;"></text>
       <text class="bar-label">购物车</text>
       <view class="bar-badge" wx:if="{{cartCount > 0}}">{{cartCount}}</view>
     </view>
@@ -168,7 +168,7 @@
   </view>
   <scroll-view class="cart-popup-list" scroll-y enhanced show-scrollbar="{{false}}">
     <view class="cart-popup-empty" wx:if="{{cartPopupItems.length === 0}}">
-      <text class="cart-empty-icon -shopping-cart" style="font-size:80rpx;">🛒</text>
+      <text class="i cart-empty-icon -shopping-cart i-bag" style="font-size:80rpx;"></text>
       <text class="cart-empty-text">购物车是空的</text>
     </view>
     <view class="cart-popup-item" wx:for="{{cartPopupItems}}" wx:key="foodId">

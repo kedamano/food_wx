@@ -1,5 +1,5 @@
 <!-- 消费明细页面 -->
-<scroll-view class="container" scroll-y>
+<scroll-view class="container" scroll-y enable-flex>
   <!-- 头部 -->
   <view class="header-section">
     <view class="header-content">

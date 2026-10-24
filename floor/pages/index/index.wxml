@@ -6,7 +6,7 @@
     <view class="location">
       <picker mode="selector" range="{{cityList}}" value="{{cityIndex}}" bindchange="onCityChange">
         <view class="location-inner">
-          <text class="location-icon">📍</text>
+          <text class="i location-icon i-location"></text>
           <text class="location-text">{{city}}</text>
           <text class="arrow-icon">▾</text>
         </view>
@@ -14,12 +14,12 @@
     </view>
     <!-- 搜索栏 -->
     <view class="search-bar" bindtap="onSearchTap">
-      <text class="search-icon">🔍</text>
+      <text class="i search-icon i-search"></text>
       <text class="search-placeholder">搜索美食、商家</text>
     </view>
     <!-- 扫码 -->
     <view class="scan-btn" bindtap="onScanTap">
-      <text class="scan-icon">二维码</text>
+      <text class="scan-icon i i-scan"></text>
     </view>
   </view>
 
@@ -115,7 +115,7 @@
           <view class="store-card-img">
             <image lazy-load class="store-img" src="{{item.banner}}" mode="aspectFill" wx:if="{{item.banner}}"></image>
             <view class="store-img-placeholder" wx:else>
-              <text>🏪</text>
+              <text><text class="i i-store"></text></text>
             </view>
             <view class="store-rank-badge" wx:if="{{item.rank}}">No.{{item.rank}}</view>
           </view>

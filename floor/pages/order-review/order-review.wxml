@@ -24,11 +24,11 @@
   <view class="rating-section">
     <text class="section-title">总体评分</text>
     <view class="rating-stars">
-      <text class="star {{rating >= 1 ? 'active' : ''}}" bindtap="onRatingChange" data-rating="1">★</text>
-      <text class="star {{rating >= 2 ? 'active' : ''}}" bindtap="onRatingChange" data-rating="2">★</text>
-      <text class="star {{rating >= 3 ? 'active' : ''}}" bindtap="onRatingChange" data-rating="3">★</text>
-      <text class="star {{rating >= 4 ? 'active' : ''}}" bindtap="onRatingChange" data-rating="4">★</text>
-      <text class="star {{rating >= 5 ? 'active' : ''}}" bindtap="onRatingChange" data-rating="5">★</text>
+      <text class="star {{rating >= 1 ? 'active' : ''}} i-star-fill" bindtap="onRatingChange" data-rating="1"></text>
+      <text class="star {{rating >= 2 ? 'active' : ''}} i-star-fill" bindtap="onRatingChange" data-rating="2"></text>
+      <text class="star {{rating >= 3 ? 'active' : ''}} i-star-fill" bindtap="onRatingChange" data-rating="3"></text>
+      <text class="star {{rating >= 4 ? 'active' : ''}} i-star-fill" bindtap="onRatingChange" data-rating="4"></text>
+      <text class="star {{rating >= 5 ? 'active' : ''}} i-star-fill" bindtap="onRatingChange" data-rating="5"></text>
     </view>
     <text class="rating-text">{{rating}}分</text>
   </view>

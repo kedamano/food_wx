@@ -2,7 +2,7 @@
 
 .container {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: var(--bg);
 }
 
 .header {
@@ -20,13 +20,13 @@
   align-items: center;
   justify-content: center;
   font-size: 32rpx;
-  color: #333;
+  color: var(--text-1);
 }
 
 .header-title {
   font-size: 34rpx;
   font-weight: 600;
-  color: #333;
+  color: var(--text-1);
 }
 
 .header-placeholder {
@@ -48,7 +48,7 @@
 }
 
 .device-item.current {
-  border: 2rpx solid #FF6633;
+  border: 2rpx solid var(--brand);
 }
 
 .device-icon {
@@ -64,7 +64,7 @@
 
 .device-icon text {
   font-size: 36rpx;
-  color: #666;
+  color: var(--text-2);
 }
 
 .device-info {
@@ -80,14 +80,14 @@
 .device-name {
   font-size: 30rpx;
   font-weight: 600;
-  color: #333;
+  color: var(--text-1);
 }
 
 .device-badge {
   margin-left: 16rpx;
   padding: 4rpx 12rpx;
   font-size: 22rpx;
-  color: #FF6633;
+  color: var(--brand);
   background: rgba(255, 102, 51, 0.1);
   border-radius: 8rpx;
 }
@@ -95,7 +95,7 @@
 .device-type {
   display: block;
   font-size: 26rpx;
-  color: #666;
+  color: var(--text-2);
   margin-bottom: 12rpx;
 }
 
@@ -108,7 +108,7 @@
   display: flex;
   align-items: center;
   font-size: 24rpx;
-  color: #999;
+  color: var(--text-3);
   margin-bottom: 4rpx;
 }
 
@@ -125,8 +125,8 @@
   align-items: center;
   padding: 12rpx 20rpx;
   font-size: 24rpx;
-  color: #999;
-  background: #f5f5f5;
+  color: var(--text-3);
+  background: var(--bg);
   border: none;
   border-radius: 8rpx;
 }
@@ -174,7 +174,7 @@
 
 .tip-icon {
   font-size: 40rpx;
-  color: #ff9800;
+  color: var(--warn);
   margin-right: 20rpx;
   margin-top: 4rpx;
 }
@@ -187,14 +187,14 @@
   display: block;
   font-size: 28rpx;
   font-weight: 600;
-  color: #333;
+  color: var(--text-1);
   margin-bottom: 16rpx;
 }
 
 .tip-text {
   display: block;
   font-size: 24rpx;
-  color: #666;
+  color: var(--text-2);
   line-height: 1.6;
   margin-bottom: 8rpx;
 }

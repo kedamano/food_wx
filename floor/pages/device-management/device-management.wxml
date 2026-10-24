@@ -26,7 +26,7 @@
         <text class="device-type">{{item.type}}</text>
         <view class="device-meta">
           <text class="meta-item">
-            <text class="-map-marker-alt">📍</text>
+            <text class="i -map-marker-alt i-location"></text>
             {{item.location}}
           </text>
           <text class="meta-item">

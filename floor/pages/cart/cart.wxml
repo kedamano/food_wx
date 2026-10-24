@@ -15,7 +15,7 @@
   <view class="store-section" wx:if="{{cartItems.length > 0}}">
     <view class="store-header">
       <view class="store-info">
-        <text class="-store store-logo">🏪</text>
+        <text class="i -store store-logo i-store"></text>
         <view class="store-details">
           <text class="store-name">{{storeInfo.name}}</text>
           <view class="delivery-tags">
@@ -43,7 +43,7 @@
                  mode="aspectFill"
                  binderror="onImageError"
                  data-index="{{index}}"></image>
-          <text class="-utensils food-icon" wx:if="{{!item.image && !item.imageError}}">🍴</text>
+          <text class="i -utensils food-icon i-store" wx:if="{{!item.image && !item.imageError}}"></text>
         </view>
 
         <!-- 商品信息 -->
@@ -76,7 +76,7 @@
   <!-- 空购物车提示 -->
   <view class="empty-cart" wx:else>
     <view class="empty-content">
-      <text class="-shopping-cart empty-icon">🛒</text>
+      <text class="i -shopping-cart empty-icon i-bag"></text>
       <text class="empty-text">购物车空空如也</text>
       <text class="empty-subtext">快去挑选心仪的美食吧</text>
       <button class="go-shopping-btn" bindtap="onGoShopping">去逛逛</button>
@@ -87,7 +87,7 @@
   <view class="coupon-section" wx:if="{{cartItems.length > 0}}">
     <view class="coupon-header" bindtap="onSelectCoupon">
       <view class="coupon-left">
-        <text class="-ticket-alt coupon-icon">🎫</text>
+        <text class="i -ticket-alt coupon-icon i-ticket"></text>
         <text class="section-title">优惠券</text>
       </view>
       <view class="coupon-info">

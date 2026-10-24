@@ -1,6 +1,6 @@
 /* 用户评价页面样式 */
 page {
-  background-color: #F5F5F7;
+  background-color: var(--bg);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
@@ -14,7 +14,7 @@ page {
 }
 
 .stats-card {
-  background: linear-gradient(135deg, #FF9800 0%, #FFB74D 100%);
+  background: linear-gradient(135deg, var(--warn) 0%, #FFB74D 100%);
   border-radius: 20rpx;
   padding: 30rpx;
   display: flex;
@@ -60,18 +60,18 @@ page {
   align-items: center;
   margin-bottom: 20rpx;
   padding-bottom: 20rpx;
-  border-bottom: 1rpx solid #F0F0F0;
+  border-bottom: 1rpx solid var(--line);
 }
 
 .section-title {
   font-size: 32rpx;
   font-weight: 600;
-  color: #333333;
+  color: var(--text-1);
 }
 
 .section-count {
   font-size: 24rpx;
-  color: #999999;
+  color: var(--text-3);
 }
 
 .review-list {
@@ -81,7 +81,7 @@ page {
 }
 
 .review-card {
-  background: #FAFAFA;
+  background: var(--bg);
   border-radius: 16rpx;
   padding: 24rpx;
   transition: all 0.3s ease;
@@ -89,7 +89,7 @@ page {
 
 .review-card:active {
   transform: scale(0.98);
-  background: #F5F5F5;
+  background: var(--bg);
 }
 
 .review-header {
@@ -109,7 +109,7 @@ page {
   width: 80rpx;
   height: 80rpx;
   border-radius: 12rpx;
-  background: #E0E0E0;
+  background: var(--line);
 }
 
 .food-details {
@@ -121,7 +121,7 @@ page {
 .food-name {
   font-size: 28rpx;
   font-weight: 500;
-  color: #333333;
+  color: var(--text-1);
 }
 
 .rating-stars {
@@ -131,7 +131,7 @@ page {
 
 .star {
   font-size: 24rpx;
-  color: #E0E0E0;
+  color: var(--line);
 }
 
 .star.active {
@@ -140,7 +140,7 @@ page {
 
 .review-time {
   font-size: 22rpx;
-  color: #999999;
+  color: var(--text-3);
 }
 
 .review-content {
@@ -149,7 +149,7 @@ page {
 
 .review-text {
   font-size: 28rpx;
-  color: #666666;
+  color: var(--text-2);
   line-height: 1.6;
 }
 
@@ -164,7 +164,7 @@ page {
   width: 160rpx;
   height: 160rpx;
   border-radius: 8rpx;
-  background: #E0E0E0;
+  background: var(--line);
 }
 
 .review-actions {
@@ -186,7 +186,7 @@ page {
 
 .action-text {
   font-size: 24rpx;
-  color: #999999;
+  color: var(--text-3);
 }
 
 .empty-state {
@@ -205,13 +205,13 @@ page {
 .empty-title {
   font-size: 32rpx;
   font-weight: 500;
-  color: #333333;
+  color: var(--text-1);
   margin-bottom: 16rpx;
 }
 
 .empty-desc {
   font-size: 26rpx;
-  color: #999999;
+  color: var(--text-3);
   margin-bottom: 40rpx;
 }
 
@@ -224,7 +224,7 @@ page {
 
 .loading-text {
   font-size: 26rpx;
-  color: #999999;
+  color: var(--text-3);
 }
 
 .btn {
@@ -236,7 +236,7 @@ page {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #FF9800 0%, #FFB74D 100%);
+  background: linear-gradient(135deg, var(--warn) 0%, #FFB74D 100%);
   color: #FFFFFF;
 }
 

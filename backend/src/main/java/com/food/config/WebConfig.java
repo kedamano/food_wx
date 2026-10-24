@@ -9,18 +9,22 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.nio.file.Paths;
 
 @Configuration
-public class WebConfig extends WebMvcConfigurationSupport {
+/**
+ * 实现 WebMvcConfigurer（而非继承 WebMvcConfigurationSupport），
+ * 保留 Boot MVC 自动配置，使 spring.jackson.* 等配置对 HTTP 消息转换器生效。
+ */
+public class WebConfig implements WebMvcConfigurer {
 
     @Autowired
     private JwtInterceptor jwtInterceptor;
 
     @Override
-    protected void addCorsMappings(CorsRegistry registry) {
+    public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOriginPatterns("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
@@ -30,7 +34,7 @@ public class WebConfig extends WebMvcConfigurationSupport {
     }
 
     @Override
-    protected void addInterceptors(InterceptorRegistry registry) {
+    public void addInterceptors(InterceptorRegistry registry) {
         // JWT拦截器配置 - 只拦截特定路径
         registry.addInterceptor(jwtInterceptor)
                 .addPathPatterns("/user/**", "/cart/**", "/order/**", "/review/**")
@@ -44,7 +48,7 @@ public class WebConfig extends WebMvcConfigurationSupport {
     private String uploadDir;
 
     @Override
-    protected void addResourceHandlers(ResourceHandlerRegistry registry) {
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // 静态资源处理 - 可通过 file.image-dir / file.upload-dir 配置
         registry.addResourceHandler("/images/**")
                 .addResourceLocations(ensureTrailingSlash(imageDir));

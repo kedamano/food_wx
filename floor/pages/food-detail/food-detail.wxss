@@ -1,6 +1,6 @@
 /* 美食详情页 - 大众点评风格 */
 page {
-  background: #f5f5f5;
+  background: var(--bg);
   font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
 }
 
@@ -111,13 +111,13 @@ page {
 
 .price-symbol {
   font-size: 28rpx;
-  color: #FF6633;
+  color: var(--brand);
   font-weight: 700;
 }
 
 .food-price {
   font-size: 52rpx;
-  color: #FF6633;
+  color: var(--brand);
   font-weight: 800;
   line-height: 1;
   margin-right: 12rpx;
@@ -130,12 +130,12 @@ page {
 
 .orig-symbol {
   font-size: 22rpx;
-  color: #999;
+  color: var(--text-3);
 }
 
 .orig-price {
   font-size: 26rpx;
-  color: #999;
+  color: var(--text-3);
   text-decoration: line-through;
 }
 
@@ -145,8 +145,8 @@ page {
 
 .sold-text {
   font-size: 24rpx;
-  color: #999;
-  background: #f5f5f5;
+  color: var(--text-3);
+  background: var(--bg);
   padding: 6rpx 16rpx;
   border-radius: 20rpx;
 }
@@ -154,7 +154,7 @@ page {
 .food-name {
   font-size: 36rpx;
   font-weight: 700;
-  color: #333;
+  color: var(--text-1);
   line-height: 1.4;
   display: block;
   margin-bottom: 16rpx;
@@ -174,7 +174,7 @@ page {
 
 .tag-hot {
   background: rgba(255, 102, 51, 0.1);
-  color: #FF6633;
+  color: var(--brand);
 }
 
 .tag-classic {
@@ -209,7 +209,7 @@ page {
 .score-num {
   font-size: 48rpx;
   font-weight: 800;
-  color: #FF6633;
+  color: var(--brand);
 }
 
 .score-stars {
@@ -219,12 +219,12 @@ page {
 
 .star {
   font-size: 28rpx;
-  color: #FF6633;
+  color: var(--brand);
 }
 
 .review-count {
   font-size: 24rpx;
-  color: #999;
+  color: var(--text-3);
 }
 
 .rating-info {
@@ -244,13 +244,13 @@ page {
 .info-num {
   font-size: 28rpx;
   font-weight: 700;
-  color: #333;
+  color: var(--text-1);
   margin-bottom: 4rpx;
 }
 
 .info-label {
   font-size: 22rpx;
-  color: #999;
+  color: var(--text-3);
 }
 
 /* 描述区域 */
@@ -270,18 +270,18 @@ page {
 .section-title {
   font-size: 30rpx;
   font-weight: 700;
-  color: #333;
+  color: var(--text-1);
 }
 
 .view-all {
   font-size: 26rpx;
-  color: #999;
+  color: var(--text-3);
 }
 
 .desc-text {
   font-size: 28rpx;
   line-height: 1.8;
-  color: #666;
+  color: var(--text-2);
 }
 
 /* 评价区域 */
@@ -313,7 +313,7 @@ page {
   width: 64rpx;
   height: 64rpx;
   border-radius: 50%;
-  background: linear-gradient(135deg, #FF6633, #FF8855);
+  background: linear-gradient(135deg, var(--brand), #FF8855);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -334,7 +334,7 @@ page {
 .reviewer-name {
   font-size: 26rpx;
   font-weight: 600;
-  color: #333;
+  color: var(--text-1);
   display: block;
   margin-bottom: 4rpx;
 }
@@ -350,13 +350,13 @@ page {
 
 .review-time {
   font-size: 22rpx;
-  color: #999;
+  color: var(--text-3);
 }
 
 .review-content {
   font-size: 28rpx;
   line-height: 1.6;
-  color: #666;
+  color: var(--text-2);
   display: block;
   margin-bottom: 16rpx;
 }
@@ -388,7 +388,7 @@ page {
 
 .empty-text {
   font-size: 28rpx;
-  color: #999;
+  color: var(--text-3);
 }
 
 /* 商家卡片 */
@@ -412,7 +412,7 @@ page {
   height: 80rpx;
   border-radius: 16rpx;
   margin-right: 20rpx;
-  background: #f5f5f5;
+  background: var(--bg);
 }
 
 .store-info {
@@ -422,7 +422,7 @@ page {
 .store-name {
   font-size: 28rpx;
   font-weight: 600;
-  color: #333;
+  color: var(--text-1);
   display: block;
   margin-bottom: 6rpx;
 }
@@ -436,7 +436,7 @@ page {
 
 .store-rating {
   font-size: 24rpx;
-  color: #FF6633;
+  color: var(--brand);
   font-weight: 600;
 }
 
@@ -447,12 +447,12 @@ page {
 
 .store-sales {
   font-size: 22rpx;
-  color: #999;
+  color: var(--text-3);
 }
 
 .store-dist {
   font-size: 22rpx;
-  color: #999;
+  color: var(--text-3);
 }
 
 .store-arrow {
@@ -495,7 +495,7 @@ page {
 
 .bar-label {
   font-size: 20rpx;
-  color: #999;
+  color: var(--text-3);
 }
 
 .bar-badge {
@@ -505,7 +505,7 @@ page {
   min-width: 32rpx;
   height: 32rpx;
   line-height: 32rpx;
-  background: #FF3B30;
+  background: var(--danger);
   color: #fff;
   font-size: 18rpx;
   font-weight: 600;
@@ -541,7 +541,7 @@ page {
 }
 
 .buy-now {
-  background: linear-gradient(135deg, #FF6633, #ee4422);
+  background: linear-gradient(135deg, var(--brand), #ee4422);
   color: #fff;
 }
 
@@ -581,19 +581,19 @@ page {
 .cart-popup-title {
   font-size: 32rpx;
   font-weight: 700;
-  color: #333;
+  color: var(--text-1);
   flex: 1;
 }
 
 .cart-popup-count {
   font-size: 24rpx;
-  color: #999;
+  color: var(--text-3);
   margin-right: 20rpx;
 }
 
 .cart-popup-clear {
   font-size: 24rpx;
-  color: #FF3B30;
+  color: var(--danger);
   padding: 8rpx 16rpx;
 }
 
@@ -619,14 +619,14 @@ page {
 
 .cart-empty-text {
   font-size: 28rpx;
-  color: #999;
+  color: var(--text-3);
 }
 
 .cart-popup-item {
   display: flex;
   align-items: center;
   padding: 24rpx 0;
-  border-bottom: 1rpx solid #f5f5f5;
+  border-bottom: 1rpx solid var(--bg);
 }
 
 .cart-popup-item:last-child {
@@ -639,7 +639,7 @@ page {
   border-radius: 12rpx;
   flex-shrink: 0;
   margin-right: 20rpx;
-  background: #f5f5f5;
+  background: var(--bg);
 }
 
 .cart-item-info {
@@ -649,7 +649,7 @@ page {
 
 .cart-item-name {
   font-size: 28rpx;
-  color: #333;
+  color: var(--text-1);
   font-weight: 500;
   display: block;
   overflow: hidden;
@@ -660,7 +660,7 @@ page {
 
 .cart-item-price {
   font-size: 24rpx;
-  color: #999;
+  color: var(--text-3);
 }
 
 .cart-item-right {
@@ -673,7 +673,7 @@ page {
 
 .cart-item-subtotal {
   font-size: 28rpx;
-  color: #FF6633;
+  color: var(--brand);
   font-weight: 600;
   margin-bottom: 12rpx;
 }
@@ -693,20 +693,20 @@ page {
   align-items: center;
   justify-content: center;
   font-size: 32rpx;
-  color: #666;
+  color: var(--text-2);
   background: #fff;
 }
 
 .qty-btn.qty-plus {
-  background: #FF6633;
-  border-color: #FF6633;
+  background: var(--brand);
+  border-color: var(--brand);
   color: #fff;
 }
 
 .qty-num {
   font-size: 28rpx;
   font-weight: 600;
-  color: #333;
+  color: var(--text-1);
   min-width: 40rpx;
   text-align: center;
 }
@@ -729,17 +729,17 @@ page {
 
 .cart-total-label {
   font-size: 26rpx;
-  color: #666;
+  color: var(--text-2);
 }
 
 .cart-total-price {
   font-size: 40rpx;
   font-weight: 800;
-  color: #FF6633;
+  color: var(--brand);
 }
 
 .cart-popup-go {
-  background: linear-gradient(135deg, #FF6633, #ee4422);
+  background: linear-gradient(135deg, var(--brand), #ee4422);
   color: #fff;
   font-size: 28rpx;
   font-weight: 600;

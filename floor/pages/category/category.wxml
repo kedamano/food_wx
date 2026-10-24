@@ -3,7 +3,7 @@
   <!-- 顶部搜索栏 -->
   <view class="top-bar">
     <view class="search-box" bindtap="onSearchClick">
-      <text class="search-icon-text -search">🔍</text>
+      <text class="i search-icon-text -search i-search"></text>
       <text class="search-placeholder">搜索美食、商家</text>
     </view>
   </view>
@@ -63,7 +63,7 @@
             </view>
             <view class="food-rating" wx:if="{{item.rating}}">
               <view class="stars">
-                <text class="star" wx:for="{{5}}" wx:for-item="s" wx:key="*this">{{s < item.rating ? '★' : '☆'}}</text>
+                <text class="star" wx:for="{{5}}" wx:for-item="s" wx:key="*this">{{s < item.rating ? '' : ''}}</text>
               </view>
               <text class="rating-num">{{item.rating}}</text>
               <text class="review-count" wx:if="{{item.reviews}}">{{item.reviews}}条评价</text>
@@ -74,14 +74,14 @@
 
       <!-- 空状态 -->
       <view class="empty-state" wx:if="{{categoryFoods.length === 0 && !isLoading && selectedCategory}}">
-        <text class="-utensils empty-icon" style="font-size:80rpx;">🍴</text>
+        <text class="i -utensils empty-icon i-store" style="font-size:80rpx;"></text>
         <text class="empty-text">暂无该分类下的美食</text>
         <text class="empty-hint">换个分类看看吧</text>
       </view>
 
       <!-- 默认提示 -->
       <view class="empty-state" wx:if="{{!selectedCategory && categoryFoods.length === 0}}">
-        <text class="-hand-pointer empty-icon" style="font-size:80rpx;">👆</text>
+        <text class="i -hand-pointer empty-icon i-chev-right" style="font-size:80rpx;"></text>
         <text class="empty-text">请选择左侧分类</text>
         <text class="empty-hint">发现更多美味</text>
       </view>

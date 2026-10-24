@@ -36,7 +36,7 @@
 
     <!-- 空状态 -->
     <view class="empty-state" wx:if="{{isEmpty && !loading}}">
-      <text class="-clipboard-list empty-icon" style="font-size:80rpx;">📋</text>
+      <text class="i -clipboard-list empty-icon i-list" style="font-size:80rpx;"></text>
       <text class="empty-title">暂无记录</text>
       <text class="empty-desc">完成签到或兑换商品后，积分变动会记录在这里</text>
     </view>

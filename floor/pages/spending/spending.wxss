@@ -1,6 +1,6 @@
 /* 消费明细页面 */
 page {
-  background-color: #F5F5F7;
+  background-color: var(--bg);
   font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
 }
 
@@ -10,7 +10,7 @@ page {
 }
 
 .header-section {
-  background: linear-gradient(135deg, #FF6633 0%, #FF8855 100%);
+  background: linear-gradient(135deg, var(--brand) 0%, #FF8855 100%);
   border-radius: 20rpx;
   padding: 30rpx;
   margin-bottom: 20rpx;
@@ -56,7 +56,7 @@ page {
 }
 
 .filter-item.active {
-  background: #FF6633;
+  background: var(--brand);
 }
 
 .filter-item:active {
@@ -65,7 +65,7 @@ page {
 
 .filter-text {
   font-size: 24rpx;
-  color: #666;
+  color: var(--text-2);
 }
 
 .filter-item.active .filter-text {
@@ -102,7 +102,7 @@ page {
   width: 80rpx;
   height: 80rpx;
   border-radius: 50%;
-  background: #FFF0EB;
+  background: var(--brand-soft);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -110,7 +110,7 @@ page {
 
 .store-icon-text {
   font-size: 48rpx;
-  color: #FF6633;
+  color: var(--brand);
   font-weight: 700;
 }
 
@@ -129,18 +129,18 @@ page {
 .store-name {
   font-size: 28rpx;
   font-weight: 600;
-  color: #333;
+  color: var(--text-1);
 }
 
 .amount {
   font-size: 30rpx;
   font-weight: 700;
-  color: #FF6633;
+  color: var(--brand);
 }
 
 .item-names {
   font-size: 24rpx;
-  color: #666;
+  color: var(--text-2);
   display: block;
   margin-bottom: 6rpx;
   overflow: hidden;
@@ -171,13 +171,13 @@ page {
 .empty-title {
   font-size: 32rpx;
   font-weight: 500;
-  color: #333;
+  color: var(--text-1);
   margin-bottom: 12rpx;
 }
 
 .empty-desc {
   font-size: 26rpx;
-  color: #999;
+  color: var(--text-3);
 }
 
 .loading-state {
@@ -189,7 +189,7 @@ page {
 
 .loading-text {
   font-size: 26rpx;
-  color: #999;
+  color: var(--text-3);
 }
 
 .safe-area-bottom {

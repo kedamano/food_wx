@@ -4,21 +4,21 @@
   <view class="quick-actions">
     <button class="action-card contact-btn" open-type="contact">
       <view class="action-icon-wrap chat">
-        <text class="-comments action-icon-text">💬</text>
+        <text class="i -comments action-icon-text i-chat"></text>
       </view>
       <text class="action-title">在线客服</text>
       <text class="action-desc">平均响应时间 5 分钟</text>
     </button>
     <view class="action-card" bindtap="onCallService">
       <view class="action-icon-wrap phone">
-        <text class="-phone action-icon-text">📞</text>
+        <text class="i -phone action-icon-text i-phone"></text>
       </view>
       <text class="action-title">电话客服</text>
       <text class="action-desc">{{servicePhone}}</text>
     </view>
     <view class="action-card" bindtap="onFeedback">
       <view class="action-icon-wrap feedback">
-        <text class="-pen action-icon-text">✏️</text>
+        <text class="i -pen action-icon-text i-edit"></text>
       </view>
       <text class="action-title">意见反馈</text>
       <text class="action-desc">我们会认真对待每条反馈</text>

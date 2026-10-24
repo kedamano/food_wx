@@ -9,7 +9,7 @@
       <view class="avg-score-block">
         <text class="avg-score">{{reviewStats.avgRating}}</text>
         <view class="avg-stars">
-          <text class="star" wx:for="{{5}}" wx:for-item="s" wx:key="*this">{{s <= reviewStats.avgRating ? '★' : '☆'}}</text>
+          <text class="star" wx:for="{{5}}" wx:for-item="s" wx:key="*this">{{s <= reviewStats.avgRating ? '' : ''}}</text>
         </view>
         <text class="total-label">共{{reviewStats.total}}条评价</text>
       </view>
@@ -36,7 +36,7 @@
           <text class="bar-count">{{reviewStats.threeStarCount}}</text>
         </view>
         <view class="img-tag" wx:if="{{reviewStats.withImage > 0}}">
-          <text class="img-tag-text"><text class="-camera" style="margin-right:8rpx;">📷</text>{{reviewStats.withImage}}条有图</text>
+          <text class="img-tag-text"><text class="i -camera i-camera" style="margin-right:8rpx;"></text>{{reviewStats.withImage}}条有图</text>
         </view>
       </view>
     </view>
@@ -64,7 +64,7 @@
         <view class="user-info">
           <text class="user-name">{{item.userName}}</text>
           <view class="stars-row">
-            <text class="star-filled" wx:for="{{item.stars}}" wx:for-item="s" wx:key="*this">★</text>
+            <text class="star-filled i-star-fill" wx:for="{{item.stars}}" wx:for-item="s" wx:key="*this"></text>
           </view>
         </view>
         <text class="review-time">{{item.time}}</text>
@@ -90,7 +90,7 @@
 
   <!-- 无评价 -->
   <view class="empty-state" wx:if="{{!isLoading && reviews.length === 0}}">
-    <text class="-comments empty-icon" style="font-size:80rpx;">💬</text>
+    <text class="i -comments empty-icon i-chat" style="font-size:80rpx;"></text>
     <text class="empty-title">暂无评价</text>
     <text class="empty-desc">快来抢沙发吧~</text>
   </view>

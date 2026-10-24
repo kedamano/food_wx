@@ -32,7 +32,7 @@
   <!-- 商家信息 -->
   <view class="store-section">
     <view class="store-info">
-      <text class="-store store-icon">🏪</text>
+      <text class="i -store store-icon i-store"></text>
       <text class="store-name">{{orderInfo.store.name}}</text>
     </view>
     <view class="delivery-info">
@@ -52,7 +52,7 @@
       <view class="item-row" wx:for="{{orderInfo.items}}" wx:key="foodId">
         <view class="item-image">
           <image class="food-image" src="{{item.image}}" mode="aspectFill"></image>
-          <text class="-utensils food-icon" wx:if="{{!item.image}}">🍴</text>
+          <text class="i -utensils food-icon i-store" wx:if="{{!item.image}}"></text>
         </view>
         <view class="item-details">
           <text class="item-name">{{item.name}}</text>
@@ -112,7 +112,7 @@
     <text class="section-title">支付方式</text>
     <view class="payment-options">
       <view class="payment-option {{paymentMethod === 'wechat' ? 'selected' : ''}}" bindtap="onSelectPayment" data-method="wechat">
-        <text class="-comment-dollar payment-icon">💳</text>
+        <text class="i -comment-dollar payment-icon i-card"></text>
         <text class="payment-name">微信支付</text>
         <text class="payment-radio">{{paymentMethod === 'wechat' ? '✓' : '○'}}</text>
       </view>

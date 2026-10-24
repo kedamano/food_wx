@@ -1,13 +1,13 @@
 /* 地址编辑页面样式 */
 .container {
   height: 100vh;
-  background: linear-gradient(135deg, #F8F9FA 0%, #E9ECEF 100%);
+  background: linear-gradient(135deg, var(--bg) 0%, var(--line) 100%);
   font-family: PingFang SC, Helvetica Neue, Arial, sans-serif;
 }
 
 /* 头部样式 */
 .header {
-  background: linear-gradient(135deg, #FF6633 0%, #FF8855 100%);
+  background: linear-gradient(135deg, var(--brand) 0%, #FF8855 100%);
   padding: 40px 20px 30px;
   text-align: center;
   border-radius: 0 0 20px 20px;
@@ -55,14 +55,14 @@
 }
 
 .required {
-  color: #FF5252;
+  color: var(--danger);
   margin-right: 5px;
 }
 
 .label-text {
   font-size: 14px;
   font-weight: 600;
-  color: #212529;
+  color: var(--text-1);
 }
 
 .item-input,
@@ -70,25 +70,25 @@
 .item-textarea {
   width: 100%;
   padding: 12px;
-  background: #F8F9FA;
+  background: var(--bg);
   border: 2px solid transparent;
   border-radius: 8px;
   font-size: 14px;
-  color: #212529;
+  color: var(--text-1);
   transition: all 0.3s ease;
 }
 
 .item-input.error,
 .item-picker.error,
 .item-textarea.error {
-  border-color: #FF5252;
+  border-color: var(--danger);
   background: #FFF5F5;
 }
 
 .item-input:focus,
 .item-picker:focus,
 .item-textarea:focus {
-  border-color: #FF6633;
+  border-color: var(--brand);
   background: #FFFFFF;
   outline: none;
 }
@@ -106,19 +106,19 @@
 
 .picker-text {
   font-size: 14px;
-  color: #212529;
+  color: var(--text-1);
 }
 
 .picker-arrow {
   font-size: 12px;
-  color: #6C757D;
+  color: var(--text-2);
 }
 
 .error-text {
   display: block;
   margin-top: 8px;
   font-size: 12px;
-  color: #FF5252;
+  color: var(--danger);
 }
 
 /* 标签设置 */
@@ -139,7 +139,7 @@
 
 .tag-text {
   font-size: 14px;
-  color: #212529;
+  color: var(--text-1);
 }
 
 /* 底部按钮 */
@@ -151,7 +151,7 @@
 .save-btn {
   width: 100%;
   padding: 15px;
-  background: linear-gradient(135deg, #FF6633 0%, #FF8855 100%);
+  background: linear-gradient(135deg, var(--brand) 0%, #FF8855 100%);
   color: #FFFFFF;
   border: none;
   border-radius: 25px;

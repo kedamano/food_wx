@@ -37,6 +37,8 @@ spring:
     time-zone: GMT+8
     serialization:
       fail-on-empty-beans: false
+      # LocalDateTime 等序列化为 ISO 字符串（否则前端收到数组无法解析）
+      write-dates-as-timestamps: false
 
 # MyBatis配置
 mybatis:

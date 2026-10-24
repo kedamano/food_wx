@@ -12,7 +12,7 @@
       <!-- 用户名输入 -->
       <view class="form-item">
         <view class="item-label">
-          <text class="-user label-icon">👤</text>
+          <text class="i -user label-icon i-user"></text>
           <text class="label-text">用户名</text>
         </view>
         <input 
@@ -28,7 +28,7 @@
       <!-- 手机号输入 -->
       <view class="form-item">
         <view class="item-label">
-          <text class="-mobile-alt label-icon">📱</text>
+          <text class="i -mobile-alt label-icon i-phone"></text>
           <text class="label-text">手机号</text>
         </view>
         <input 
@@ -72,7 +72,7 @@
       <!-- 密码输入 -->
       <view class="form-item">
         <view class="item-label">
-          <text class="-lock label-icon">🔒</text>
+          <text class="i -lock label-icon i-lock"></text>
           <text class="label-text">密码</text>
         </view>
         <input 
@@ -84,13 +84,13 @@
           value="{{password}}"
           bindinput="onPasswordInput"
         />
-        <text class="password-toggle" bindtap="onTogglePassword">{{showPassword ? '🙈' : '👁'}}</text>
+        <text class="password-toggle" bindtap="onTogglePassword">{{showPassword ? '<text class="i i-eye-off"></text>' : '<text class="i i-eye"></text>'}}</text>
       </view>
 
       <!-- 确认密码输入 -->
       <view class="form-item">
         <view class="item-label">
-          <text class="-lock label-icon">🔒</text>
+          <text class="i -lock label-icon i-lock"></text>
           <text class="label-text">确认密码</text>
         </view>
         <input 
@@ -102,13 +102,13 @@
           value="{{confirmPassword}}"
           bindinput="onConfirmPasswordInput"
         />
-        <text class="password-toggle" bindtap="onToggleConfirmPassword">{{showConfirmPassword ? '🙈' : '👁'}}</text>
+        <text class="password-toggle" bindtap="onToggleConfirmPassword">{{showConfirmPassword ? '<text class="i i-eye-off"></text>' : '<text class="i i-eye"></text>'}}</text>
       </view>
 
       <!-- 邀请码输入 -->
       <view class="form-item">
         <view class="item-label">
-          <text class="-gift label-icon">🎁</text>
+          <text class="i -gift label-icon i-gift"></text>
           <text class="label-text">邀请码（可选）</text>
         </view>
         <input 
@@ -149,7 +149,7 @@
       <text class="divider-text">快速注册</text>
       <view class="social-register">
         <button class="social-btn wechat" bindtap="onWeChatRegister">
-          <text class="-comment social-icon">💬</text>
+          <text class="i -comment social-icon i-chat"></text>
           <text class="social-text">微信一键注册</text>
         </button>
       </view>

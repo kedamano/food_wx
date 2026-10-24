@@ -1,6 +1,6 @@
 /* 优惠券管理 - 现代化CSS */
 page {
-  background-color: #F5F5F7;
+  background-color: var(--bg);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
@@ -11,7 +11,7 @@ page {
 
 /* 积分头部 */
 .points-header {
-  background: linear-gradient(135deg, #FF6633 0%, #FF8855 100%);
+  background: linear-gradient(135deg, var(--brand) 0%, #FF8855 100%);
   border-radius: 20rpx;
   padding: 30rpx;
   margin-bottom: 20rpx;
@@ -105,12 +105,12 @@ page {
 }
 
 .tab-item.active {
-  background: #FF6633;
+  background: var(--brand);
 }
 
 .tab-text {
   font-size: 24rpx;
-  color: #666666;
+  color: var(--text-2);
   margin-bottom: 4rpx;
   font-weight: 500;
 }
@@ -121,7 +121,7 @@ page {
 
 .tab-badge {
   font-size: 20rpx;
-  color: #FF6B6B;
+  color: var(--danger);
   background: #FFE8E8;
   padding: 2rpx 8rpx;
   border-radius: 10rpx;
@@ -173,21 +173,21 @@ page {
   display: flex;
   align-items: flex-end;
   padding-right: 30rpx;
-  border-right: 2rpx dashed #F0F0F0;
+  border-right: 2rpx dashed var(--line);
   margin-right: 30rpx;
   min-width: 160rpx;
 }
 
 .amount-symbol {
   font-size: 32rpx;
-  color: #FF6B6B;
+  color: var(--danger);
   font-weight: 600;
   margin-bottom: 8rpx;
 }
 
 .amount-value {
   font-size: 56rpx;
-  color: #FF6B6B;
+  color: var(--danger);
   font-weight: 700;
   line-height: 1;
 }
@@ -201,19 +201,19 @@ page {
 .coupon-name {
   font-size: 28rpx;
   font-weight: 600;
-  color: #333333;
+  color: var(--text-1);
   margin-bottom: 8rpx;
 }
 
 .coupon-condition {
   font-size: 24rpx;
-  color: #666666;
+  color: var(--text-2);
   margin-bottom: 8rpx;
 }
 
 .coupon-expiry {
   font-size: 22rpx;
-  color: #999999;
+  color: var(--text-3);
 }
 
 .coupon-status {
@@ -225,17 +225,17 @@ page {
 
 .status-text {
   font-size: 22rpx;
-  color: #FF6633;
+  color: var(--brand);
   margin-bottom: 8rpx;
   font-weight: 500;
 }
 
 .used .status-text {
-  color: #999999;
+  color: var(--text-3);
 }
 
 .expired .status-text {
-  color: #FF6B6B;
+  color: var(--danger);
 }
 
 .status-icon {
@@ -256,7 +256,7 @@ page {
   position: absolute;
   width: 30rpx;
   height: 30rpx;
-  background: #F5F5F7;
+  background: var(--bg);
   border-radius: 50%;
   top: 50%;
   transform: translateY(-50%);
@@ -276,7 +276,7 @@ page {
   top: 0;
   bottom: 0;
   width: 2rpx;
-  border-left: 2rpx dashed #F0F0F0;
+  border-left: 2rpx dashed var(--line);
 }
 
 /* 推荐优惠券 */
@@ -294,12 +294,12 @@ page {
 .section-title {
   font-size: 32rpx;
   font-weight: 600;
-  color: #333333;
+  color: var(--text-1);
 }
 
 .section-desc {
   font-size: 24rpx;
-  color: #999999;
+  color: var(--text-3);
 }
 
 .recommend-list {
@@ -336,24 +336,24 @@ page {
 .recommend-name {
   font-size: 26rpx;
   font-weight: 600;
-  color: #333333;
+  color: var(--text-1);
   margin-bottom: 8rpx;
 }
 
 .recommend-discount {
   font-size: 32rpx;
-  color: #FF6B6B;
+  color: var(--danger);
   font-weight: 700;
   margin-bottom: 4rpx;
 }
 
 .recommend-condition {
   font-size: 22rpx;
-  color: #999999;
+  color: var(--text-3);
 }
 
 .recommend-btn {
-  background: #FF6633;
+  background: var(--brand);
   color: #FFFFFF;
   padding: 12rpx 24rpx;
   border-radius: 12rpx;
@@ -364,7 +364,7 @@ page {
 }
 
 .recommend-btn:active {
-  background: #ee5522;
+  background: var(--brand-deep);
   transform: scale(0.95);
 }
 
@@ -386,13 +386,13 @@ page {
 .empty-title {
   font-size: 32rpx;
   font-weight: 500;
-  color: #333333;
+  color: var(--text-1);
   margin-bottom: 16rpx;
 }
 
 .empty-desc {
   font-size: 26rpx;
-  color: #999999;
+  color: var(--text-3);
   margin-bottom: 40rpx;
   text-align: center;
 }

@@ -188,8 +188,9 @@ App({
   resolveImageUrl: function(url) {
     if (!url) return '';
     if (url.indexOf('http://') === 0 || url.indexOf('https://') === 0) return url;
-    // 使用完整 URL（微信小程序需要）
-    if (url.indexOf('/images/') === 0) return this.apiBase() + url;
+    // 内置演示图片直接走小程序包内资源，避免 HTTP 图片被基础库拦截
+    if (url.indexOf('/images/') === 0) return url;
+    // 用户上传等运行时资源走后端
     if (url.indexOf('/') === 0) return this.apiBase() + url;
     return url;
   },

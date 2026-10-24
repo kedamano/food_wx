@@ -1,7 +1,7 @@
 /* 登录页 - 大众点评橙红风格 */
 .container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #FF6633 0%, #FF8855 50%, #FFaa77 100%);
+  background: linear-gradient(135deg, var(--brand) 0%, #FF8855 50%, #FFaa77 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -98,7 +98,7 @@
 
 .label-text {
   font-size: 28rpx;
-  color: #333;
+  color: var(--text-1);
   font-weight: 500;
 }
 
@@ -115,7 +115,7 @@
 }
 
 .item-input:focus {
-  border-color: #FF6633;
+  border-color: var(--brand);
   background: #fff;
   box-shadow: 0 0 0 4rpx rgba(255, 102, 51, 0.08);
 }
@@ -129,7 +129,7 @@
   position: absolute;
   right: 48rpx;
   font-size: 36rpx;
-  color: #999;
+  color: var(--text-3);
 }
 
 /* 选项 */
@@ -152,19 +152,19 @@
 
 .checkbox-label {
   font-size: 26rpx;
-  color: #666;
+  color: var(--text-2);
 }
 
 .forgot-password {
   font-size: 26rpx;
-  color: #FF6633;
+  color: var(--brand);
 }
 
 /* 登录按钮 */
 .login-btn {
   width: 100%;
   height: 96rpx;
-  background: linear-gradient(135deg, #FF6633, #FF8855);
+  background: linear-gradient(135deg, var(--brand), #FF8855);
   border-radius: 48rpx;
   color: #fff;
   font-size: 34rpx;
@@ -189,7 +189,7 @@
 /* 错误 */
 .error-message {
   display: block;
-  color: #FF3B30;
+  color: var(--danger);
   font-size: 26rpx;
   text-align: center;
   margin-top: 20rpx;

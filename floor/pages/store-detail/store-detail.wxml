@@ -10,7 +10,7 @@
       </swiper-item>
     </swiper>
     <view class="hero-placeholder" wx:else>
-      <text class="-store">🏪</text>
+      <text class="i -store i-store"></text>
     </view>
     
     <!-- 浮动导航 -->
@@ -34,7 +34,7 @@
     <view class="info-top">
       <text class="store-name">{{storeInfo.name}}</text>
       <view class="collect-btn {{isCollected ? 'collected' : ''}}" bindtap="toggleCollect">
-        <text>{{isCollected ? '❤️' : '🤍'}}</text>
+        <text>{{isCollected ? '<text class="i i-heart-fill"></text>' : '<text class="i i-heart-fill"></text>'}}</text>
         <text>{{isCollected ? '已收藏' : '收藏'}}</text>
       </view>
     </view>
@@ -45,7 +45,7 @@
       </view>
       <view class="rating-detail">
         <view class="stars-row">
-          <text class="-star star-filled" wx:for="{{5}}" wx:key="*this">⭐</text>
+          <text class="i -star star-filled i-star-fill" wx:for="{{5}}" wx:key="*this"></text>
         </view>
         <text class="rating-count">{{storeInfo.reviews || 0}}条评价</text>
       </view>
@@ -89,7 +89,7 @@
   <!-- 优惠活动 -->
   <view class="deals-card card" wx:if="{{deals.length > 0}}">
     <view class="deals-header">
-      <text class="-ticket-alt deals-icon">🎫</text>
+      <text class="i -ticket-alt deals-icon i-ticket"></text>
       <text class="deals-title">优惠活动</text>
     </view>
     <view class="deal-item" wx:for="{{deals}}" wx:key="index">
@@ -136,7 +136,7 @@
             <view class="menu-food-img">
               <image lazy-load class="menu-img" src="{{item.image}}" mode="aspectFill" wx:if="{{item.image}}"></image>
               <view class="menu-img-placeholder" wx:else>
-                <text class="-utensils">🍴</text>
+                <text class="i -utensils i-store"></text>
               </view>
             </view>
             <view class="menu-food-info">
@@ -156,7 +156,7 @@
         </view>
         <!-- 空状态 -->
         <view class="empty-state" wx:if="{{foodList.length === 0}}">
-          <text class="-utensils empty-state-icon">🍴</text>
+          <text class="i -utensils empty-state-icon i-store"></text>
           <text class="empty-state-text">暂无菜品</text>
         </view>
       </scroll-view>
@@ -184,7 +184,7 @@
           <view class="review-user-info">
             <text class="review-username">{{item.userName}}</text>
             <view class="review-stars">
-              <text class="-star" wx:for="{{item.starCount || 5}}" wx:key="*this" wx:for-item="s">⭐</text>
+              <text class="i -star i-star-fill" wx:for="{{item.starCount || 5}}" wx:key="*this" wx:for-item="s"></text>
             </view>
           </view>
           <text class="review-date">{{item.time}}</text>
@@ -232,7 +232,7 @@
   <view class="bottom-bar safe-bottom" wx:if="{{cartCount > 0}}">
     <view class="cart-info" bindtap="onCartTap">
       <view class="cart-icon-wrap">
-        <text class="-shopping-cart">🛒</text>
+        <text class="i -shopping-cart i-bag"></text>
         <text class="cart-badge">{{cartCount}}</text>
       </view>
       <text class="cart-total">
@@ -254,7 +254,7 @@
   </view>
   <scroll-view class="cart-popup-list" scroll-y enhanced show-scrollbar="{{false}}">
     <view class="cart-popup-empty" wx:if="{{cartPopupItems.length === 0}}">
-      <text class="cart-empty-icon -shopping-cart" style="font-size:80rpx;">🛒</text>
+      <text class="i cart-empty-icon -shopping-cart i-bag" style="font-size:80rpx;"></text>
       <text class="cart-empty-text">购物车是空的</text>
     </view>
     <view class="cart-popup-item" wx:for="{{cartPopupItems}}" wx:key="foodId">

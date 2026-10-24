@@ -1,5 +1,5 @@
 <!-- 积分商城 -->
-<scroll-view class="container" scroll-y>
+<scroll-view class="container" scroll-y enable-flex>
   <!-- 积分头部 -->
   <view class="points-header">
     <view class="points-card">
@@ -38,7 +38,7 @@
   <!-- 今日任务 -->
   <view class="tasks-section">
     <view class="section-header">
-      <text class="section-title"><text class="-bullseye" style="margin-right:8rpx;">🎯</text>今日任务</text>
+      <text class="section-title"><text class="i -bullseye i-target" style="margin-right:8rpx;"></text>今日任务</text>
       <text class="section-desc">完成得积分</text>
     </view>
     <view class="task-list">
@@ -60,7 +60,7 @@
   <!-- 积分商品 -->
   <view class="products-section">
     <view class="section-header">
-      <text class="section-title"><text class="-gift" style="margin-right:8rpx;">🎁</text>积分兑换</text>
+      <text class="section-title"><text class="i -gift i-gift" style="margin-right:8rpx;"></text>积分兑换</text>
       <view class="sort-options" bindtap="onSortClick">
         <text class="sort-text">{{sortText}}</text>
         <text class="sort-icon">▼</text>

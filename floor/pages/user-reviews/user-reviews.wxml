@@ -1,7 +1,7 @@
 ﻿﻿<!-- 用户评价页面 -->
 
 
-<scroll-view class="container" scroll-y>
+<scroll-view class="container" scroll-y enable-flex>
 
 
   <!-- 头部统计 -->
@@ -112,7 +112,7 @@
               <view class="rating-stars">
 
 
-                <text class="star {{index < item.rating ? 'active' : ''}}" wx:for="{{5}}" wx:key="*this" wx:for-index="index">★</text>
+                <text class="star {{index < item.rating ? 'active' : ''}} i-star-fill" wx:for="{{5}}" wx:key="*this" wx:for-index="index"></text>
 
 
               </view>
@@ -175,7 +175,7 @@
           <view class="action-btn" bindtap="onLikeReview" data-review="{{item}}">
 
 
-            <text class="action-icon {{item.isLiked ? 'liked' : ''}}">❤️</text>
+            <text class="i action-icon {{item.isLiked ? 'liked' : ''}} i-heart-fill"></text>
 
 
             <text class="action-text">{{item.likeCount || 0}}</text>
@@ -187,7 +187,7 @@
           <view class="action-btn" bindtap="onReplyReview" data-review="{{item}}">
 
 
-            <text class="-comment action-icon">💬</text>
+            <text class="i -comment action-icon i-chat"></text>
 
 
             <text class="action-text">回复</text>
@@ -214,7 +214,7 @@
     <view class="empty-state" wx:if="{{reviews.length === 0 && !loading}}">
 
 
-      <text class="-pen empty-icon">✏️</text>
+      <text class="i -pen empty-icon i-edit"></text>
 
 
       <text class="empty-title">暂无评价</text>

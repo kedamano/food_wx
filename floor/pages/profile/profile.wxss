@@ -1,6 +1,6 @@
 /* 个人中心 - 大众点评风格 */
 page {
-  background: #f5f5f5;
+  background: var(--bg);
   font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
 }
 
@@ -22,7 +22,7 @@ page {
   left: 0;
   right: 0;
   height: 320rpx;
-  background: linear-gradient(135deg, #FF6633, #FF8855, #FFaa77);
+  background: linear-gradient(135deg, var(--brand), #FF8855, #FFaa77);
 }
 
 .header-content {
@@ -138,16 +138,16 @@ page {
 .stat-num {
   font-size: 36rpx;
   font-weight: 700;
-  color: #333;
+  color: var(--text-1);
 }
 
 .stat-num.highlight {
-  color: #FF6633;
+  color: var(--brand);
 }
 
 .stat-label {
   font-size: 22rpx;
-  color: #999;
+  color: var(--text-3);
   margin-top: 4rpx;
 }
 
@@ -176,7 +176,7 @@ page {
 .section-title {
   font-size: 32rpx;
   font-weight: 700;
-  color: #333;
+  color: var(--text-1);
 }
 
 .view-all {
@@ -187,7 +187,7 @@ page {
 
 .view-all-text {
   font-size: 24rpx;
-  color: #999;
+  color: var(--text-3);
 }
 
 .arrow {
@@ -229,7 +229,7 @@ page {
   min-width: 32rpx;
   height: 32rpx;
   line-height: 32rpx;
-  background: #FF3B30;
+  background: var(--danger);
   color: #fff;
   font-size: 18rpx;
   font-weight: 600;
@@ -240,7 +240,7 @@ page {
 
 .order-text {
   font-size: 24rpx;
-  color: #666;
+  color: var(--text-2);
 }
 
 /* 工具区域 */
@@ -265,7 +265,7 @@ page {
 
 .tool-text {
   font-size: 24rpx;
-  color: #666;
+  color: var(--text-2);
 }
 
 .coupon-tool-icon {
@@ -278,7 +278,7 @@ page {
   right: -4rpx;
   width: 14rpx;
   height: 14rpx;
-  background: #FF3B30;
+  background: var(--danger);
   border-radius: 50%;
   border: 2rpx solid #fff;
 }
@@ -294,7 +294,7 @@ page {
   justify-content: space-between;
   align-items: center;
   padding: 28rpx 0;
-  border-bottom: 1rpx solid #f5f5f5;
+  border-bottom: 1rpx solid var(--bg);
 }
 
 .menu-item:last-child {
@@ -314,7 +314,7 @@ page {
 
 .menu-text {
   font-size: 28rpx;
-  color: #333;
+  color: var(--text-1);
   font-weight: 500;
 }
 
@@ -326,7 +326,7 @@ page {
 
 .menu-desc {
   font-size: 24rpx;
-  color: #999;
+  color: var(--text-3);
 }
 
 .menu-arrow {
@@ -344,7 +344,7 @@ page {
   height: 88rpx;
   line-height: 88rpx;
   background: #fff;
-  color: #FF3B30;
+  color: var(--danger);
   font-size: 30rpx;
   font-weight: 500;
   border: none;
@@ -357,7 +357,7 @@ page {
 }
 
 .logout-btn:active {
-  background: #f5f5f5;
+  background: var(--bg);
 }
 
 .bottom-safe {

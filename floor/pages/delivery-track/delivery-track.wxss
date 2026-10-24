@@ -1,6 +1,6 @@
 /* pages/delivery-track/delivery-track.wxss */
 page {
-  background-color: #F8F9FA;
+  background-color: var(--bg);
   min-height: 100vh;
 }
 
@@ -9,7 +9,7 @@ page {
 }
 
 .status-card {
-  background: linear-gradient(135deg, #FF7A45, #FF4D4F);
+  background: linear-gradient(135deg, var(--brand), var(--danger));
   border-radius: 20rpx;
   padding: 40rpx;
   color: #fff;
@@ -50,17 +50,17 @@ page {
 .rider-name {
   font-size: 30rpx;
   font-weight: 600;
-  color: #333;
+  color: var(--text-1);
 }
 
 .rider-rating {
   margin-top: 8rpx;
   font-size: 24rpx;
-  color: #999;
+  color: var(--text-3);
 }
 
 .call-btn {
-  background: #FF7A45;
+  background: var(--brand);
   color: #fff;
   font-size: 26rpx;
   padding: 0 30rpx;
@@ -79,7 +79,7 @@ page {
 .section-title {
   font-size: 30rpx;
   font-weight: 600;
-  color: #333;
+  color: var(--text-1);
 }
 
 .step-list {
@@ -104,7 +104,7 @@ page {
   top: 28rpx;
   bottom: 0;
   width: 2rpx;
-  background: #E9ECEF;
+  background: var(--line);
 }
 
 .step-item:last-child::before {
@@ -115,17 +115,17 @@ page {
   width: 24rpx;
   height: 24rpx;
   border-radius: 50%;
-  background: #E9ECEF;
+  background: var(--line);
   flex-shrink: 0;
   z-index: 1;
 }
 
 .step-item.done .step-dot {
-  background: #52C41A;
+  background: var(--success);
 }
 
 .step-item.active .step-dot {
-  background: #FF7A45;
+  background: var(--brand);
   box-shadow: 0 0 0 6rpx rgba(255, 122, 69, 0.2);
 }
 
@@ -135,17 +135,17 @@ page {
 
 .step-name {
   font-size: 28rpx;
-  color: #666;
+  color: var(--text-2);
 }
 
 .step-item.done .step-name,
 .step-item.active .step-name {
-  color: #333;
+  color: var(--text-1);
   font-weight: 600;
 }
 
 .step-time {
   margin-top: 6rpx;
   font-size: 24rpx;
-  color: #999;
+  color: var(--text-3);
 }
