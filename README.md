@@ -11,7 +11,7 @@
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.7.14-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Java](https://img.shields.io/badge/Java-8-orange.svg)](https://openjdk.java.net/)
 [![WeChat Mini Program](https://img.shields.io/badge/微信-小程序-blue.svg)](https://developers.weixin.qq.com/miniprogram/dev/framework/)
-[![Tests](https://img.shields.io/badge/tests-111%20passing-success.svg)](#-测试与-ci)
+[![Tests](https://img.shields.io/badge/tests-145%20passing-success.svg)](#-测试与-ci)
 
 </div>
 
@@ -22,16 +22,18 @@
 - **完整外卖闭环** — 浏览 / 加购 / 下单 / 优惠券抵扣 / 微信支付 / 确认收货 / 评价，一条链路真实可用，无假数据冒充
 - **真实微信能力** — `code2session` 微信登录、微信支付 V2 JSAPI 下单 + 回调验签，未配置商户号时自动降级为模拟支付
 - **安全内建** — JWT + BCrypt + 角色鉴权（`@RequireRole`）+ 数据归属校验（防越权 IDOR）+ 支付回调验签，杜绝常见 Web 漏洞
-- **测试门禁** — 后端 74 例（JUnit 5 + Mockito + H2 集成测试）+ 前端 37 例（Vitest），GitHub Actions 自动执行
+- **测试门禁** — 后端 74 例（JUnit 5 + Mockito + H2 集成测试）+ 前端 71 例（Vitest，含请求行为锁定与 SWR 缓存），GitHub Actions 自动执行
 - **清爽架构** — Controller / Service / Mapper 分层，全局异常处理，动态 SQL 更新，批量查询消除 N+1
+- **SDD/TDD 驱动** — 剩余迭代先立规格（docs/specs/）再测试先行，authRequest 行为被测试锁定，重构有安全网
 
 ## 📊 系统架构
 
 ```mermaid
 graph LR
     subgraph 微信小程序 [微信小程序 · floor/]
-        A[37 个页面<br/>首页/分类/购物车/订单/积分/优惠券]
-        R[统一请求层<br/>Bearer Token · 401 自动重登]
+        A[38 个页面<br/>主包 9 页 + 两个分包 pkg-list/pkg-user]
+        R[统一请求层<br/>Bearer Token · 401 刷新重试]
+        K[SWR 数据缓存<br/>商家/统计/券包 秒显]
     end
     subgraph 后端 [Spring Boot · backend/]
         I[JwtInterceptor 认证]
@@ -45,6 +47,7 @@ graph LR
         SMS[阿里云短信]
     end
     A --> R --> I --> C --> S --> M
+    R --> K
     C --> W --> WX
     C --> SMS
     WX -. 支付回调 .-> W
@@ -60,13 +63,17 @@ graph LR
 | 📦 订单 | 下单、优惠券抵扣、取消（自动回补券）、退款（回补券+流水标记）、模拟支付、确认收货发积分、催单、订单统计、服务端分页 | ✅ |
 | 💳 支付 | 微信支付 JSAPI 下单 + 回调验签（需商户号），未配置时降级模拟支付 | ✅ |
 | 🎫 优惠券 | 兑换、本人券包、下单核销、取消回补、门槛/有效期校验 | ✅ |
-| ⭐ 评价 | 订单评价（发积分）、菜品评价列表与统计、全部评价筛选 | ✅ |
-| 📍 地址 | 增删改查、默认地址、下单自动带入 | ✅ |
-| 🎁 积分 | 签到（连续奖励）、积分明细、积分兑换 | ✅ |
+| ⭐ 评价 | 订单评价（发积分）、菜品评价列表与统计、点赞/回复互动 | ✅ |
+| ❤️ 收藏 | 商家收藏 + 菜品收藏（服务器态，跨设备同步） | ✅ |
+| 📍 地址 | 增删改查、默认地址、31 省市区三级联动选择器 | ✅ |
+| 🎁 积分 | 每日签到、真实任务系统（成单/评价实时判定）、积分商城兑换（库存/积分事务校验，券类自动发放） | ✅ |
+| 💬 话题 | 话题列表、详情（参与商家聚合）、参与 | ✅ |
+| 📱 设备管理 | 登录设备上报/列表/解绑 | ✅ |
 | 🔐 安全 | 角色鉴权（ADMIN/MERCHANT/USER）、越权防护、支付回调验签 | ✅ |
 | 🛵 骑手端 | 待配送订单池、接单派单、实时位置上报、确认送达（RIDER 角色 API） | ✅ API 就绪 |
 | 📷 文件上传 | 头像、评价图片、反馈附图真实上传（白名单校验 + UUID 重命名） | ✅ |
-| ⚡ 缓存 | 轮播图/分类/热门菜品热点读缓存，内存（默认）/Redis 双模式 | ✅ |
+| ⚡ 缓存 | 双层：服务端热点缓存（内存/Redis 双模式）+ 客户端 SWR（商家 10min/统计 60s 秒显，登录切换防串号） | ✅ |
+| 🔑 会话 | Token 刷新换发（签名合法的过期 Token 换新），前端 401 自动刷新重试 | ✅ |
 | 👨‍💼 商家管理后台 | 可视化运营界面（接口已就绪） | 🗺️ Roadmap |
 | 🔔 消息通知 | 催单/派单通知推送 | 🗺️ Roadmap |
 
@@ -82,7 +89,7 @@ graph LR
 | 认证 | JWT (jjwt) + BCrypt 密码散列 |
 | 接口文档 | Swagger / springfox（`/api/swagger-ui/`） |
 | 短信 | 阿里云短信 SDK |
-| 前端 | 微信原生小程序（WXML/WXSS/JS），37 个页面 |
+| 前端 | 微信原生小程序（WXML/WXSS/JS），38 个页面（主包 9 + 分包 29） |
 | 测试 | JUnit 5 · Mockito · H2(MODE=MySQL) · Vitest |
 | CI/CD | GitHub Actions |
 
@@ -104,12 +111,16 @@ food_wx/
 │   └── sql/
 │       ├── schema.sql              # 建表脚本（MySQL 8 兼容）
 │       └── data.sql                # 演示数据
-├── floor/                          # 微信小程序前端
-│   ├── pages/                      # 37 个页面
-│   ├── api/                        # 请求封装（拦截器 / 401 处理）
+├── floor/                          # 微信小程序前端（主包 < 2MB）
+│   ├── pages/                      # 主包 9 页（tab/登录/首页/详情）
+│   ├── pkg-list/                   # 分包：订单相关 8 页
+│   ├── pkg-user/                   # 分包：个人中心与工具 21 页
+│   ├── components/                 # error-retry 等共享组件
+│   ├── utils/                      # format/order-format/cache(SWR) 等（含单测）
+│   ├── api/                        # 请求封装（环境自适应 / 401 刷新重试）
 │   ├── app.js                      # 全局购物车 / 登录态 / 请求中枢
-│   └── __tests__/                  # Vitest 单元测试
-├── docs/                           # 设计文档与代码审查报告
+│   └── __tests__/                  # Vitest 71 用例（含 authRequest 行为锁定）
+├── docs/                           # 文档 + specs/（SDD 规格与验收标准）
 └── .github/workflows/ci.yml        # CI：push/PR 自动跑前后端测试
 ```
 
@@ -127,9 +138,12 @@ food_wx/
 ### 1. 初始化数据库
 
 ```bash
-mysql -u root -p < backend/sql/schema.sql   # 建库建表
-mysql -u root -p < backend/sql/data.sql     # 导入演示数据（商家/菜品/优惠券/轮播图）
+mysql -u root -p < backend/sql/schema.sql       # 建库建表
+mysql -u root -p < backend/sql/data.sql         # 基础演示数据
+mysql -u root -p < backend/sql/demo_data.sql    # 全量演示数据（商家/商品/订单/评价/收藏 各约 500 条）
 ```
+
+> 演示账号：`zhangsan` / `123456`（已加权：150 订单、75 收藏、60 优惠券、1250 积分）。未配置阿里云短信时验证码自动进入开发模式（打印在后端控制台）。
 
 ### 2. 配置并启动后端
 
@@ -150,11 +164,16 @@ mvn spring-boot:run
 
 > 💡 本地调试需在微信开发者工具中勾选「不校验合法域名」。
 
+**真机调试**：手机与电脑同一 Wi-Fi，`floor/api/config.js` 的 `LAN_BASEURL` 改为电脑局域网 IP（`ipconfig` 查看），并以管理员放行 8080 入站：
+```powershell
+netsh advfirewall firewall add rule name="food_wx-8080" dir=in action=allow protocol=TCP localport=8080
+```
+
 ### 4. 跑通测试
 
 ```bash
-cd backend && mvn test      # 72 个用例（H2 内存库，无需 MySQL）
-cd floor && npm install && npm test   # 37 个用例
+cd backend && mvn test      # 74 个用例（H2 内存库，无需 MySQL）
+cd floor && npm install && npm test   # 71 个用例（请求行为锁定/SWR 缓存/纯函数）
 ```
 
 ## 🔐 环境变量
@@ -233,6 +252,13 @@ cd floor && npm install && npm test   # 37 个用例
 | POST | `/rider/orders/{id}/dispatch` | 接单派单（订单进入配送中） |
 | PUT | `/rider/orders/{id}/location` · `/deliver` | 骑手位置上报 / 确认送达 |
 | POST | `/file/upload` | 图片上传（multipart，字段名 file） |
+| POST | `/review/{id}/like` · `/reply` | 评价点赞切换 / 回复 |
+| POST | `/food/{id}/favorite` | 菜品收藏切换 |
+| GET | `/points-shop/products` · `/tasks` · POST `/exchange` | 积分商城 / 每日任务 / 兑换（事务） |
+| GET | `/topic/list` · `/{id}` · POST `/{id}/join` | 话题列表 / 详情 / 参与 |
+| POST | `/user/refresh-token` | Token 刷新换发（签名合法的过期 Token） |
+| GET | `/region/tree` | 省市区三级数据（31 省） |
+| GET/POST/DELETE | `/user/devices/**` | 登录设备上报 / 列表 / 解绑 |
 </details>
 
 ## 🗄️ 数据库设计
@@ -258,7 +284,7 @@ cd floor && npm install && npm test   # 37 个用例
 | 套件 | 用例数 | 覆盖 |
 |------|:----:|------|
 | 后端 `mvn test` | 74 | Service 单测（Mockito）+ 集成测试（H2 内存库）+ JWT/验证码工具 |
-| 前端 `npm test` | 37 | 请求封装（拦截器/401/错误处理）+ 工具函数 |
+| 前端 `npm test` | 71 | 请求封装与 authRequest 行为锁定（401 刷新重试）+ SWR 缓存层 + 日期/订单/分类纯函数 |
 
 GitHub Actions 在每次 push / PR 时自动运行两个测试作业（[ci.yml](.github/workflows/ci.yml)）。
 
@@ -268,12 +294,16 @@ GitHub Actions 在每次 push / PR 时自动运行两个测试作业（[ci.yml](
 - [x] 骑手端 API：待配送订单池、接单派单、实时位置上报、确认送达（`RIDER` 角色）
 - [x] 服务端分页（订单列表 + 菜品列表，`page/size` 可选参数，向后兼容）
 - [x] 文件上传（`POST /file/upload`：头像 / 评价图片 / 反馈附图）
-- [x] 热点读缓存（内存 / Redis 双模式，`cache.type` 切换）
+- [x] 热点读缓存（服务端内存/Redis + 客户端 SWR 双层）
+- [x] 积分商城 / 每日任务 / 评价点赞回复 / 菜品收藏 / 话题 / 设备管理 / Token 刷新
+- [x] 省市区三级联动（31 省完整数据）
+- [x] 主包分包（4.3MB → 1.63MB，pkg-list + pkg-user）
 - [ ] 附近商家按真实距离排序（stores 表经纬度已就绪）
 - [ ] 微信支付升级 V3 API
 - [ ] 骑手端小程序界面（当前为 API + 角色授权，无独立客户端）
 - [ ] 商家管理后台（角色数据模型已就绪）
 - [ ] 验证码迁移 Redis（当前 JVM 内存存储，多实例部署需先完成此项）
+- [ ] 两套请求层结构合并（行为已统一并由测试锁定）
 
 ## 🤝 贡献
 
