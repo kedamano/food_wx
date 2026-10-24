@@ -1,65 +1,48 @@
-<!-- 登录设备管理页面 -->
-<view class="container">
-  <!-- 头部 -->
-  <view class="header">
-    <view class="back-btn" bindtap="onBack">
-      <text class="-arrow-left">‹</text>
-    </view>
-    <text class="header-title">登录设备</text>
-    <view class="header-placeholder"></view>
-  </view>
-
-  <!-- 设备列表 -->
+<!-- 登录设备管理：信息层级 = 设备名(当前标记) → 型号 → 最近登录时间 -->
+<view class="page-devices">
   <view class="device-list">
-    <view class="device-item {{item.isCurrent ? 'current' : ''}}" 
-          wx:for="{{devices}}" 
+    <view class="device-item {{item.isCurrent ? 'current' : ''}}"
+          wx:for="{{devices}}"
           wx:key="id"
           wx:for-item="item">
       <view class="device-icon">
-        <text>{{item.platform === 'iOS' || item.platform === 'iPadOS' ? '\uD83C\uDF4E' : '\uD83D\uDDA5\uFE0F'}}</text>
+        <text class="i i-user"></text>
       </view>
       <view class="device-info">
         <view class="device-header">
           <text class="device-name">{{item.name}}</text>
           <text class="device-badge" wx:if="{{item.isCurrent}}">当前</text>
         </view>
-        <text class="device-type">{{item.type}}</text>
-        <view class="device-meta">
-          <text class="meta-item">
-            <text class="i -map-marker-alt i-location"></text>
-            {{item.location}}
-          </text>
-          <text class="meta-item">
-            <text class="-clock">●</text>
-            {{item.lastTime}}
-          </text>
+        <text class="device-type" wx:if="{{item.type}}">{{item.type}}</text>
+        <view class="device-meta" wx:if="{{item.lastTime}}">
+          <text class="i i-clock meta-ico"></text>
+          <text class="meta-text">{{item.lastTime}} 登录</text>
         </view>
       </view>
       <view class="device-action" wx:if="{{!item.isCurrent}}">
-        <button class="unbind-btn" bindtap="onUnbindDevice" data-device-id="{{item.id}}">
-          <text class="-unlink">●</text>
-          解绑
-        </button>
+        <view class="unbind-btn" bindtap="onUnbindDevice" data-device-id="{{item.id}}" hover-class="press-hover">解绑</view>
       </view>
+    </view>
+
+    <!-- 空态 -->
+    <view class="empty" wx:if="{{devices.length === 0 && !loading}}">
+      <text class="i i-user empty-ico"></text>
+      <text class="empty-text">暂无登录设备记录</text>
     </view>
   </view>
 
-  <!-- 全部解绑按钮 -->
+  <!-- 全部解绑 -->
   <view class="action-section" wx:if="{{devices.length > 1}}">
-    <button class="danger-btn" bindtap="onUnbindAll">
-      <text class="-exclamation-triangle">●</text>
-      全部解绑
-    </button>
+    <view class="danger-btn" bindtap="onUnbindAll" hover-class="press-hover">解绑其他设备（{{devices.length - 1}}）</view>
   </view>
 
   <!-- 安全提示 -->
   <view class="security-tip">
-    <text class="-info-circle tip-icon">ℹ</text>
+    <text class="i i-help tip-ico"></text>
     <view class="tip-content">
       <text class="tip-title">安全提示</text>
-      <text class="tip-text">• 建议定期检查登录设备列表</text>
-      <text class="tip-text">• 发现可疑设备请立即解绑</text>
-      <text class="tip-text">• 不要在公共设备上保存登录状态</text>
+      <text class="tip-text">建议定期检查登录设备，发现可疑设备立即解绑</text>
+      <text class="tip-text">不要在公共设备上保存登录状态</text>
     </view>
   </view>
 </view>

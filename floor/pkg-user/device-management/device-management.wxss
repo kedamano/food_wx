@@ -1,50 +1,24 @@
-/* 登录设备管理页面样式 */
-
-.container {
+/* 登录设备管理 —— 设计系统 token 版 */
+.page-devices {
   min-height: 100vh;
   background: var(--bg);
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 30rpx 30rpx 20rpx;
-  background: #fff;
-}
-
-.back-btn {
-  width: 60rpx;
-  height: 60rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32rpx;
-  color: var(--text-1);
-}
-
-.header-title {
-  font-size: 34rpx;
-  font-weight: 600;
-  color: var(--text-1);
-}
-
-.header-placeholder {
-  width: 60rpx;
+  padding: 24rpx 24rpx 60rpx;
+  box-sizing: border-box;
 }
 
 .device-list {
-  padding: 20rpx 30rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
 }
 
 .device-item {
   display: flex;
-  align-items: flex-start;
-  padding: 30rpx;
-  background: #fff;
-  border-radius: 16rpx;
-  margin-bottom: 20rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+  align-items: center;
+  padding: 28rpx;
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-1);
 }
 
 .device-item.current {
@@ -54,147 +28,160 @@
 .device-icon {
   width: 80rpx;
   height: 80rpx;
-  background: #f0f0f0;
+  background: var(--brand-soft);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 24rpx;
+  flex-shrink: 0;
 }
 
-.device-icon text {
-  font-size: 36rpx;
-  color: var(--text-2);
+.device-icon .i {
+  width: 36rpx;
+  height: 36rpx;
 }
 
 .device-info {
   flex: 1;
+  min-width: 0;
 }
 
 .device-header {
   display: flex;
   align-items: center;
-  margin-bottom: 8rpx;
+  margin-bottom: 6rpx;
 }
 
 .device-name {
   font-size: 30rpx;
   font-weight: 600;
   color: var(--text-1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .device-badge {
-  margin-left: 16rpx;
-  padding: 4rpx 12rpx;
-  font-size: 22rpx;
+  margin-left: 14rpx;
+  flex-shrink: 0;
+  padding: 4rpx 14rpx;
+  font-size: 20rpx;
   color: var(--brand);
-  background: rgba(255, 102, 51, 0.1);
-  border-radius: 8rpx;
+  background: var(--brand-soft);
+  border-radius: var(--r-pill);
 }
 
 .device-type {
   display: block;
-  font-size: 26rpx;
+  font-size: 24rpx;
   color: var(--text-2);
-  margin-bottom: 12rpx;
+  margin-bottom: 8rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .device-meta {
   display: flex;
-  flex-direction: column;
-}
-
-.meta-item {
-  display: flex;
   align-items: center;
-  font-size: 24rpx;
-  color: var(--text-3);
-  margin-bottom: 4rpx;
 }
 
-.meta-item text:first-child {
+.meta-ico {
+  width: 24rpx;
+  height: 24rpx;
   margin-right: 8rpx;
+  color: var(--text-3);
+}
+
+.meta-text {
+  font-size: 22rpx;
+  color: var(--text-3);
 }
 
 .device-action {
-  margin-left: 20rpx;
+  margin-left: 16rpx;
+  flex-shrink: 0;
 }
 
 .unbind-btn {
-  display: flex;
-  align-items: center;
-  padding: 12rpx 20rpx;
+  padding: 12rpx 26rpx;
   font-size: 24rpx;
+  color: var(--danger);
+  background: var(--surface);
+  border: 1rpx solid rgba(239, 68, 68, 0.35);
+  border-radius: var(--r-pill);
+}
+
+/* 空态 */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 100rpx 0;
+}
+
+.empty-ico {
+  width: 80rpx;
+  height: 80rpx;
   color: var(--text-3);
-  background: var(--bg);
-  border: none;
-  border-radius: 8rpx;
+  opacity: 0.5;
 }
 
-.unbind-btn::after {
-  border: none;
+.empty-text {
+  margin-top: 20rpx;
+  font-size: 26rpx;
+  color: var(--text-3);
 }
 
-.unbind-btn text {
-  margin-right: 8rpx;
-}
-
+/* 全部解绑 */
 .action-section {
-  padding: 0 30rpx;
-  margin-top: 40rpx;
+  margin-top: 30rpx;
 }
 
 .danger-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24rpx;
-  font-size: 30rpx;
-  color: #fff;
-  background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
-  border: none;
-  border-radius: 12rpx;
+  height: 88rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--danger);
+  background: var(--surface);
+  border: 1rpx solid rgba(239, 68, 68, 0.35);
+  border-radius: var(--r-pill);
 }
 
-.danger-btn::after {
-  border: none;
-}
-
-.danger-btn text {
-  margin-right: 12rpx;
-}
-
+/* 安全提示 */
 .security-tip {
   display: flex;
-  padding: 30rpx;
-  margin: 40rpx 30rpx;
-  background: #fff;
-  border-radius: 16rpx;
+  gap: 18rpx;
+  padding: 28rpx;
+  margin-top: 30rpx;
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-1);
 }
 
-.tip-icon {
-  font-size: 40rpx;
-  color: var(--warn);
-  margin-right: 20rpx;
+.tip-ico {
+  width: 34rpx;
+  height: 34rpx;
+  color: var(--brand);
+  flex-shrink: 0;
   margin-top: 4rpx;
-}
-
-.tip-content {
-  flex: 1;
 }
 
 .tip-title {
   display: block;
-  font-size: 28rpx;
+  font-size: 26rpx;
   font-weight: 600;
   color: var(--text-1);
-  margin-bottom: 16rpx;
+  margin-bottom: 8rpx;
 }
 
 .tip-text {
   display: block;
   font-size: 24rpx;
-  color: var(--text-2);
-  line-height: 1.6;
-  margin-bottom: 8rpx;
+  color: var(--text-3);
+  line-height: 1.7;
 }
