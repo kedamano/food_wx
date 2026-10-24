@@ -85,14 +85,16 @@ page { background: var(--bg); }
 .menu-img { width: 100%; height: 100%; }
 .menu-img-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--bg); }
 .menu-img-placeholder .fa { font-size: 60rpx; color: var(--text-placeholder); }
-.menu-food-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-.menu-food-name { font-size: 28rpx; font-weight: 600; color: var(--text-main); }
-.menu-food-desc { font-size: 22rpx; color: var(--text-light); margin-top: 6rpx; }
+.menu-food-info { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: space-between; }
+.menu-food-name { font-size: 28rpx; font-weight: 600; color: var(--text-main); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.menu-food-desc { font-size: 22rpx; color: var(--text-light); margin-top: 6rpx;
+  overflow: hidden; text-overflow: ellipsis; display: -webkit-box;
+  -webkit-box-orient: vertical; -webkit-line-clamp: 1; word-break: break-all; }
 .menu-food-sales { font-size: 22rpx; color: var(--text-light); margin-top: 4rpx; }
 .menu-food-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 8rpx; }
 .menu-food-price { font-size: 32rpx; font-weight: 700; color: var(--primary); }
 .price-symbol-sm { font-size: 22rpx; }
-.menu-add-btn { width: 48rpx; height: 48rpx; border-radius: 50%; background: var(--primary); color: #fff; font-size: 36rpx; display: flex; align-items: center; justify-content: center; line-height: 1; }
+.menu-add-btn { width: 52rpx; height: 52rpx; border-radius: 50%; background: var(--brand); color: #fff; font-size: 36rpx; display: flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0; margin-left: 4rpx; box-shadow: var(--shadow-brand); }
 
 /* 评价 */
 .review-summary { display: flex; align-items: baseline; gap: 12rpx; padding: 28rpx 32rpx; background: #fff; }
@@ -126,7 +128,8 @@ page { background: var(--bg); }
 /* 底部购物车 */
 .bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; display: flex; align-items: center; background: var(--text-1); padding: 16rpx 24rpx; z-index: 100; }
 .cart-info { flex: 1; display: flex; align-items: center; gap: 16rpx; }
-.cart-icon-wrap { position: relative; width: 56rpx; height: 56rpx; background: var(--text-2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: -24rpx; border: 4rpx solid var(--text-1); }
+.cart-icon-wrap { position: relative; width: 72rpx; height: 72rpx; background: var(--brand); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: -30rpx; border: 4rpx solid rgba(255, 255, 255, 0.9); box-shadow: var(--shadow-brand); }
+.cart-glyph { width: 36rpx; height: 36rpx; filter: brightness(0) invert(1); }
 .cart-icon-wrap .fa { font-size: 32rpx; color: #fff; }
 .cart-badge { position: absolute; top: -8rpx; right: -12rpx; background: var(--primary); color: #fff; font-size: 20rpx; padding: 2rpx 10rpx; border-radius: 20rpx; font-weight: 700; min-width: 32rpx; text-align: center; }
 .cart-total { font-size: 36rpx; font-weight: 700; color: #fff; }

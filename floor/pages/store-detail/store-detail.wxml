@@ -232,8 +232,8 @@
   <view class="bottom-bar safe-bottom" wx:if="{{cartCount > 0}}">
     <view class="cart-info" bindtap="onCartTap">
       <view class="cart-icon-wrap">
-        <text class="i -shopping-cart i-bag"></text>
-        <text class="cart-badge">{{cartCount}}</text>
+        <text class="i i-bag-white cart-glyph"></text>
+        <view class="cart-badge">{{cartCount}}</view>
       </view>
       <text class="cart-total">
         <text class="price-symbol-sm">¥</text>{{cartTotal}}
