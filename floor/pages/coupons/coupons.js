@@ -65,8 +65,15 @@ Page({
   onSelectCoupon: function(e) {
     var coupon = e.currentTarget.dataset.coupon;
     if (coupon && coupon.id) {
-      wx.navigateTo({
-        url: '/pages/coupon-detail/coupon-detail?id=' + coupon.id
+      wx.showModal({
+        title: coupon.name,
+        content: '面额：' + coupon.discount + '元\n' +
+          '使用条件：' + coupon.condition + '\n' +
+          '有效期至：' + coupon.expiry + '\n' +
+          '状态：' + (coupon.statusText || '可用') + '\n\n' +
+          '下单时在确认订单页选择该优惠券即可抵扣',
+        showCancel: false,
+        confirmText: '知道了'
       });
     }
   },

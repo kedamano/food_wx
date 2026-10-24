@@ -1,5 +1,7 @@
 // 全部评价页面逻辑
 
+var app = getApp();
+
 Page({
   data: {
     foodId: null,

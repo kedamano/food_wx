@@ -271,7 +271,7 @@ Page({
     } else {
       // 已登录，跳转到个人信息页面
       wx.navigateTo({
-        url: '/pages/profile/userinfo',
+        url: '/pages/account-info/account-info',
       });
     }
   },

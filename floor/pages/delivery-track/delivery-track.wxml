@@ -1,0 +1,31 @@
+<view class="track-page">
+  <!-- 状态卡片 -->
+  <view class="status-card">
+    <view class="status-title">{{status}}</view>
+    <view class="status-desc" wx:if="{{estimatedTime}}">预计 {{estimatedTime}} 后送达</view>
+  </view>
+
+  <!-- 骑手信息 -->
+  <view class="rider-card" wx:if="{{rider}}">
+    <image class="rider-avatar" src="{{rider.avatar}}" mode="aspectFill" />
+    <view class="rider-info">
+      <view class="rider-name">{{rider.name}}</view>
+      <view class="rider-rating">评分 {{rider.rating}}</view>
+    </view>
+    <button class="call-btn" bindtap="onCallRider">联系骑手</button>
+  </view>
+
+  <!-- 配送进度 -->
+  <view class="steps-card">
+    <view class="section-title">配送进度</view>
+    <view class="step-list">
+      <view class="step-item {{item.completed ? 'done' : ''}} {{item.active ? 'active' : ''}}" wx:for="{{steps}}" wx:key="name">
+        <view class="step-dot"></view>
+        <view class="step-body">
+          <view class="step-name">{{item.name}}</view>
+          <view class="step-time" wx:if="{{item.time}}">{{item.time}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

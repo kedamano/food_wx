@@ -15,6 +15,7 @@ CREATE TABLE users (
     phone VARCHAR(20) COMMENT '手机号',
     openid VARCHAR(100) COMMENT '微信openid',
     register_source VARCHAR(20) DEFAULT 'normal' COMMENT '注册来源：normal-普通注册，wechat-微信注册',
+    role VARCHAR(20) DEFAULT 'USER' COMMENT '用户角色：ADMIN-管理员，USER-普通用户，MERCHANT-商家',
     invite_code VARCHAR(20) COMMENT '邀请码',
     invited_by INT COMMENT '邀请人ID',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',

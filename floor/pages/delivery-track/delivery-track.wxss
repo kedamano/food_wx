@@ -1,0 +1,151 @@
+/* pages/delivery-track/delivery-track.wxss */
+page {
+  background-color: #F8F9FA;
+  min-height: 100vh;
+}
+
+.track-page {
+  padding: 24rpx;
+}
+
+.status-card {
+  background: linear-gradient(135deg, #FF7A45, #FF4D4F);
+  border-radius: 20rpx;
+  padding: 40rpx;
+  color: #fff;
+}
+
+.status-title {
+  font-size: 40rpx;
+  font-weight: bold;
+}
+
+.status-desc {
+  margin-top: 12rpx;
+  font-size: 26rpx;
+  opacity: 0.9;
+}
+
+.rider-card {
+  background: #fff;
+  border-radius: 20rpx;
+  margin-top: 24rpx;
+  padding: 30rpx;
+  display: flex;
+  align-items: center;
+}
+
+.rider-avatar {
+  width: 90rpx;
+  height: 90rpx;
+  border-radius: 50%;
+  background: #eee;
+}
+
+.rider-info {
+  flex: 1;
+  margin-left: 24rpx;
+}
+
+.rider-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.rider-rating {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #999;
+}
+
+.call-btn {
+  background: #FF7A45;
+  color: #fff;
+  font-size: 26rpx;
+  padding: 0 30rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  border-radius: 32rpx;
+}
+
+.steps-card {
+  background: #fff;
+  border-radius: 20rpx;
+  margin-top: 24rpx;
+  padding: 30rpx;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.step-list {
+  margin-top: 24rpx;
+}
+
+.step-item {
+  display: flex;
+  align-items: flex-start;
+  padding-bottom: 40rpx;
+  position: relative;
+}
+
+.step-item:last-child {
+  padding-bottom: 0;
+}
+
+.step-item::before {
+  content: '';
+  position: absolute;
+  left: 11rpx;
+  top: 28rpx;
+  bottom: 0;
+  width: 2rpx;
+  background: #E9ECEF;
+}
+
+.step-item:last-child::before {
+  display: none;
+}
+
+.step-dot {
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: 50%;
+  background: #E9ECEF;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.step-item.done .step-dot {
+  background: #52C41A;
+}
+
+.step-item.active .step-dot {
+  background: #FF7A45;
+  box-shadow: 0 0 0 6rpx rgba(255, 122, 69, 0.2);
+}
+
+.step-body {
+  margin-left: 24rpx;
+}
+
+.step-name {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.step-item.done .step-name,
+.step-item.active .step-name {
+  color: #333;
+  font-weight: 600;
+}
+
+.step-time {
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: #999;
+}

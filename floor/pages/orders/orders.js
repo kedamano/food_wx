@@ -291,7 +291,7 @@ Page({
   onReviewOrder: function(e) {
     var orderId = e.currentTarget.dataset.orderId
     wx.navigateTo({
-      url: '/pages/review/review?orderId=' + orderId
+      url: '/pages/order-review/order-review?orderId=' + orderId
     })
   },
 

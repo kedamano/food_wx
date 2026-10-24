@@ -5,10 +5,12 @@ import com.food.entity.Coupon;
 import com.food.entity.UserCoupon;
 import com.food.mapper.CouponMapper;
 import com.food.mapper.UserCouponMapper;
+import com.food.utils.JwtUtil;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -26,6 +28,30 @@ public class CouponController {
 
     @Autowired
     private UserCouponMapper userCouponMapper;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    /**
+     * 从请求中解析当前登录用户ID（兼容裸 token 与 Bearer 前缀）
+     */
+    private Integer getCurrentUserId(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        if (token != null && !token.isEmpty()) {
+            return jwtUtil.getUserIdFromToken(token);
+        }
+        return null;
+    }
+
+    /**
+     * 校验当前用户是否有权访问目标用户的数据（本人或管理员）
+     */
+    private boolean hasAccess(Integer currentUserId, Integer targetUserId) {
+        return currentUserId != null && currentUserId.equals(targetUserId);
+    }
 
     @GetMapping("/all")
     @ApiOperation(value = "获取所有优惠券", notes = "获取系统中所有优惠券")
@@ -50,8 +76,15 @@ public class CouponController {
     }
 
     @GetMapping("/user/{userId}")
-    @ApiOperation(value = "获取用户优惠券", notes = "获取指定用户的所有优惠券")
-    public BaseResult getUserCoupons(@PathVariable Integer userId) {
+    @ApiOperation(value = "获取用户优惠券", notes = "获取指定用户的所有优惠券（仅本人）")
+    public BaseResult getUserCoupons(@PathVariable Integer userId, HttpServletRequest request) {
+        Integer currentUserId = getCurrentUserId(request);
+        if (currentUserId == null) {
+            return BaseResult.error(401, "未登录");
+        }
+        if (!hasAccess(currentUserId, userId)) {
+            return BaseResult.error(403, "无权查看该用户的优惠券");
+        }
         try {
             List<UserCoupon> coupons = userCouponMapper.selectByUserId(userId);
             
@@ -111,12 +144,16 @@ public class CouponController {
         @ApiImplicitParam(name = "userId", value = "用户ID", required = true, paramType = "body"),
         @ApiImplicitParam(name = "couponId", value = "优惠券ID", required = true, paramType = "body")
     })
-    public BaseResult exchangeCoupon(@RequestBody Map<String, Integer> request) {
+    public BaseResult exchangeCoupon(@RequestBody Map<String, Integer> request, HttpServletRequest httpRequest) {
         try {
-            Integer userId = request.get("userId");
+            // 兑换人只能是当前登录用户，userId 不再信任请求体
+            Integer userId = getCurrentUserId(httpRequest);
             Integer couponId = request.get("couponId");
-            
-            if (userId == null || couponId == null) {
+
+            if (userId == null) {
+                return BaseResult.error(401, "未登录");
+            }
+            if (couponId == null) {
                 return BaseResult.error("参数不完整");
             }
             
@@ -157,8 +194,15 @@ public class CouponController {
     }
 
     @GetMapping("/statistics/{userId}")
-    @ApiOperation(value = "获取用户优惠券统计", notes = "获取用户优惠券数量统计")
-    public BaseResult getUserCouponStatistics(@PathVariable Integer userId) {
+    @ApiOperation(value = "获取用户优惠券统计", notes = "获取用户优惠券数量统计（仅本人）")
+    public BaseResult getUserCouponStatistics(@PathVariable Integer userId, HttpServletRequest request) {
+        Integer currentUserId = getCurrentUserId(request);
+        if (currentUserId == null) {
+            return BaseResult.error(401, "未登录");
+        }
+        if (!hasAccess(currentUserId, userId)) {
+            return BaseResult.error(403, "无权查看该用户的优惠券统计");
+        }
         try {
             List<UserCoupon> allCoupons = userCouponMapper.selectByUserId(userId);
             List<UserCoupon> availableCoupons = userCouponMapper.selectAvailableByUserId(userId);

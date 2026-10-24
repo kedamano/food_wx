@@ -150,14 +150,16 @@ public class FoodController {
     }
 
     @PutMapping("/{foodId}/sales")
-    @ApiOperation(value = "更新菜品销量", notes = "更新菜品销量")
+    @ApiOperation(value = "更新菜品销量", notes = "更新菜品销量（仅商家/管理员）")
+    @RequireRole("MERCHANT")
     @ApiImplicitParam(name = "sales", value = "销量增量", required = true, paramType = "body")
     public BaseResult updateFoodSales(@PathVariable Integer foodId, @RequestBody SalesUpdateRequest salesRequest) {
         return foodService.updateFoodSales(foodId, salesRequest.getSales());
     }
 
     @PutMapping("/{foodId}/rating")
-    @ApiOperation(value = "更新菜品评分", notes = "更新菜品评分")
+    @ApiOperation(value = "更新菜品评分", notes = "更新菜品评分（仅商家/管理员）")
+    @RequireRole("MERCHANT")
     @ApiImplicitParam(name = "rating", value = "新评分", required = true, paramType = "body")
     public BaseResult updateFoodRating(@PathVariable Integer foodId, @RequestBody RatingUpdateRequest ratingRequest) {
         return foodService.updateFoodRating(foodId, ratingRequest.getRating());

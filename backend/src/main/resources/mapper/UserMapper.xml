@@ -10,6 +10,9 @@
         <result column="level" jdbcType="VARCHAR" property="level"/>
         <result column="points" jdbcType="INTEGER" property="points"/>
         <result column="phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="openid" jdbcType="VARCHAR" property="openid"/>
+        <result column="register_source" jdbcType="VARCHAR" property="registerSource"/>
+        <result column="role" jdbcType="VARCHAR" property="role"/>
         <result column="invite_code" jdbcType="VARCHAR" property="inviteCode"/>
         <result column="invited_by" jdbcType="INTEGER" property="invitedBy"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
@@ -17,25 +20,31 @@
     </resultMap>
 
     <sql id="BaseColumnList">
-        user_id, username, password, avatar, level, points, phone, invite_code, invited_by, create_time, update_time
+        user_id, username, password, avatar, level, points, phone, openid, register_source, role, invite_code, invited_by, create_time, update_time
     </sql>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="userId">
         INSERT INTO users (
-            username, password, avatar, level, points, phone, invite_code, invited_by
+            username, password, avatar, level, points, phone, openid, register_source, role, invite_code, invited_by
         ) VALUES (
-            #{username}, #{password}, #{avatar}, #{level}, #{points}, #{phone}, #{inviteCode}, #{invitedBy}
+            #{username}, #{password}, #{avatar}, #{level}, #{points}, #{phone}, #{openid}, #{registerSource}, #{role}, #{inviteCode}, #{invitedBy}
         )
     </insert>
 
     <update id="update">
         UPDATE users
-        SET username = #{username},
-            avatar = #{avatar},
-            level = #{level},
-            points = #{points},
-            phone = #{phone},
+        <set>
+            <if test="username != null">username = #{username},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="avatar != null">avatar = #{avatar},</if>
+            <if test="level != null">level = #{level},</if>
+            <if test="points != null">points = #{points},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="openid != null">openid = #{openid},</if>
+            <if test="registerSource != null">register_source = #{registerSource},</if>
+            <if test="role != null">role = #{role},</if>
             update_time = CURRENT_TIMESTAMP
+        </set>
         WHERE user_id = #{userId}
     </update>
 

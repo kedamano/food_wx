@@ -134,9 +134,20 @@ public class OrderController {
     }
 
     @GetMapping("/store/{storeId}")
-    @ApiOperation(value = "获取商家订单", notes = "获取指定商家的订单列表")
+    @ApiOperation(value = "获取商家订单", notes = "获取指定商家的订单列表（仅商家/管理员）")
     public BaseResult getOrdersByStoreId(@PathVariable Integer storeId, HttpServletRequest request) {
-        // 实际项目中应该验证用户是否是商家管理员
+        Integer currentUserId = getUserIdFromRequest(request);
+        if (currentUserId == null) {
+            return BaseResult.error(401, "未登录");
+        }
+
+        // 只有商家或管理员可以查看商家订单
+        User currentUser = userService.getUserById(currentUserId);
+        String role = currentUser != null ? currentUser.getRole() : null;
+        if (!"ADMIN".equals(role) && !"MERCHANT".equals(role)) {
+            return BaseResult.error(403, "无权查看商家订单");
+        }
+
         return orderService.getOrdersByStoreId(storeId);
     }
 
@@ -178,10 +189,16 @@ public class OrderController {
             return BaseResult.error(401, "未登录");
         }
 
-        // 验证订单属于该用户
+        // 状态流转属于商家/管理员操作；普通用户请使用 支付/取消/确认收货 接口
+        User currentUser = userService.getUserById(userId);
+        String role = currentUser != null ? currentUser.getRole() : null;
+        if (!"ADMIN".equals(role) && !"MERCHANT".equals(role)) {
+            return BaseResult.error(403, "无权修改订单状态");
+        }
+
         Order order = (Order) orderService.getOrderById(orderId).getData();
-        if (order == null || !order.getUserId().equals(userId)) {
-            return BaseResult.error(403, "无权操作该订单");
+        if (order == null) {
+            return BaseResult.error(404, "订单不存在");
         }
 
         String newStatus = statusRequest.getStatus();
@@ -431,7 +448,11 @@ public class OrderController {
             double totalSpent = 0.0;
 
             for (Order order : orders) {
-                totalSpent += order.getPayAmount().doubleValue();
+                // 已取消/已退款/待付款的订单不计入实际消费
+                if (!"已取消".equals(order.getStatus()) && !"已退款".equals(order.getStatus())
+                        && !"待付款".equals(order.getStatus()) && order.getPayAmount() != null) {
+                    totalSpent += order.getPayAmount().doubleValue();
+                }
                 switch (order.getStatus()) {
                     case "待付款":
                         pendingCount++;

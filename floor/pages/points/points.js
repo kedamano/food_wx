@@ -264,51 +264,8 @@ Page({
     }).catch(function(err) {
       wx.hideLoading();
       console.error('签到失败', err);
-
-      var today2 = new Date().toDateString();
-      var signInDate2 = wx.getStorageSync('signInDate');
-
-      if (signInDate2 !== today2) {
-        var updatedTasks2 = [];
-        for (var ti2 = 0; ti2 < self.data.dailyTasks.length; ti2++) {
-          var tsk2 = self.data.dailyTasks[ti2];
-          var tCopy2 = {};
-          for (var tj2 in tsk2) tCopy2[tj2] = tsk2[tj2];
-          if (tsk2.name === '签到') {
-            tCopy2.completed = true;
-          }
-          updatedTasks2.push(tCopy2);
-        }
-
-        var newUserPoints2 = self.data.userPoints + 20;
-
-        self.setData({
-          userPoints: newUserPoints2,
-          dailyTasks: updatedTasks2,
-          todayPoints: self.data.todayPoints + 20
-        });
-
-        wx.setStorageSync('signInDate', today2);
-        wx.setStorageSync('userPoints', newUserPoints2);
-
-        var newRecord2 = {
-          id: Date.now(),
-          type: '收入',
-          desc: '每日签到',
-          points: '+20',
-          icon: 'fa-check',
-          iconText: '\u2713',
-          time: new Date().toLocaleString()
-        };
-        var history2 = wx.getStorageSync('pointsHistory') || [];
-        history2.unshift(newRecord2);
-        wx.setStorageSync('pointsHistory', history2);
-        self.loadRecentHistory();
-
-        wx.showToast({ title: '签到成功，获得20积分', icon: 'success' });
-      } else {
-        wx.showToast({ title: '今日已签到', icon: 'none' });
-      }
+      // 请求失败不能本地伪造签到成功，以服务端为准
+      wx.showToast({ title: (err && err.message) || '签到失败，请稍后重试', icon: 'none' });
     });
   },
 
@@ -455,41 +412,8 @@ Page({
     }).catch(function(err) {
       wx.hideLoading();
       console.error('兑换失败', err);
-
-      var newUserPoints2 = self.data.userPoints - product.points;
-      var updatedProducts2 = [];
-      for (var pi2 = 0; pi2 < self.data.products.length; pi2++) {
-        var prodItem2 = self.data.products[pi2];
-        var pCopy2 = {};
-        for (var pk2 in prodItem2) pCopy2[pk2] = prodItem2[pk2];
-        if (prodItem2.id === product.id) {
-          pCopy2.stock = prodItem2.stock - 1;
-        }
-        updatedProducts2.push(pCopy2);
-      }
-
-      self.setData({
-        userPoints: newUserPoints2,
-        products: updatedProducts2
-      });
-
-      wx.setStorageSync('userPoints', newUserPoints2);
-
-      var newRecord2 = {
-        id: Date.now(),
-        type: '支出',
-        desc: '兑换' + product.name,
-        points: '-' + product.points,
-        icon: 'fa-gift',
-        iconText: '\uD83C\uDF81',
-        time: new Date().toLocaleString()
-      };
-      var history2 = wx.getStorageSync('pointsHistory') || [];
-      history2.unshift(newRecord2);
-      wx.setStorageSync('pointsHistory', history2);
-      self.loadRecentHistory();
-
-      wx.showToast({ title: '兑换成功', icon: 'success' });
+      // 请求失败不能本地伪造兑换成功，以服务端为准
+      wx.showToast({ title: (err && err.message) || '兑换失败，请稍后重试', icon: 'none' });
     });
   },
 

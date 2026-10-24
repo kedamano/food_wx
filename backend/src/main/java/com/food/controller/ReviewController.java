@@ -180,7 +180,7 @@ public class ReviewController {
     }
 
     @GetMapping("/order/{orderId}")
-    @ApiOperation(value = "获取订单评价", notes = "根据订单ID获取评价")
+    @ApiOperation(value = "获取订单评价", notes = "根据订单ID获取评价（仅订单归属人）")
     public BaseResult getReviewsByOrderId(@PathVariable Integer orderId, HttpServletRequest request) {
         Integer userId = getUserIdFromRequest(request);
         if (userId == null) {
@@ -188,7 +188,11 @@ public class ReviewController {
         }
 
         // 验证订单属于该用户
-        // 实际项目中应该查询订单表验证
+        Order order = (Order) orderService.getOrderById(orderId).getData();
+        if (order == null || !order.getUserId().equals(userId)) {
+            return BaseResult.error(403, "无权查看该订单的评价");
+        }
+
         return reviewService.getReviewsByOrderId(orderId);
     }
 

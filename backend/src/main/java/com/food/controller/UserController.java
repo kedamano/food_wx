@@ -453,9 +453,24 @@ public class UserController {
     }
 
     @GetMapping("/points/{userId}")
-    @ApiOperation(value = "获取用户积分信息", notes = "获取用户积分详细信息")
-    public BaseResult getUserPointsInfo(@PathVariable Integer userId) {
+    @ApiOperation(value = "获取用户积分信息", notes = "获取用户积分详细信息（仅本人或管理员）")
+    public BaseResult getUserPointsInfo(@PathVariable Integer userId, HttpServletRequest request) {
         try {
+            String token = extractToken(request);
+            if (token == null || token.isEmpty()) {
+                return BaseResult.error(401, "未登录");
+            }
+            Integer currentUserId = jwtUtil.getUserIdFromToken(token);
+            if (currentUserId == null) {
+                return BaseResult.error(401, "Token无效");
+            }
+            // 只能查自己的积分，管理员可以查所有
+            User currentUser = userService.getUserById(currentUserId);
+            boolean isAdmin = currentUser != null && "ADMIN".equals(currentUser.getRole());
+            if (!currentUserId.equals(userId) && !isAdmin) {
+                return BaseResult.error(403, "无权查看他人积分信息");
+            }
+
             User user = userService.getUserById(userId);
             if (user == null) {
                 return BaseResult.error(404, "用户不存在");
