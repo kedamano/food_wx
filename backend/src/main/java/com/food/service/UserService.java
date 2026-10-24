@@ -1,6 +1,7 @@
 package com.food.service;
 
 import com.food.dto.BaseResult;
+import com.food.utils.TxSupport;
 import com.food.entity.PointsLog;
 import com.food.entity.User;
 import com.food.mapper.PointsLogMapper;
@@ -9,6 +10,7 @@ import com.food.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -45,6 +47,7 @@ public class UserService {
         return userMapper.selectByOpenid(openid);
     }
 
+    @Transactional
     public BaseResult register(User user) {
         try {
             // 检查用户名是否已存在
@@ -112,6 +115,7 @@ public class UserService {
             }
             return BaseResult.error("注册失败");
         } catch (Exception e) {
+            TxSupport.rollbackIfActive();
             return BaseResult.error("注册失败: " + e.getMessage());
         }
     }
@@ -180,6 +184,10 @@ public class UserService {
         return updateUserPoints(userId, points, "ADMIN", "积分更新");
     }
 
+    /**
+     * 积分变更为读-改-写操作，必须走事务防止并发丢更新
+     */
+    @Transactional
     public BaseResult updateUserPoints(Integer userId, Integer points, String type, String reason) {
         try {
             User user = userMapper.selectById(userId);
@@ -204,6 +212,7 @@ public class UserService {
             }
             return BaseResult.error("积分更新失败");
         } catch (Exception e) {
+            TxSupport.rollbackIfActive();
             return BaseResult.error("积分更新失败: " + e.getMessage());
         }
     }

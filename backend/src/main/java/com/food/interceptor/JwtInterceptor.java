@@ -2,6 +2,8 @@ package com.food.interceptor;
 
 import com.food.dto.BaseResult;
 import com.food.utils.JwtUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -12,6 +14,8 @@ import com.alibaba.fastjson.JSON;
 @Component
 public class JwtInterceptor implements HandlerInterceptor {
 
+    private static final Logger log = LoggerFactory.getLogger(JwtInterceptor.class);
+
     @Autowired
     private JwtUtil jwtUtil;
 
@@ -19,17 +23,15 @@ public class JwtInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         // 获取请求头中的token
         String token = request.getHeader("Authorization");
-        
+
         // 对于某些不需要验证的路径，直接放行（包括静态资源）
         String uri = request.getRequestURI();
-        System.out.println("=== JwtInterceptor: uri = " + uri);
         if (uri.contains("/user/register") || uri.contains("/user/login") ||
             uri.contains("/user/wechat-login") || uri.contains("/user/wechat-register") ||
             uri.contains("/order/pay-notify") ||
             uri.contains("/food/all") || uri.contains("/food/popular") ||
             uri.contains("/food/recommend") || uri.contains("/food/*/rating") ||
             uri.contains("/images/") || uri.endsWith(".png") || uri.endsWith(".jpg") || uri.endsWith(".jpeg")) {
-            System.out.println("=== JwtInterceptor: 放行（静态资源）");
             return true;
         }
 
@@ -47,21 +49,15 @@ public class JwtInterceptor implements HandlerInterceptor {
             token = token.substring(7);
         }
 
-        // 验证token有效性
-        System.out.println("=== JwtInterceptor 验证Token ===");
-        System.out.println("token: " + token);
-        boolean isExpired = jwtUtil.isTokenExpired(token);
-        System.out.println("isTokenExpired结果: " + isExpired);
-        if (isExpired) {
+        // 验证token有效性（不得打印 token 明文）
+        if (jwtUtil.isTokenExpired(token)) {
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json");
             BaseResult result = BaseResult.error(401, "Token已过期");
             response.getWriter().write(JSON.toJSONString(result));
-            System.out.println("原因: Token已过期");
-            System.out.println("================================");
+            log.debug("Token 已过期: uri={}", uri);
             return false;
         }
-        System.out.println("================================");
 
         // Token验证通过，将用户ID放入request中供后续使用
         Integer userId = jwtUtil.getUserIdFromToken(token);

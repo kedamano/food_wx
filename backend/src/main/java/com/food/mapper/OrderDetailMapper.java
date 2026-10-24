@@ -16,6 +16,8 @@ public interface OrderDetailMapper {
 
     List<OrderDetail> selectByOrderId(Integer orderId);
 
+    List<OrderDetail> selectByOrderIds(@Param("orderIds") List<Integer> orderIds);
+
     int deleteById(Integer detailId);
 
     int deleteByOrderId(Integer orderId);

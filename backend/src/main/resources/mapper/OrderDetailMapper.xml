@@ -51,6 +51,17 @@
         ORDER BY create_time DESC
     </select>
 
+    <select id="selectByOrderIds" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM order_details
+        WHERE order_id IN
+        <foreach collection="orderIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        ORDER BY create_time DESC
+    </select>
+
     <delete id="deleteById">
         DELETE FROM order_details
         WHERE detail_id = #{detailId}

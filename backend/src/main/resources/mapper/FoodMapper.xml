@@ -59,6 +59,16 @@
         WHERE food_id = #{foodId}
     </select>
 
+    <select id="selectByIds" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>
+        FROM foods
+        WHERE food_id IN
+        <foreach collection="foodIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
     <select id="selectAll" resultMap="BaseResultMap">
         SELECT f.*, c.category_name, s.store_name
         FROM foods f

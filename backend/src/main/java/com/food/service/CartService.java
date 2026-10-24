@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,20 +112,40 @@ public class CartService {
     public BaseResult getCartByUserId(Integer userId) {
         try {
             List<Cart> cartList = cartMapper.selectByUserId(userId);
-            // 填充菜品信息
-            for (Cart cart : cartList) {
-                if (cart.getFoodId() != null) {
-                    Food food = foodMapper.selectById(cart.getFoodId());
-                    if (food != null) {
-                        cart.setFoodName(food.getName());
-                        cart.setFoodImage(food.getImage());
-                        cart.setFoodPrice(food.getPrice() != null ? food.getPrice().doubleValue() : 0.0);
-                    }
-                }
-            }
+            fillFoodInfo(cartList);
             return BaseResult.success(cartList);
         } catch (Exception e) {
             return BaseResult.error("获取购物车失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 批量填充菜品信息，避免逐项查询的 N+1 问题
+     */
+    private void fillFoodInfo(List<Cart> cartList) {
+        if (cartList == null || cartList.isEmpty()) {
+            return;
+        }
+        List<Integer> foodIds = new ArrayList<>(cartList.size());
+        for (Cart cart : cartList) {
+            if (cart.getFoodId() != null) {
+                foodIds.add(cart.getFoodId());
+            }
+        }
+        if (foodIds.isEmpty()) {
+            return;
+        }
+        Map<Integer, Food> foodById = new HashMap<>();
+        for (Food food : foodMapper.selectByIds(foodIds)) {
+            foodById.put(food.getFoodId(), food);
+        }
+        for (Cart cart : cartList) {
+            Food food = foodById.get(cart.getFoodId());
+            if (food != null) {
+                cart.setFoodName(food.getName());
+                cart.setFoodImage(food.getImage());
+                cart.setFoodPrice(food.getPrice() != null ? food.getPrice().doubleValue() : 0.0);
+            }
         }
     }
 

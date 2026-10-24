@@ -1,6 +1,7 @@
 package com.food.service;
 
 import com.food.dto.BaseResult;
+import com.food.utils.TxSupport;
 import com.food.entity.Cart;
 import com.food.entity.Food;
 import com.food.entity.Order;
@@ -180,6 +181,8 @@ public class OrderService {
             order.setOrderDetails(orderDetails);
             return BaseResult.success("订单创建成功", order);
         } catch (Exception e) {
+            // 已写入的数据必须回滚（下单涉及订单/明细/购物车/优惠券多表写）
+            TxSupport.rollbackIfActive();
             return BaseResult.error("创建订单失败: " + e.getMessage());
         }
     }
@@ -202,11 +205,7 @@ public class OrderService {
     public BaseResult getOrdersByUserId(Integer userId) {
         try {
             List<Order> orders = orderMapper.selectByUserId(userId);
-            // 查询每个订单的详情
-            for (Order order : orders) {
-                List<OrderDetail> details = orderDetailMapper.selectByOrderId(order.getOrderId());
-                order.setOrderDetails(details);
-            }
+            fillOrderDetails(orders);
             return BaseResult.success(orders);
         } catch (Exception e) {
             return BaseResult.error("获取订单列表失败: " + e.getMessage());
@@ -216,13 +215,31 @@ public class OrderService {
     public BaseResult getOrdersByStoreId(Integer storeId) {
         try {
             List<Order> orders = orderMapper.selectByStoreId(storeId);
-            for (Order order : orders) {
-                List<OrderDetail> details = orderDetailMapper.selectByOrderId(order.getOrderId());
-                order.setOrderDetails(details);
-            }
+            fillOrderDetails(orders);
             return BaseResult.success(orders);
         } catch (Exception e) {
             return BaseResult.error("获取商家订单失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 批量填充订单明细，避免逐单查询的 N+1 问题
+     */
+    private void fillOrderDetails(List<Order> orders) {
+        if (orders == null || orders.isEmpty()) {
+            return;
+        }
+        List<Integer> orderIds = new ArrayList<>(orders.size());
+        for (Order order : orders) {
+            orderIds.add(order.getOrderId());
+        }
+        List<OrderDetail> allDetails = orderDetailMapper.selectByOrderIds(orderIds);
+        Map<Integer, List<OrderDetail>> detailsByOrder = new java.util.HashMap<>();
+        for (OrderDetail detail : allDetails) {
+            detailsByOrder.computeIfAbsent(detail.getOrderId(), k -> new ArrayList<>()).add(detail);
+        }
+        for (Order order : orders) {
+            order.setOrderDetails(detailsByOrder.getOrDefault(order.getOrderId(), new ArrayList<>()));
         }
     }
 
@@ -303,6 +320,7 @@ public class OrderService {
             // 模拟支付：直接置为已支付状态并落支付流水
             return markPaid(order, "PAY" + System.currentTimeMillis(), "模拟支付");
         } catch (Exception e) {
+            TxSupport.rollbackIfActive();
             return BaseResult.error("支付失败: " + e.getMessage());
         }
     }
@@ -312,22 +330,27 @@ public class OrderService {
      */
     @Transactional
     public BaseResult markPaid(Order order, String paymentNo, String paymentMethod) {
-        int result = orderMapper.updateStatus(order.getOrderId(), "制作中");
-        if (result <= 0) {
-            return BaseResult.error("支付失败");
+        try {
+            int result = orderMapper.updateStatus(order.getOrderId(), "制作中");
+            if (result <= 0) {
+                return BaseResult.error("支付失败");
+            }
+
+            com.food.entity.PaymentRecord paymentRecord = new com.food.entity.PaymentRecord();
+            paymentRecord.setOrderId(order.getOrderId());
+            paymentRecord.setPaymentNo(paymentNo);
+            paymentRecord.setPaymentMethod(paymentMethod);
+            paymentRecord.setAmount(order.getPayAmount());
+            paymentRecord.setStatus("已支付");
+            paymentRecord.setPayTime(LocalDateTime.now());
+            paymentRecord.setCreateTime(LocalDateTime.now());
+            paymentRecordMapper.insert(paymentRecord);
+
+            return BaseResult.success("支付成功", order);
+        } catch (Exception e) {
+            TxSupport.rollbackIfActive();
+            return BaseResult.error("支付失败: " + e.getMessage());
         }
-
-        com.food.entity.PaymentRecord paymentRecord = new com.food.entity.PaymentRecord();
-        paymentRecord.setOrderId(order.getOrderId());
-        paymentRecord.setPaymentNo(paymentNo);
-        paymentRecord.setPaymentMethod(paymentMethod);
-        paymentRecord.setAmount(order.getPayAmount());
-        paymentRecord.setStatus("已支付");
-        paymentRecord.setPayTime(LocalDateTime.now());
-        paymentRecord.setCreateTime(LocalDateTime.now());
-        paymentRecordMapper.insert(paymentRecord);
-
-        return BaseResult.success("支付成功", order);
     }
 
     /**

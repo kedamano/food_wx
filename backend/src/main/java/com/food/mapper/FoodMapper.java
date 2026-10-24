@@ -14,6 +14,8 @@ public interface FoodMapper {
 
     Food selectById(Integer foodId);
 
+    List<Food> selectByIds(@Param("foodIds") List<Integer> foodIds);
+
     List<Food> selectAll();
 
     List<Food> selectByCategoryId(Integer categoryId);
