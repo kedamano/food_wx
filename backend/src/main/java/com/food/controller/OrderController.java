@@ -551,13 +551,13 @@ public class OrderController {
             Map<String, Object> statistics = new HashMap<>();
             int totalOrders = orders.size();
             int pendingCount = 0, preparingCount = 0, deliveringCount = 0, completedCount = 0;
-            double totalSpent = 0.0;
+            java.math.BigDecimal totalSpent = java.math.BigDecimal.ZERO;
 
             for (Order order : orders) {
                 // 已取消/已退款/待付款的订单不计入实际消费
                 if (!"已取消".equals(order.getStatus()) && !"已退款".equals(order.getStatus())
                         && !"待付款".equals(order.getStatus()) && order.getPayAmount() != null) {
-                    totalSpent += order.getPayAmount().doubleValue();
+                    totalSpent = totalSpent.add(order.getPayAmount());
                 }
                 switch (order.getStatus()) {
                     case "待付款":
@@ -580,7 +580,7 @@ public class OrderController {
             statistics.put("preparingOrders", preparingCount);
             statistics.put("deliveringOrders", deliveringCount);
             statistics.put("completedOrders", completedCount);
-            statistics.put("totalSpent", totalSpent);
+            statistics.put("totalSpent", totalSpent.setScale(2, java.math.RoundingMode.HALF_UP).doubleValue());
 
             return BaseResult.success(statistics);
         }

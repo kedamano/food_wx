@@ -14,6 +14,8 @@ import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +29,23 @@ public class FoodController {
 
     @Autowired
     private FoodService foodService;
+
+    @Autowired
+    private com.food.mapper.FoodFavoriteMapper foodFavoriteMapper;
+
+    @Autowired
+    private com.food.utils.JwtUtil jwtUtil;
+
+    private Integer getFoodUserId(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        if (token != null && !token.isEmpty()) {
+            return jwtUtil.getUserIdFromToken(token);
+        }
+        return null;
+    }
 
     @Autowired
     private BannerMapper bannerMapper;
@@ -59,6 +78,35 @@ public class FoodController {
     @ApiOperation(value = "获取菜品详情", notes = "根据ID获取菜品详情")
     public BaseResult getFoodById(@PathVariable Integer foodId) {
         return foodService.getFoodById(foodId);
+    }
+
+    @PostMapping("/{foodId}/favorite")
+    @ApiOperation(value = "收藏/取消收藏菜品", notes = "切换状态，返回最新 favored")
+    public BaseResult toggleFavorite(@PathVariable Integer foodId, HttpServletRequest request) {
+        Integer userId = getFoodUserId(request);
+        if (userId == null) {
+            return BaseResult.error(401, "未登录");
+        }
+        boolean favored;
+        if (foodFavoriteMapper.select(userId, foodId) != null) {
+            foodFavoriteMapper.delete(userId, foodId);
+            favored = false;
+        } else {
+            foodFavoriteMapper.insert(userId, foodId);
+            favored = true;
+        }
+        Map<String, Object> data = new HashMap<>();
+        data.put("favored", favored);
+        return BaseResult.success(data);
+    }
+
+    @GetMapping("/{foodId}/favorite/status")
+    @ApiOperation(value = "菜品收藏状态", notes = "未登录返回 favored=false")
+    public BaseResult favoriteStatus(@PathVariable Integer foodId, HttpServletRequest request) {
+        Integer userId = getFoodUserId(request);
+        Map<String, Object> data = new HashMap<>();
+        data.put("favored", userId != null && foodFavoriteMapper.countByUserAndFood(userId, foodId) > 0);
+        return BaseResult.success(data);
     }
 
     @GetMapping("/all")

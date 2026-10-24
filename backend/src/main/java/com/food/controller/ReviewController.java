@@ -34,6 +34,9 @@ public class ReviewController {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private com.food.mapper.ReviewInteractionMapper reviewInteractionMapper;
+
     private Integer getUserIdFromRequest(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
         if (token != null && token.startsWith("Bearer ")) {
@@ -177,6 +180,66 @@ public class ReviewController {
         }
 
         return reviewService.getReviewsByUserId(userId);
+    }
+
+    @PostMapping("/{reviewId}/like")
+    @ApiOperation(value = "点赞/取消点赞", notes = "切换状态，返回最新点赞数与是否已赞")
+    public BaseResult toggleLike(@PathVariable Integer reviewId, HttpServletRequest request) {
+        Integer userId = getUserIdFromRequest(request);
+        if (userId == null) {
+            return BaseResult.error(401, "未登录");
+        }
+        boolean liked;
+        if (reviewInteractionMapper.selectLike(reviewId, userId) != null) {
+            reviewInteractionMapper.deleteLike(reviewId, userId);
+            liked = false;
+        } else {
+            reviewInteractionMapper.insertLike(reviewId, userId);
+            liked = true;
+        }
+        Map<String, Object> data = new HashMap<>();
+        data.put("liked", liked);
+        data.put("likeCount", reviewInteractionMapper.countLikes(reviewId));
+        return BaseResult.success(data);
+    }
+
+    @GetMapping("/likes")
+    @ApiOperation(value = "批量点赞摘要", notes = "ids=1,2,3；返回每条评价的点赞数与当前用户是否已赞")
+    public BaseResult likeSummary(@RequestParam String ids, HttpServletRequest request) {
+        Integer userId = getUserIdFromRequest(request);
+        List<Integer> reviewIds = new ArrayList<>();
+        for (String part : ids.split(",")) {
+            try {
+                reviewIds.add(Integer.parseInt(part.trim()));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        if (reviewIds.isEmpty()) {
+            return BaseResult.success(new ArrayList<>());
+        }
+        return BaseResult.success(reviewInteractionMapper.selectLikeSummary(reviewIds, userId));
+    }
+
+    @PostMapping("/{reviewId}/reply")
+    @ApiOperation(value = "回复评价", notes = "需登录，内容至少 2 个字符")
+    public BaseResult reply(@PathVariable Integer reviewId, @RequestBody Map<String, String> body,
+                            HttpServletRequest request) {
+        Integer userId = getUserIdFromRequest(request);
+        if (userId == null) {
+            return BaseResult.error(401, "未登录");
+        }
+        String content = body.get("content") == null ? "" : body.get("content").trim();
+        if (content.length() < 2) {
+            return BaseResult.error(400, "回复内容太短");
+        }
+        reviewInteractionMapper.insertReply(reviewId, userId, content);
+        return BaseResult.success("回复成功", reviewInteractionMapper.selectReplies(reviewId));
+    }
+
+    @GetMapping("/{reviewId}/replies")
+    @ApiOperation(value = "评价的回复列表", notes = "按时间正序")
+    public BaseResult replies(@PathVariable Integer reviewId) {
+        return BaseResult.success(reviewInteractionMapper.selectReplies(reviewId));
     }
 
     @GetMapping("/order/{orderId}")

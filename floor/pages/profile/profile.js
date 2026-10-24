@@ -222,6 +222,19 @@ Page({
         checkAllComplete();
       });
 
+      // 顶部实时积分（不阻塞统计）
+      app.authRequest({
+        url: '/user/points/' + userId,
+        method: 'GET'
+      }).then(function(res) {
+        if (res && res.code === 200 && res.data && res.data.points !== undefined) {
+          self.setData({ 'userInfo.points': res.data.points });
+          var ui = app.globalData.userInfo || {};
+          ui.points = res.data.points;
+          app.updateUserInfo(ui);
+        }
+      }).catch(function() {});
+
     });
   },
 
