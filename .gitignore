@@ -60,3 +60,7 @@ Thumbs.db
 
 # WorkBuddy
 .workbuddy/
+uploads/
+
+# 用户上传文件（运行时数据）
+backend/uploads/
