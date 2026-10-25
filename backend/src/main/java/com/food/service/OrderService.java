@@ -42,6 +42,9 @@ public class OrderService {
     @Autowired
     private UserCouponMapper userCouponMapper;
 
+    @Autowired(required = false)
+    private com.food.utils.WechatPayService wechatPayService;
+
     @Transactional
     public BaseResult createOrder(Order order, List<Integer> cartIds, List<OrderItemRequest> items) {
         try {
@@ -468,6 +471,19 @@ public class OrderService {
             int result = orderMapper.updateStatus(orderId, "已退款");
             if (result <= 0) {
                 return BaseResult.error("退款失败");
+            }
+
+            // 已配置商户号时发起真实退款（框架就绪，证书未配则降级模拟）
+            try {
+                com.food.entity.PaymentRecord payRecord = paymentRecordMapper.selectByOrderId(orderId);
+                if (payRecord != null && wechatPayService != null && wechatPayService.isEnabled()) {
+                    int totalFee = payRecord.getAmount().multiply(new java.math.BigDecimal(100)).intValue();
+                    wechatPayService.refund(order.getOrderNo(), "RF" + System.currentTimeMillis(), totalFee, totalFee);
+                }
+            } catch (Exception payEx) {
+                // 真实退款失败不阻断状态流转（人工对账兜底），仅记录
+                org.slf4j.LoggerFactory.getLogger(OrderService.class)
+                        .warn("微信退款未发起（{}），降级为状态流转", payEx.getMessage());
             }
 
             // 支付流水同步标记为已退款

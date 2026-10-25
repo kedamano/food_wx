@@ -12,11 +12,62 @@ import java.util.concurrent.TimeUnit;
  */
 public class VerifyCodeUtil {
 
-    // 存储验证码的缓存，key为手机号，value为验证码
-    private static final ConcurrentHashMap<String, String> verifyCodeCache = new ConcurrentHashMap<>();
+    /**
+     * 验证码存储：默认 JVM 内存；cache.type=redis 时由 VerifyCodeRedisBridge
+     * 在启动时切换为 Redis 实现（多实例部署共享限频/防重放数据）。
+     */
+    public interface CodeStore {
+        void save(String phone, String code, int ttlSeconds);
+        String get(String phone);
+        void remove(String phone);
+        void saveSentAt(String phone, long epochMilli, int ttlSeconds);
+        Long getSentAt(String phone);
+    }
 
-    // 存储验证码发送时间的缓存，用于限制发送频率
-    private static final ConcurrentHashMap<String, Long> lastSendTimeCache = new ConcurrentHashMap<>();
+    /** 默认内存实现（带 TTL 判定，单实例开发/部署） */
+    static class MemoryStore implements CodeStore {
+        private final ConcurrentHashMap<String, String> codes = new ConcurrentHashMap<>();
+        private final ConcurrentHashMap<String, Long> sentAt = new ConcurrentHashMap<>();
+        private final ConcurrentHashMap<String, Long> codeDeadline = new ConcurrentHashMap<>();
+
+        public void save(String phone, String code, int ttlSeconds) {
+            codes.put(phone, code);
+            codeDeadline.put(phone, System.currentTimeMillis() + ttlSeconds * 1000L);
+        }
+        public String get(String phone) {
+            Long dl = codeDeadline.get(phone);
+            if (dl != null && dl < System.currentTimeMillis()) {
+                codes.remove(phone);
+                codeDeadline.remove(phone);
+                return null;
+            }
+            return codes.get(phone);
+        }
+        public void remove(String phone) {
+            codes.remove(phone);
+            codeDeadline.remove(phone);
+            sentAt.remove(phone);
+        }
+        public void saveSentAt(String phone, long epochMilli, int ttlSeconds) {
+            sentAt.put(phone, epochMilli);
+        }
+        public Long getSentAt(String phone) {
+            Long at = sentAt.get(phone);
+            if (at != null && System.currentTimeMillis() - at > 24 * 3600 * 1000L) {
+                sentAt.remove(phone);
+                return null;
+            }
+            return at;
+        }
+    }
+
+    private static volatile CodeStore store = new MemoryStore();
+
+    /** 供 Spring 启动时注入 Redis 实现（见 VerifyCodeRedisBridge） */
+    public static void setStore(CodeStore externalStore) {
+        store = externalStore;
+    }
+
 
     // 验证码有效期（分钟）
     private static final int CODE_EXPIRE_MINUTES = 5;
@@ -51,8 +102,9 @@ public class VerifyCodeUtil {
      * @param code 验证码
      */
     public static void storeVerifyCode(String phone, String code) {
-        verifyCodeCache.put(phone, code);
-        lastSendTimeCache.put(phone, System.currentTimeMillis());
+        int ttl = CODE_EXPIRE_MINUTES * 60 + 60;
+        store.save(phone, code, ttl);
+        store.saveSentAt(phone, System.currentTimeMillis(), ttl);
     }
 
     /**
@@ -65,7 +117,7 @@ public class VerifyCodeUtil {
         if (phone == null || code == null) {
             return false;
         }
-        String storedCode = verifyCodeCache.get(phone);
+        String storedCode = store.get(phone);
         if (storedCode == null) {
             return false;
         }
@@ -77,8 +129,7 @@ public class VerifyCodeUtil {
      * @param phone 手机号
      */
     public static void clearVerifyCode(String phone) {
-        verifyCodeCache.remove(phone);
-        lastSendTimeCache.remove(phone);
+        store.remove(phone);
     }
 
     /**
@@ -87,7 +138,7 @@ public class VerifyCodeUtil {
      * @return 是否可以发送
      */
     public static boolean canSendCode(String phone) {
-        Long lastSendTime = lastSendTimeCache.get(phone);
+        Long lastSendTime = store.getSentAt(phone);
         if (lastSendTime == null) {
             return true;
         }
@@ -101,7 +152,7 @@ public class VerifyCodeUtil {
      * @return 剩余等待时间（秒）
      */
     public static long getRemainingWaitTime(String phone) {
-        Long lastSendTime = lastSendTimeCache.get(phone);
+        Long lastSendTime = store.getSentAt(phone);
         if (lastSendTime == null) {
             return 0;
         }
@@ -114,17 +165,8 @@ public class VerifyCodeUtil {
      * 清理过期的验证码
      */
     private static void cleanExpiredCodes() {
-        long currentTime = System.currentTimeMillis();
-        verifyCodeCache.forEach((phone, code) -> {
-            Long lastSendTime = lastSendTimeCache.get(phone);
-            if (lastSendTime != null) {
-                long elapsedMinutes = (currentTime - lastSendTime) / (60 * 1000);
-                if (elapsedMinutes >= CODE_EXPIRE_MINUTES) {
-                    verifyCodeCache.remove(phone);
-                    lastSendTimeCache.remove(phone);
-                }
-            }
-        });
+        // 过期清理由存储层 TTL 负责：MemoryStore 由 save 时记录的时间判定（见 get 判空逻辑演进），
+        // RedisStore 由 key TTL 自动过期。此处保留空实现以兼容既有调度线程。
     }
 
     /**

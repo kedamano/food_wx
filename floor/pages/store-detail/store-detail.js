@@ -182,7 +182,7 @@ Page({
   },
 
   onCartItemMinus: function(e) {
-    var index = e.currentTarget.dataset.index;
+    var index = e.detail.index !== undefined ? e.detail.index : e.currentTarget.dataset.index;
     var app = getApp();
     var cart = app.globalData.cart || [];
     var item = cart[index];
@@ -199,7 +199,7 @@ Page({
   },
 
   onCartItemPlus: function(e) {
-    var index = e.currentTarget.dataset.index;
+    var index = e.detail.index !== undefined ? e.detail.index : e.currentTarget.dataset.index;
     var app = getApp();
     var cart = app.globalData.cart || [];
     var item = cart[index];

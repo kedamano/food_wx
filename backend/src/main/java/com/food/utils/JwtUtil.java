@@ -3,12 +3,15 @@ package com.food.utils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
@@ -16,24 +19,47 @@ public class JwtUtil {
 
     private static final Logger log = LoggerFactory.getLogger(JwtUtil.class);
 
+    /** HS512 要求密钥 >= 512bit（64 字节），短密钥循环填充到该长度 */
+    private static final int MIN_KEY_BYTES = 64;
+
     @Value("${jwt.secret}")
     private String secret;
 
     @Value("${jwt.expiration}")
     private Long expiration;
 
-    private static final int MIN_SECRET_LENGTH = 32; // 最小密钥长度
+    private volatile SecretKey signingKey;
 
-    // 启动时校验配置强度（不打印任何敏感值）
     @PostConstruct
     public void init() {
-        String envSecret = System.getenv("JWT_SECRET");
-        if (envSecret == null || envSecret.isEmpty()) {
+        buildKeyIfNeeded();
+        if (System.getenv("JWT_SECRET") == null || System.getenv("JWT_SECRET").isEmpty()) {
             log.warn("JWT 密钥使用默认值，仅适用于开发环境！生产环境请设置环境变量 JWT_SECRET");
         }
-        if (secret == null || secret.length() < MIN_SECRET_LENGTH) {
-            log.error("JWT 密钥长度不足 {} 位，存在安全隐患", MIN_SECRET_LENGTH);
+    }
+
+    /** 懒构建签名密钥：兼容 Spring 注入与纯单元测试反射注入两种路径 */
+    private SecretKey key() {
+        buildKeyIfNeeded();
+        return signingKey;
+    }
+
+    private synchronized void buildKeyIfNeeded() {
+        if (signingKey != null) {
+            return;
         }
+        byte[] bytes = secret.getBytes(StandardCharsets.UTF_8);
+        if (bytes.length < MIN_KEY_BYTES) {
+            byte[] padded = new byte[MIN_KEY_BYTES];
+            int filled = 0;
+            while (filled < MIN_KEY_BYTES) {
+                int n = Math.min(bytes.length, MIN_KEY_BYTES - filled);
+                System.arraycopy(bytes, 0, padded, filled, n);
+                filled += n;
+            }
+            bytes = padded;
+        }
+        signingKey = Keys.hmacShaKeyFor(bytes);
     }
 
     /**
@@ -50,7 +76,7 @@ public class JwtUtil {
                 .setSubject(userId.toString())
                 .setIssuedAt(nowDate)
                 .setExpiration(expireDate)
-                .signWith(SignatureAlgorithm.HS512, secret)
+                .signWith(key(), SignatureAlgorithm.HS512)
                 .compact();
     }
 
@@ -61,31 +87,13 @@ public class JwtUtil {
      */
     public Claims parseToken(String token) {
         try {
-            return Jwts.parser()
-                    .setSigningKey(secret)
+            return Jwts.parserBuilder()
+                    .setSigningKey(key())
+                    .build()
                     .parseClaimsJws(token)
                     .getBody();
         } catch (Exception e) {
             log.debug("Token 解析失败: {}", e.getClass().getSimpleName());
-            return null;
-        }
-    }
-
-    /**
-     * 宽松解析：签名合法但已过期的 Token 仍返回 Claims（供刷新换发新 Token）
-     * @return Claims；签名非法等情形返回 null
-     */
-    public Claims parseTokenIgnoreExpiry(String token) {
-        try {
-            return Jwts.parser()
-                    .setSigningKey(secret)
-                    .parseClaimsJws(token)
-                    .getBody();
-        } catch (io.jsonwebtoken.ExpiredJwtException e) {
-            // 仅过期：签名仍合法
-            return e.getClaims();
-        } catch (Exception e) {
-            log.debug("Token 宽松解析失败: {}", e.getClass().getSimpleName());
             return null;
         }
     }
@@ -127,12 +135,32 @@ public class JwtUtil {
     }
 
     /**
+     * 宽松解析：签名合法但已过期的 Token 仍返回 Claims（供刷新换发新 Token）
+     * @return Claims；签名非法等情形返回 null
+     */
+    public Claims parseTokenIgnoreExpiry(String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            // 仅过期：签名仍合法
+            return e.getClaims();
+        } catch (Exception e) {
+            log.debug("Token 宽松解析失败: {}", e.getClass().getSimpleName());
+            return null;
+        }
+    }
+
+    /**
      * 刷新Token
      * @param token Token字符串
      * @return 新的Token
      */
     public String refreshToken(String token) {
-        Claims claims = parseToken(token);
+        Claims claims = parseTokenIgnoreExpiry(token);
         if (claims == null) {
             return null;
         }

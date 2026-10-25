@@ -411,10 +411,34 @@ Page({
     });
   },
 
-  // 获取附近商家
+  // 静默解析定位：已授权才取，失败/拒绝降级为无坐标
+  resolveLocation: function (done) {
+    wx.getSetting({
+      success: function (res) {
+        if (!res.authSetting['scope.userLocation']) {
+          done(null, null);
+          return;
+        }
+        wx.getLocation({
+          type: 'wgs84',
+          success: function (loc) { done(loc.latitude, loc.longitude); },
+          fail: function () { done(null, null); }
+        });
+      },
+      fail: function () { done(null, null); }
+    });
+  },
+
+  // 获取附近商家（已授权定位则带经纬度，后端按真实距离排序；未授权按评分）
   getNearbyStores: function (onSuccess, onFail) {
-    app.authRequest({
-      url: '/store/nearby',
+    var self = this;
+    this.resolveLocation(function (lat, lng) {
+      var url = '/store/nearby';
+      if (lat != null && lng != null) {
+        url += '?lat=' + lat + '&lng=' + lng;
+      }
+      app.authRequest({
+      url: url,
       method: 'GET',
       success: function (res) {
         if (res && res.code === 200 && res.data) {
@@ -440,6 +464,7 @@ Page({
       fail: function () {
         onSuccess([]);
       }
+      });
     });
   },
 

@@ -23,10 +23,14 @@ public class WebConfig implements WebMvcConfigurer {
     @Autowired
     private JwtInterceptor jwtInterceptor;
 
+    /** 允许的源：默认 *（开发），生产用 cors.allowed-origins 配置收敛为具体域名 */
+    @Value("${cors.allowed-origins:*}")
+    private String allowedOrigins;
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOriginPatterns("*")
+                .allowedOriginPatterns(allowedOrigins.split(","))
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 // 通配源不允许携带凭据，避免不安全组合

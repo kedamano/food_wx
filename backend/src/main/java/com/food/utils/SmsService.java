@@ -8,6 +8,8 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import org.springframework.beans.factory.annotation.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -15,6 +17,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class SmsService {
+
+    private static final Logger log = LoggerFactory.getLogger(SmsService.class);
 
     @Value("${aliyun.sms.access-key-id}")
     private String accessKeyId;
@@ -63,10 +67,10 @@ public class SmsService {
     public boolean sendVerifyCode(String phoneNumber, String verifyCode) {
         // 开发模式：未配置阿里云短信时模拟发送成功，验证码打印到控制台
         if (isDevMode()) {
-            System.out.println("==================================================");
-            System.out.println("【开发模式】短信未配置，模拟发送验证码");
-            System.out.println("【开发模式】手机号: " + phoneNumber + "  验证码: " + verifyCode);
-            System.out.println("==================================================");
+            log.info("==================================================");
+            log.info("【开发模式】短信未配置，模拟发送验证码");
+            log.info("【开发模式】手机号: {}  验证码: {}", phoneNumber, verifyCode);
+            log.info("==================================================");
             return true;
         }
 
@@ -86,18 +90,18 @@ public class SmsService {
             // 检查发送结果
             if (response.getCode() != null && response.getCode().equals("OK")) {
                 // 不打印验证码明文，避免日志泄露
-                System.out.println("短信发送成功，手机号：" + phoneNumber.substring(0, 3) + "****" + phoneNumber.substring(7));
+                log.info("短信发送成功，手机号：{}****{}", phoneNumber.substring(0, 3), phoneNumber.substring(7));
                 return true;
             } else {
-                System.err.println("短信发送失败，手机号：" + phoneNumber + "，错误码：" + response.getCode());
+                log.error("短信发送失败，手机号：{}，错误码：{}", phoneNumber, response.getCode());
                 return false;
             }
         } catch (ClientException e) {
-            System.err.println("短信发送异常：" + e.getMessage());
+            log.error("短信发送异常", e);
             e.printStackTrace();
             return false;
         } catch (Exception e) {
-            System.err.println("系统异常：" + e.getMessage());
+            log.error("系统异常", e);
             e.printStackTrace();
             return false;
         }
@@ -124,7 +128,7 @@ public class SmsService {
             
             return response.getCode() != null && response.getCode().equals("OK");
         } catch (Exception e) {
-            System.err.println("批量短信发送异常：" + e.getMessage());
+            log.error("批量短信发送异常", e);
             e.printStackTrace();
             return false;
         }

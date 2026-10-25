@@ -24,6 +24,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @Api(tags = "用户管理接口")
 public class UserController {
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UserController.class);
+
     @Autowired
     private UserService userService;
 
@@ -102,7 +104,7 @@ public class UserController {
         if (sendSuccess) {
             // 明确返回成功结果
             BaseResult result = BaseResult.success("验证码已发送");
-            System.out.println("返回结果：" + result);
+            log.debug("send-verify-code 返回结果：{}", result);
             return result;
         } else {
             // 发送失败，清除验证码
@@ -356,7 +358,7 @@ public class UserController {
             @ApiImplicitParam(name = "username", value = "用户名或手机号", required = true, paramType = "body"),
             @ApiImplicitParam(name = "password", value = "密码", required = true, paramType = "body")
     })
-    public BaseResult login(@RequestBody LoginRequest loginRequest) {
+    public BaseResult login(@RequestBody @javax.validation.Valid LoginRequest loginRequest) {
         return userService.login(loginRequest.getUsername(), loginRequest.getPassword());
     }
 
@@ -738,7 +740,9 @@ public class UserController {
 
     // 内部类用于登录请求
     private static class LoginRequest {
+        @javax.validation.constraints.NotBlank(message = "用户名不能为空")
         private String username;
+        @javax.validation.constraints.NotBlank(message = "密码不能为空")
         private String password;
 
         public String getUsername() {

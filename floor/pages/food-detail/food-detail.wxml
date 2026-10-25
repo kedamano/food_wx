@@ -159,39 +159,13 @@
 </view>
 
 <!-- 购物车详情弹窗 -->
-<view class="cart-popup-mask" wx:if="{{showCartPopup}}" bindtap="hideCartPopup"></view>
-<view class="cart-popup {{showCartPopup ? 'cart-popup-show' : ''}}">
-  <view class="cart-popup-header">
-    <text class="cart-popup-title">购物车</text>
-    <text class="cart-popup-count" wx:if="{{cartPopupItems.length > 0}}">共{{cartPopupCount}}件</text>
-    <text class="cart-popup-clear" wx:if="{{cartPopupItems.length > 0}}" bindtap="clearCart">清空</text>
-  </view>
-  <scroll-view class="cart-popup-list" scroll-y enhanced show-scrollbar="{{false}}">
-    <view class="cart-popup-empty" wx:if="{{cartPopupItems.length === 0}}">
-      <text class="i cart-empty-icon -shopping-cart i-bag" style="font-size:80rpx;"></text>
-      <text class="cart-empty-text">购物车是空的</text>
-    </view>
-    <view class="cart-popup-item" wx:for="{{cartPopupItems}}" wx:key="foodId">
-      <image class="cart-item-img" src="{{item.image}}" mode="aspectFill"></image>
-      <view class="cart-item-info">
-        <text class="cart-item-name">{{item.name}}</text>
-        <text class="cart-item-price">¥{{item.price}}</text>
-      </view>
-      <view class="cart-item-right">
-        <text class="cart-item-subtotal">¥{{item.subtotal}}</text>
-        <view class="cart-item-qty">
-          <view class="qty-btn" bindtap="onCartItemMinus" data-index="{{index}}">-</view>
-          <text class="qty-num">{{item.quantity}}</text>
-          <view class="qty-btn qty-plus" bindtap="onCartItemPlus" data-index="{{index}}">+</view>
-        </view>
-      </view>
-    </view>
-  </scroll-view>
-  <view class="cart-popup-footer" wx:if="{{cartPopupItems.length > 0}}">
-    <view class="cart-popup-total">
-      <text class="cart-total-label">合计</text>
-      <text class="cart-total-price">¥{{cartPopupTotal}}</text>
-    </view>
-    <view class="cart-popup-go" bindtap="goToCart">去购物车</view>
-  </view>
-</view>
+<cart-popup
+  show="{{showCartPopup}}"
+  items="{{cartPopupItems}}"
+  count="{{cartPopupCount}}"
+  total="{{cartPopupTotal}}"
+  bind:close="hideCartPopup"
+  bind:clear="clearCart"
+  bind:gocart="goToCart"
+  bind:minus="onCartItemMinus"
+  bind:plus="onCartItemPlus"></cart-popup>

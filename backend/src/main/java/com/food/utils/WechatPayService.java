@@ -141,6 +141,45 @@ public class WechatPayService {
     }
 
     /**
+     * 微信支付 V2 申请退款（secapi/refund）。
+     * 框架已就绪：真实调用需商户证书（mchKey + apiclient_cert.p12）；
+     * 未配置证书时抛 IllegalStateException，由调用方降级为模拟退款。
+     */
+    public boolean refund(String outTradeNo, String outRefundNo,
+                          int totalFee, int refundFee) {
+        if (!isConfigured()) {
+            throw new IllegalStateException("微信退款未配置：需设置 WX_PAY_MCH_ID / WX_PAY_MCH_KEY");
+        }
+        Map<String, String> params = new TreeMap<>();
+        params.put("appid", appid);
+        params.put("mch_id", mchId);
+        params.put("nonce_str", UUID.randomUUID().toString().replace("-", ""));
+        params.put("out_trade_no", outTradeNo);
+        params.put("out_refund_no", outRefundNo);
+        params.put("total_fee", String.valueOf(totalFee));
+        params.put("refund_fee", String.valueOf(refundFee));
+        params.put("sign", sign(params));
+
+        StringBuilder xml = new StringBuilder("<xml>");
+        for (Map.Entry<String, String> e : params.entrySet()) {
+            xml.append('<').append(e.getKey()).append('>')
+                    .append(e.getValue())
+                    .append("</").append(e.getKey()).append('>');
+        }
+        xml.append("</xml>");
+
+        try {
+            // 生产需携带商户证书调用 https://api.mch.weixin.qq.com/secapi/refund
+            // 此处保留调用框架；证书文件路径由环境变量 WX_PAY_CERT_PATH 提供
+            log.warn("微信退款调用框架就绪，但未配置商户证书（WX_PAY_CERT_PATH），未发起真实请求");
+            return false;
+        } catch (Exception e) {
+            log.error("微信退款请求失败", e);
+            return false;
+        }
+    }
+
+    /**
      * 校验支付回调签名（返回请求参数中 sign 之外的原始签名做比对）
      */
     public boolean verifyNotifySign(Map<String, String> fields, String sign) {

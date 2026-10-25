@@ -68,4 +68,22 @@
         ORDER BY rating DESC
     </select>
 
+    <select id="selectNearby" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumnList"/>,
+        CASE WHEN lat IS NULL OR lng IS NULL THEN NULL
+             ELSE SQRT(POW(lat - #{lat}, 2) + POW(lng - #{lng}, 2))
+        END AS dist
+        FROM stores
+        WHERE status = 1
+        <choose>
+            <when test="lat != null and lng != null">
+                ORDER BY dist IS NULL, dist ASC
+            </when>
+            <otherwise>
+                ORDER BY rating DESC
+            </otherwise>
+        </choose>
+    </select>
+
 </mapper>

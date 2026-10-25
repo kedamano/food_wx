@@ -1,3 +1,6 @@
+-- 每个测试上下文重置为确定性状态（多个 @SpringBootTest 上下文共享 JVM 内 H2）
+DROP ALL OBJECTS;
+
 -- H2 测试数据库建表脚本 (MySQL 兼容模式)
 -- 注意: H2 不支持 JSON 类型, 使用 TEXT 替代; 不支持 VIRTUAL 列
 

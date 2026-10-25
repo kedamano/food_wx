@@ -1,4 +1,6 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "cart-popup": "/components/cart-popup/cart-popup"
+  },
   "enablePullDownRefresh": false
 }

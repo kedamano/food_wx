@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@org.springframework.context.annotation.Profile("!prod")
 @RestController
 @RequestMapping("/test")
 @Api(tags = "测试接口")
@@ -21,7 +22,7 @@ public class TestController {
     @GetMapping("/health")
     @ApiOperation(value = "健康检查", notes = "系统健康状态检查")
     public BaseResult health() {
-        System.out.println("Health check: System is running normally");
+        
         return BaseResult.success("系统运行正常", null);
     }
 

@@ -46,8 +46,8 @@ public class StoreService {
 
     public BaseResult getNearbyStores(Double lat, Double lng) {
         try {
-            List<Store> stores = storeMapper.selectAll();
-            // 简单返回所有商家，实际项目中应根据经纬度计算距离排序
+            // 有坐标按近似距离升序（1 度 ≈ 111km，市区尺度平面近似足够）；无坐标按评分
+            List<Store> stores = storeMapper.selectNearby(lat, lng);
             return BaseResult.success(stores);
         } catch (Exception e) {
             return BaseResult.error("获取附近商家失败: " + e.getMessage());

@@ -50,7 +50,7 @@ public class OrderController {
 
     @PostMapping
     @ApiOperation(value = "创建订单", notes = "从购物车创建订单")
-    public BaseResult createOrder(@RequestBody OrderRequest orderRequest, HttpServletRequest request) {
+    public BaseResult createOrder(@RequestBody @javax.validation.Valid OrderRequest orderRequest, HttpServletRequest request) {
         Integer userId = getUserIdFromRequest(request);
         if (userId == null) {
             return BaseResult.error(401, "未登录");
@@ -590,6 +590,7 @@ public class OrderController {
 
     // 内部类用于订单创建请求
     public static class OrderRequest {
+        @javax.validation.constraints.NotNull(message = "storeId 不能为空")
         private Integer storeId;
         private String storeName;
         private BigDecimal totalAmount;

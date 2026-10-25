@@ -1,0 +1,45 @@
+# =====================================================================
+# 生产环境配置（--spring.profiles.active=prod 激活）
+# 敏感项全部从环境变量读取，无默认值回退（未设置即启动失败，fail-fast）
+# =====================================================================
+spring:
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:food_wx}?useUnicode=true&character_set_server=utf8mb4&useSSL=false&serverTimezone=Asia/Shanghai
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+
+  # 生产关闭 SQL 全量打印
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+
+# Swagger 生产关闭
+swagger:
+  enabled: false
+
+# JWT：必须显式提供，无开发默认值
+jwt:
+  secret: ${JWT_SECRET}
+
+# CORS 收敛为具体域名（逗号分隔）
+cors:
+  allowed-origins: ${CORS_ORIGINS:https://your-miniapp-h5.example.com}
+
+# 缓存：生产用 Redis（验证码/热点共享）
+cache:
+  type: redis
+
+file:
+  upload-dir: ${FILE_UPLOAD_DIR:/data/foodwx/uploads}
+  image-dir: ${FILE_IMAGE_DIR:file:///data/foodwx/images/}
+
+logging:
+  level:
+    com.food: INFO

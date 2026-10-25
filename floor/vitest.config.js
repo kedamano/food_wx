@@ -38,10 +38,10 @@ module.exports = defineConfig({
         'app.js'
       ],
       thresholds: {
-        branches: 10,
-        functions: 10,
-        lines: 10,
-        statements: 10
+        branches: 40,
+        functions: 50,
+        lines: 40,
+        statements: 40
       }
     }
   }

@@ -29,6 +29,15 @@ public class GlobalExceptionHandler {
         return BaseResult.error(400, "参数格式不正确");
     }
 
+    /** 参数校验失败（@Valid）：返回 400 + 首条校验消息 */
+    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
+    public BaseResult handleValidation(org.springframework.web.bind.MethodArgumentNotValidException e) {
+        String msg = e.getBindingResult().getFieldErrors().isEmpty() ? "参数不合法"
+                : e.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
+        log.warn("参数校验失败: {}", msg);
+        return BaseResult.error(400, msg);
+    }
+
     /** 业务规则错误（Service 中主动抛出的 RuntimeException） */
     @ExceptionHandler(RuntimeException.class)
     public BaseResult handleRuntime(RuntimeException e) {

@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface OrderMapper {
@@ -47,7 +48,18 @@ public interface OrderMapper {
 
     int deleteById(Integer orderId);
 
+    /** 今日订单数（每日任务判定用） */
     @Select("SELECT COUNT(*) FROM orders WHERE user_id = #{userId} AND DATE(create_time) = CURDATE()")
     int countTodayByUser(@Param("userId") Integer userId);
+
+    /** 聚合统计（SQL 化，替代全量拉内存计算） */
+    @Select("SELECT COUNT(*) AS totalOrders, " +
+            "SUM(CASE WHEN status='待付款' THEN 1 ELSE 0 END) AS pendingOrders, " +
+            "SUM(CASE WHEN status='制作中' THEN 1 ELSE 0 END) AS preparingOrders, " +
+            "SUM(CASE WHEN status='配送中' THEN 1 ELSE 0 END) AS deliveringOrders, " +
+            "SUM(CASE WHEN status='已完成' THEN 1 ELSE 0 END) AS completedOrders, " +
+            "COALESCE(SUM(CASE WHEN status NOT IN ('已取消','已退款','待付款') THEN pay_amount ELSE 0 END), 0) AS totalSpent " +
+            "FROM orders WHERE user_id = #{userId}")
+    Map<String, Object> statisticsByUser(@Param("userId") Integer userId);
 
 }
